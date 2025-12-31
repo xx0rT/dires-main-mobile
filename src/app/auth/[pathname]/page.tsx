@@ -1,5 +1,4 @@
 import { AuthCard, AuthLoading } from "@daveyplate/better-auth-ui"
-import { authViewPaths } from "@daveyplate/better-auth-ui/server"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { WelcomeToast } from "@/components/layout/auth-loading-toast"
@@ -10,9 +9,7 @@ export const metadata: Metadata = {
     title: "Authentication"
 }
 
-export function generateStaticParams() {
-    return Object.values(authViewPaths).map((pathname) => ({ pathname }))
-}
+export const dynamic = 'force-dynamic'
 
 export default async function AuthPage({
     params
