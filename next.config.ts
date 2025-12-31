@@ -1,7 +1,6 @@
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-    /* config options here */
     images: {
         remotePatterns: [
             {
@@ -9,7 +8,12 @@ const nextConfig: NextConfig = {
                 hostname: "images.unsplash.com"
             }
         ]
-    }
+    },
+    experimental: {
+        workerThreads: false,
+        cpus: 1
+    },
+    productionBrowserSourceMaps: false
 }
 
 export default nextConfig
