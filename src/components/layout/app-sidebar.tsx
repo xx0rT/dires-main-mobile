@@ -1,10 +1,10 @@
 import {
-  RiCodeSSlashLine,
-  RiLineChartLine,
-  RiToolsFill,
   RiSettingsLine,
   RiSpeedUpLine,
-  RiBankCardLine,
+  RiBookOpenLine,
+  RiUserLine,
+  RiAwardLine,
+  RiGroupLine,
 } from '@remixicon/react'
 import { Link, useLocation } from 'react-router-dom'
 import type * as React from 'react'
@@ -26,14 +26,14 @@ import { site } from '@/config/site'
 const data = {
   navMain: [
     {
-      title: 'General',
+      title: 'Hlavní',
       items: [
-        { title: 'Dashboard', url: '/dashboard', icon: RiSpeedUpLine },
-        { title: 'Analytics', url: '/dashboard/analytics', icon: RiLineChartLine },
-        { title: 'Integrations', url: '/dashboard/integrations', icon: RiToolsFill },
-        { title: 'Settings', url: '/dashboard/settings', icon: RiSettingsLine },
-        { title: 'Billing', url: '/dashboard/billing', icon: RiBankCardLine },
-        { title: 'API', url: '/dashboard/api', icon: RiCodeSSlashLine },
+        { title: 'Přehled', url: '/dashboard', icon: RiSpeedUpLine },
+        { title: 'Kurzy', url: '/dashboard/analytics', icon: RiBookOpenLine },
+        { title: 'Studenti', url: '/dashboard/integrations', icon: RiGroupLine },
+        { title: 'Lektoři', url: '/dashboard/api', icon: RiUserLine },
+        { title: 'Certifikáty', url: '/dashboard/billing', icon: RiAwardLine },
+        { title: 'Nastavení', url: '/dashboard/settings', icon: RiSettingsLine },
       ],
     },
   ],

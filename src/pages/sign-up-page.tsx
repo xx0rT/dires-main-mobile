@@ -26,17 +26,17 @@ export default function SignUpPage() {
     e.preventDefault()
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match')
+      toast.error('Hesla se neshodují')
       return
     }
 
     if (!agreeToTerms) {
-      toast.error('Please agree to the terms and conditions')
+      toast.error('Prosím, souhlaste s podmínkami použití')
       return
     }
 
     if (password.length < 6) {
-      toast.error('Password must be at least 6 characters')
+      toast.error('Heslo musí mít alespoň 6 znaků')
       return
     }
 
@@ -44,9 +44,9 @@ export default function SignUpPage() {
 
     try {
       await signUp(email, password)
-      toast.success('Account created successfully!')
+      toast.success('Účet byl úspěšně vytvořen!')
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create account')
+      toast.error(error.message || 'Vytvoření účtu se nezdařilo')
     } finally {
       setLoading(false)
     }
@@ -61,9 +61,9 @@ export default function SignUpPage() {
             <img src={site.logo} alt={site.name} width={40} height={40} />
             <span className="text-2xl font-bold">{site.name}</span>
           </Link>
-          <h2 className="text-4xl font-bold mb-4">Start your journey today</h2>
+          <h2 className="text-4xl font-bold mb-4">Začněte svou cestu dnes</h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of users who trust us with their business.
+            Připojte se k tisícům fyzioterapeutů, kteří nám důvěřují se svými kurzy.
           </p>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
@@ -73,8 +73,8 @@ export default function SignUpPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">100% Secure</h3>
-                <p className="text-muted-foreground text-sm">Your information is encrypted and protected.</p>
+                <h3 className="font-semibold mb-1">100% zabezpečeno</h3>
+                <p className="text-muted-foreground text-sm">Vaše informace jsou šifrovány a chráněny.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -84,8 +84,8 @@ export default function SignUpPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Quick Setup</h3>
-                <p className="text-muted-foreground text-sm">Get started in less than 2 minutes.</p>
+                <h3 className="font-semibold mb-1">Rychlé nastavení</h3>
+                <p className="text-muted-foreground text-sm">Začněte během 2 minut.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -95,8 +95,8 @@ export default function SignUpPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">24/7 Support</h3>
-                <p className="text-muted-foreground text-sm">We're here to help whenever you need us.</p>
+                <h3 className="font-semibold mb-1">Podpora 24/7</h3>
+                <p className="text-muted-foreground text-sm">Jsme tu, abychom vám pomohli, kdykoli to potřebujete.</p>
               </div>
             </div>
           </div>
@@ -110,9 +110,9 @@ export default function SignUpPage() {
               <img src={site.logo} alt={site.name} width={32} height={32} />
               <span className="text-xl font-bold">{site.name}</span>
             </div>
-            <CardTitle className="text-2xl">Create an account</CardTitle>
+            <CardTitle className="text-2xl">Vytvořit účet</CardTitle>
             <CardDescription>
-              Enter your information to get started
+              Zadejte své údaje pro začátek
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -122,7 +122,7 @@ export default function SignUpPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder="jmeno@priklad.cz"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -130,11 +130,11 @@ export default function SignUpPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Heslo</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Create a strong password"
+                  placeholder="Vytvořte silné heslo"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -143,11 +143,11 @@ export default function SignUpPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">Potvrzení hesla</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="Confirm your password"
+                  placeholder="Potvrďte své heslo"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -165,18 +165,18 @@ export default function SignUpPage() {
                   htmlFor="terms"
                   className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  I agree to the{' '}
+                  Souhlasím s{' '}
                   <Link to="/terms" className="text-primary hover:underline">
-                    Terms of Service
+                    podmínkami služby
                   </Link>{' '}
-                  and{' '}
+                  a{' '}
                   <Link to="/privacy" className="text-primary hover:underline">
-                    Privacy Policy
+                    zásadami ochrany osobních údajů
                   </Link>
                 </label>
               </div>
               <Button type="submit" className="w-full group" disabled={loading}>
-                {loading ? 'Creating account...' : 'Create account'}
+                {loading ? 'Vytváření účtu...' : 'Vytvořit účet'}
                 <RiArrowRightLine className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </form>
@@ -187,7 +187,7 @@ export default function SignUpPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-card px-2 text-muted-foreground">
-                  Or continue with
+                  Nebo pokračujte s
                 </span>
               </div>
             </div>
@@ -196,16 +196,16 @@ export default function SignUpPage() {
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => toast.info('Social login coming soon!')}
+              onClick={() => toast.info('Sociální přihlášení již brzy!')}
             >
               <RiGithubFill className="mr-2 h-4 w-4" />
               GitHub
             </Button>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              Already have an account?{' '}
+              Již máte účet?{' '}
               <Link to="/auth/sign-in" className="font-medium text-primary hover:underline">
-                Sign in
+                Přihlaste se
               </Link>
             </p>
           </CardContent>

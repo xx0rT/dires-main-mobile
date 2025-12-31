@@ -1,68 +1,68 @@
 import { useAuth } from '@/lib/auth-context'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { RiUserLine, RiLineChartLine, RiShieldCheckLine, RiCalendarLine } from '@remixicon/react'
+import { RiUserLine, RiBookOpenLine, RiAwardLine, RiCalendarLine } from '@remixicon/react'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 
 const stats = [
   {
-    title: 'Total Users',
-    value: '2,543',
-    change: '+12.5%',
+    title: 'Celkem studentů',
+    value: '248',
+    change: '+24 tento měsíc',
     icon: RiUserLine,
     trend: 'up'
   },
   {
-    title: 'Revenue',
-    value: '$45,231',
-    change: '+8.2%',
-    icon: RiLineChartLine,
+    title: 'Aktivní kurzy',
+    value: '8',
+    change: '3 probíhající',
+    icon: RiBookOpenLine,
     trend: 'up'
   },
   {
-    title: 'Active Projects',
-    value: '12',
-    change: '+3',
-    icon: RiShieldCheckLine,
+    title: 'Vydané certifikáty',
+    value: '156',
+    change: '+12 tento týden',
+    icon: RiAwardLine,
     trend: 'up'
   },
   {
-    title: 'This Month',
-    value: '148',
-    change: '-2.4%',
+    title: 'Nadcházející lekce',
+    value: '23',
+    change: 'Příští 7 dní',
     icon: RiCalendarLine,
-    trend: 'down'
+    trend: 'neutral'
   }
 ]
 
 const recentActivity = [
   {
     id: 1,
-    title: 'New user registration',
-    description: 'john.doe@example.com signed up',
-    time: '2 minutes ago',
+    title: 'Nový student registrován',
+    description: 'Jana Nováková se přihlásila do kurzu Manuální terapie',
+    time: 'Před 15 minutami',
     type: 'user'
   },
   {
     id: 2,
-    title: 'Payment received',
-    description: 'Invoice #1234 paid',
-    time: '1 hour ago',
-    type: 'payment'
+    title: 'Certifikát vystaven',
+    description: 'Petr Svoboda úspěšně dokončil kurz Sportovní fyzioterapie',
+    time: 'Před 1 hodinou',
+    type: 'certificate'
   },
   {
     id: 3,
-    title: 'Project completed',
-    description: 'Website redesign finished',
-    time: '3 hours ago',
-    type: 'project'
+    title: 'Nový kurz přidán',
+    description: 'Kurz "Kineziologický taping" byl publikován',
+    time: 'Před 3 hodinami',
+    type: 'course'
   },
   {
     id: 4,
-    title: 'New feature deployed',
-    description: 'API v2.0 is now live',
-    time: '1 day ago',
-    type: 'deployment'
+    title: 'Nadcházející lekce',
+    description: 'Manuální terapie - Modul 2 začíná zítra v 9:00',
+    time: 'Před 1 dnem',
+    type: 'event'
   }
 ]
 
@@ -71,19 +71,19 @@ export default function DashboardPage() {
 
   const getGreeting = () => {
     const hour = new Date().getHours()
-    if (hour < 12) return 'Good morning'
-    if (hour < 18) return 'Good afternoon'
-    return 'Good evening'
+    if (hour < 12) return 'Dobré ráno'
+    if (hour < 18) return 'Dobré odpoledne'
+    return 'Dobrý večer'
   }
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold">
-          {getGreeting()}, {user?.email?.split('@')[0] || 'there'}!
+          {getGreeting()}, {user?.email?.split('@')[0] || 'vítejte'}!
         </h1>
         <p className="text-muted-foreground mt-2">
-          Here's what's happening with your account today.
+          Zde je přehled vašich kurzů a aktivity studentů.
         </p>
       </div>
 
@@ -100,8 +100,8 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
-                <p className={`text-xs ${stat.trend === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {stat.change} from last month
+                <p className={`text-xs ${stat.trend === 'up' ? 'text-green-600 dark:text-green-400' : stat.trend === 'down' ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}>
+                  {stat.change}
                 </p>
               </CardContent>
             </Card>
@@ -112,18 +112,18 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Overview</CardTitle>
+            <CardTitle>Přehled kurzů</CardTitle>
             <CardDescription>
-              Your account statistics for the last 30 days
+              Statistiky vašich kurzů za posledních 30 dní
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
             <div className="h-[300px] flex items-center justify-center text-muted-foreground">
               <div className="text-center space-y-4">
-                <RiLineChartLine className="h-16 w-16 mx-auto opacity-50" />
-                <p>Chart visualization coming soon</p>
+                <RiBookOpenLine className="h-16 w-16 mx-auto opacity-50" />
+                <p>Grafická vizualizace bude brzy dostupná</p>
                 <Button asChild variant="outline" size="sm">
-                  <Link to="/dashboard/analytics">View Analytics</Link>
+                  <Link to="/dashboard/analytics">Zobrazit všechny kurzy</Link>
                 </Button>
               </div>
             </div>
@@ -132,9 +132,9 @@ export default function DashboardPage() {
 
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>Poslední aktivita</CardTitle>
             <CardDescription>
-              Latest events from your account
+              Nejnovější události z vašich kurzů
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -165,28 +165,28 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle>Rychlé akce</CardTitle>
             <CardDescription>
-              Common tasks and shortcuts
+              Běžné úkoly a zkratky
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <Button asChild variant="outline" className="w-full justify-start">
-              <Link to="/dashboard/settings">
-                <RiUserLine className="mr-2 h-4 w-4" />
-                Update Profile
+              <Link to="/dashboard/analytics">
+                <RiBookOpenLine className="mr-2 h-4 w-4" />
+                Přidat nový kurz
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full justify-start">
-              <Link to="/dashboard/api">
-                <RiShieldCheckLine className="mr-2 h-4 w-4" />
-                API Keys
+              <Link to="/dashboard/integrations">
+                <RiUserLine className="mr-2 h-4 w-4" />
+                Spravovat studenty
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full justify-start">
               <Link to="/dashboard/billing">
-                <RiCalendarLine className="mr-2 h-4 w-4" />
-                Billing
+                <RiAwardLine className="mr-2 h-4 w-4" />
+                Vystavit certifikát
               </Link>
             </Button>
           </CardContent>
@@ -194,9 +194,9 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Getting Started</CardTitle>
+            <CardTitle>Začínáme</CardTitle>
             <CardDescription>
-              Complete these steps to get the most out of your account
+              Dokončete tyto kroky pro plné využití platformy
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -207,8 +207,8 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium">Create your account</p>
-                <p className="text-xs text-muted-foreground">You've successfully signed up</p>
+                <p className="text-sm font-medium">Vytvořit účet</p>
+                <p className="text-xs text-muted-foreground">Úspěšně jste se zaregistrovali</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -216,8 +216,8 @@ export default function DashboardPage() {
                 <div className="h-3 w-3 rounded-full border-2 border-primary" />
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium">Complete your profile</p>
-                <p className="text-xs text-muted-foreground">Add your information in settings</p>
+                <p className="text-sm font-medium">Přidat první kurz</p>
+                <p className="text-xs text-muted-foreground">Vytvořte svůj první fyzioterapeutický kurz</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -225,8 +225,8 @@ export default function DashboardPage() {
                 <div className="h-3 w-3 rounded-full border-2 border-muted-foreground" />
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium">Connect integrations</p>
-                <p className="text-xs text-muted-foreground">Link your favorite tools</p>
+                <p className="text-sm font-medium">Pozvat studenty</p>
+                <p className="text-xs text-muted-foreground">Sdílejte kurzy se svými studenty</p>
               </div>
             </div>
           </CardContent>

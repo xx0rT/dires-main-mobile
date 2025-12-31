@@ -27,9 +27,9 @@ export default function SignInPage() {
 
     try {
       await signIn(email, password)
-      toast.success('Signed in successfully!')
+      toast.success('Úspěšně přihlášeno!')
     } catch (error: any) {
-      toast.error(error.message || 'Authentication failed')
+      toast.error(error.message || 'Přihlášení se nezdařilo')
     } finally {
       setLoading(false)
     }
@@ -44,9 +44,9 @@ export default function SignInPage() {
             <img src={site.logo} alt={site.name} width={40} height={40} />
             <span className="text-2xl font-bold">{site.name}</span>
           </Link>
-          <h2 className="text-4xl font-bold mb-4">Welcome back!</h2>
+          <h2 className="text-4xl font-bold mb-4">Vítejte zpět!</h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Sign in to access your dashboard and manage your account.
+            Přihlaste se pro přístup k vašim kurzům a správě studentů.
           </p>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
@@ -56,8 +56,8 @@ export default function SignInPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Secure Authentication</h3>
-                <p className="text-muted-foreground text-sm">Your data is protected with industry-standard security.</p>
+                <h3 className="font-semibold mb-1">Bezpečné přihlášení</h3>
+                <p className="text-muted-foreground text-sm">Vaše data jsou chráněna nejmodernějším zabezpečením.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -67,8 +67,8 @@ export default function SignInPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Lightning Fast</h3>
-                <p className="text-muted-foreground text-sm">Experience blazing fast performance and reliability.</p>
+                <h3 className="font-semibold mb-1">Rychlý přístup</h3>
+                <p className="text-muted-foreground text-sm">Okamžitý přístup ke všem vašim kurzům a materiálům.</p>
               </div>
             </div>
           </div>
@@ -82,9 +82,9 @@ export default function SignInPage() {
               <img src={site.logo} alt={site.name} width={32} height={32} />
               <span className="text-xl font-bold">{site.name}</span>
             </div>
-            <CardTitle className="text-2xl">Sign in to your account</CardTitle>
+            <CardTitle className="text-2xl">Přihlášení do účtu</CardTitle>
             <CardDescription>
-              Enter your email and password to access your account
+              Zadejte svůj email a heslo pro přístup
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -94,7 +94,7 @@ export default function SignInPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder="jmeno@priklad.cz"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -103,12 +103,12 @@ export default function SignInPage() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">Heslo</Label>
                   <Link
                     to="/auth/forgot-password"
                     className="text-sm text-primary hover:underline"
                   >
-                    Forgot password?
+                    Zapomenuté heslo?
                   </Link>
                 </div>
                 <Input
@@ -130,11 +130,11 @@ export default function SignInPage() {
                   htmlFor="remember"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  Remember me
+                  Zapamatovat si mě
                 </label>
               </div>
               <Button type="submit" className="w-full group" disabled={loading}>
-                {loading ? 'Signing in...' : 'Sign in'}
+                {loading ? 'Přihlašování...' : 'Přihlásit se'}
                 <RiArrowRightLine className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </form>
@@ -145,7 +145,7 @@ export default function SignInPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-card px-2 text-muted-foreground">
-                  Or continue with
+                  Nebo pokračujte s
                 </span>
               </div>
             </div>
@@ -154,16 +154,16 @@ export default function SignInPage() {
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => toast.info('Social login coming soon!')}
+              onClick={() => toast.info('Sociální přihlášení již brzy!')}
             >
               <RiGithubFill className="mr-2 h-4 w-4" />
               GitHub
             </Button>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              Don't have an account?{' '}
+              Nemáte ještě účet?{' '}
               <Link to="/auth/sign-up" className="font-medium text-primary hover:underline">
-                Sign up
+                Zaregistrujte se
               </Link>
             </p>
           </CardContent>

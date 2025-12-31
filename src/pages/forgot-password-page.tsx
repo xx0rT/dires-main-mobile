@@ -26,9 +26,9 @@ export default function ForgotPasswordPage() {
       if (error) throw error
 
       setEmailSent(true)
-      toast.success('Password reset email sent!')
+      toast.success('Email pro obnovení hesla byl odeslán!')
     } catch (error: any) {
-      toast.error(error.message || 'Failed to send reset email')
+      toast.error(error.message || 'Odeslání emailu se nezdařilo')
     } finally {
       setLoading(false)
     }
@@ -48,9 +48,9 @@ export default function ForgotPasswordPage() {
           <CardHeader className="space-y-1">
             {!emailSent ? (
               <>
-                <CardTitle className="text-2xl">Reset your password</CardTitle>
+                <CardTitle className="text-2xl">Obnovení hesla</CardTitle>
                 <CardDescription>
-                  Enter your email address and we'll send you a link to reset your password
+                  Zadejte svůj email a my vám pošleme odkaz pro obnovení hesla
                 </CardDescription>
               </>
             ) : (
@@ -60,9 +60,9 @@ export default function ForgotPasswordPage() {
                     <RiMailLine className="h-6 w-6 text-primary" />
                   </div>
                 </div>
-                <CardTitle className="text-2xl text-center">Check your email</CardTitle>
+                <CardTitle className="text-2xl text-center">Zkontrolujte svůj email</CardTitle>
                 <CardDescription className="text-center">
-                  We've sent a password reset link to {email}
+                  Poslali jsme odkaz pro obnovení hesla na {email}
                 </CardDescription>
               </>
             )}
@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="name@example.com"
+                    placeholder="jmeno@priklad.cz"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -83,20 +83,20 @@ export default function ForgotPasswordPage() {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Sending...' : 'Send reset link'}
+                  {loading ? 'Odesílání...' : 'Odeslat odkaz pro obnovení'}
                 </Button>
               </form>
             ) : (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground text-center">
-                  Didn't receive the email? Check your spam folder or try again.
+                  Nedostali jste email? Zkontrolujte složku spam nebo to zkuste znovu.
                 </p>
                 <Button
                   variant="outline"
                   className="w-full"
                   onClick={() => setEmailSent(false)}
                 >
-                  Try another email
+                  Zkusit jiný email
                 </Button>
               </div>
             )}
@@ -107,7 +107,7 @@ export default function ForgotPasswordPage() {
                 className="flex items-center justify-center text-sm text-primary hover:underline"
               >
                 <RiArrowLeftLine className="mr-2 h-4 w-4" />
-                Back to sign in
+                Zpět na přihlášení
               </Link>
             </div>
           </CardContent>

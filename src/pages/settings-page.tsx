@@ -21,12 +21,12 @@ export default function SettingsPage() {
     e.preventDefault()
 
     if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match')
+      toast.error('Hesla se neshodují')
       return
     }
 
     if (newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters')
+      toast.error('Heslo musí mít alespoň 6 znaků')
       return
     }
 
@@ -39,12 +39,12 @@ export default function SettingsPage() {
 
       if (error) throw error
 
-      toast.success('Password updated successfully!')
+      toast.success('Heslo bylo úspěšně aktualizováno!')
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update password')
+      toast.error(error.message || 'Aktualizace hesla se nezdařila')
     } finally {
       setLoading(false)
     }
@@ -53,34 +53,34 @@ export default function SettingsPage() {
   const handleSignOut = async () => {
     try {
       await signOut()
-      toast.success('Signed out successfully')
+      toast.success('Úspěšně odhlášeno')
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign out')
+      toast.error(error.message || 'Odhlášení se nezdařilo')
     }
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
+        <h1 className="text-3xl font-bold">Nastavení</h1>
         <p className="text-muted-foreground">
-          Manage your account settings and preferences
+          Spravujte své nastavení účtu a preference
         </p>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="profile">Profil</TabsTrigger>
+          <TabsTrigger value="security">Zabezpečení</TabsTrigger>
+          <TabsTrigger value="notifications">Upozornění</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
+              <CardTitle>Informace o profilu</CardTitle>
               <CardDescription>
-                Update your account profile information
+                Aktualizujte informace svého účtu
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -90,10 +90,10 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Button variant="outline" size="sm">
-                    Change Avatar
+                    Změnit avatar
                   </Button>
                   <p className="text-xs text-muted-foreground">
-                    JPG, GIF or PNG. Max size of 800K
+                    JPG, GIF nebo PNG. Maximální velikost 800 KB
                   </p>
                 </div>
               </div>
@@ -112,16 +112,16 @@ export default function SettingsPage() {
                       className="flex-1"
                     />
                     <Button variant="outline" disabled>
-                      Verified
+                      Ověřeno
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Your email address is verified and cannot be changed
+                    Váš email je ověřený a nelze jej změnit
                   </p>
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="userId">User ID</Label>
+                  <Label htmlFor="userId">ID uživatele</Label>
                   <Input
                     id="userId"
                     value={user?.id || ''}
@@ -131,10 +131,10 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="created">Account Created</Label>
+                  <Label htmlFor="created">Účet vytvořen</Label>
                   <Input
                     id="created"
-                    value={user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', {
+                    value={user?.created_at ? new Date(user.created_at).toLocaleDateString('cs-CZ', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric',
@@ -152,48 +152,48 @@ export default function SettingsPage() {
         <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Change Password</CardTitle>
+              <CardTitle>Změna hesla</CardTitle>
               <CardDescription>
-                Update your password to keep your account secure
+                Aktualizujte své heslo pro zabezpečení účtu
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleUpdatePassword} className="space-y-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Label htmlFor="currentPassword">Současné heslo</Label>
                   <Input
                     id="currentPassword"
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Enter current password"
+                    placeholder="Zadejte současné heslo"
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="newPassword">New Password</Label>
+                  <Label htmlFor="newPassword">Nové heslo</Label>
                   <Input
                     id="newPassword"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
+                    placeholder="Zadejte nové heslo"
                     required
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Label htmlFor="confirmPassword">Potvrzení nového hesla</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm new password"
+                    placeholder="Potvrďte nové heslo"
                     required
                   />
                 </div>
                 <Button type="submit" disabled={loading}>
                   <RiLockLine className="mr-2 h-4 w-4" />
-                  {loading ? 'Updating...' : 'Update Password'}
+                  {loading ? 'Aktualizuji...' : 'Aktualizovat heslo'}
                 </Button>
               </form>
             </CardContent>
@@ -201,22 +201,22 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Active Sessions</CardTitle>
+              <CardTitle>Aktivní relace</CardTitle>
               <CardDescription>
-                Manage your active sessions across devices
+                Spravujte své aktivní relace napříč zařízeními
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center justify-between rounded-lg border p-4">
                   <div className="space-y-1">
-                    <p className="font-medium">Current Session</p>
+                    <p className="font-medium">Aktuální relace</p>
                     <p className="text-sm text-muted-foreground">
-                      This device - Active now
+                      Toto zařízení - Aktivní nyní
                     </p>
                   </div>
                   <Button variant="outline" size="sm" disabled>
-                    Active
+                    Aktivní
                   </Button>
                 </div>
               </div>
@@ -225,22 +225,22 @@ export default function SettingsPage() {
 
           <Card className="border-destructive">
             <CardHeader>
-              <CardTitle>Danger Zone</CardTitle>
+              <CardTitle>Nebezpečná zóna</CardTitle>
               <CardDescription>
-                Irreversible and destructive actions
+                Nevratné a destruktivní akce
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between rounded-lg border border-destructive/50 p-4">
                 <div className="space-y-1">
-                  <p className="font-medium">Sign Out</p>
+                  <p className="font-medium">Odhlásit se</p>
                   <p className="text-sm text-muted-foreground">
-                    Sign out from your account on this device
+                    Odhlásit se ze svého účtu na tomto zařízení
                   </p>
                 </div>
                 <Button variant="destructive" size="sm" onClick={handleSignOut}>
                   <RiLogoutBoxLine className="mr-2 h-4 w-4" />
-                  Sign Out
+                  Odhlásit se
                 </Button>
               </div>
             </CardContent>
@@ -250,33 +250,33 @@ export default function SettingsPage() {
         <TabsContent value="notifications" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Email Notifications</CardTitle>
+              <CardTitle>E-mailová upozornění</CardTitle>
               <CardDescription>
-                Manage how you receive email notifications
+                Spravujte, jak přijímáte e-mailová upozornění
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="font-medium">Marketing emails</p>
+                  <p className="font-medium">Marketingové e-maily</p>
                   <p className="text-sm text-muted-foreground">
-                    Receive emails about new features and updates
+                    Dostávejte e-maily o nových funkcích a aktualizacích
                   </p>
                 </div>
                 <Button variant="outline" size="sm">
-                  Configure
+                  Konfigurovat
                 </Button>
               </div>
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="font-medium">Security alerts</p>
+                  <p className="font-medium">Bezpečnostní upozornění</p>
                   <p className="text-sm text-muted-foreground">
-                    Receive alerts about your account security
+                    Dostávejte upozornění o zabezpečení vašeho účtu
                   </p>
                 </div>
                 <Button variant="outline" size="sm" disabled>
-                  Always On
+                  Vždy zapnuto
                 </Button>
               </div>
             </CardContent>
