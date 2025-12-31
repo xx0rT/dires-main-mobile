@@ -70,7 +70,7 @@ export const FeaturesSection = () => {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {featureList.map(({ icon, title, description }, index) => (
-                    <div key={title} data-aos="zoom-in" data-aos-delay={index * 100}>
+                    <div key={title} data-aos="fade-up" data-aos-delay={index * 100}>
                         <Card className="h-full border-0 bg-background shadow-none">
                             <CardHeader className="flex items-center justify-center gap-4 align-middle pb-2">
                                 <div className="rounded-full bg-primary/20 p-2 ring-8 ring-primary/10">

@@ -97,7 +97,7 @@ export const PricingSection = () => {
                     }, index) => (
                         <Card
                             key={title}
-                            data-aos="flip-up"
+                            data-aos="fade-up"
                             data-aos-delay={index * 150}
                             className={
                                 popular === PopularPlan?.YES

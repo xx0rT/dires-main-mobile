@@ -87,7 +87,7 @@ export const Navbar = () => {
     return (
         <div className="sticky top-2 z-50 mx-auto w-[98%] max-w-7xl px-4 transition-all duration-300">
             <nav className={`rounded-xl border border-border bg-card/50 shadow-black/2 shadow-sm backdrop-blur-sm transition-all duration-300 ${
-                isScrolled ? 'scale-[0.98]' : 'scale-100'
+                isScrolled ? 'scale-[0.7]' : 'scale-100'
             }`}>
                 <div className={`flex items-center justify-between px-4 lg:px-6 transition-all duration-300 ${
                     isScrolled ? 'py-2' : 'py-3'
@@ -101,11 +101,12 @@ export const Navbar = () => {
                             <img
                                 src={site.logo}
                                 alt={site.name}
-                                width={30}
-                                height={30}
+                                className={`transition-all duration-300 ${isScrolled ? 'w-[30px] h-[30px]' : 'w-[30px] h-[30px]'}`}
                             />
                         </div>
-                        <h3 className="font-bold text-xl lg:text-2xl">
+                        <h3 className={`font-bold text-xl lg:text-2xl transition-all duration-300 ${
+                            isScrolled ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+                        }`}>
                             {site.name}
                         </h3>
                     </Link>
