@@ -90,7 +90,7 @@ export const Navbar = () => {
                 isScrolled ? 'scale-[0.7]' : 'scale-100'
             }`}>
                 <div className={`flex items-center justify-between px-4 lg:px-6 transition-all duration-300 ${
-                    isScrolled ? 'py-2' : 'py-3'
+                    isScrolled ? 'py-2 scale-[1.43]' : 'py-3'
                 }`}>
                     {/* Logo */}
                     <Link
@@ -101,7 +101,7 @@ export const Navbar = () => {
                             <img
                                 src={site.logo}
                                 alt={site.name}
-                                className={`transition-all duration-300 ${isScrolled ? 'w-[30px] h-[30px]' : 'w-[30px] h-[30px]'}`}
+                                className="w-[30px] h-[30px]"
                             />
                         </div>
                         <h3 className={`font-bold text-xl lg:text-2xl transition-all duration-300 ${
