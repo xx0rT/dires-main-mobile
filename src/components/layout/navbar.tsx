@@ -85,12 +85,12 @@ export const Navbar = () => {
     }, [])
 
     return (
-        <div className="sticky top-2 z-50 mx-auto w-[98%] max-w-7xl px-4 transition-all duration-300">
-            <nav className={`rounded-xl border border-border bg-card/50 shadow-black/2 shadow-sm backdrop-blur-sm transition-all duration-300 ${
-                isScrolled ? 'scale-[0.7]' : 'scale-100'
-            }`}>
-                <div className={`flex items-center justify-between px-4 lg:px-6 transition-all duration-300 ${
-                    isScrolled ? 'py-2 scale-[1.43]' : 'py-3'
+        <div className={`sticky top-2 z-50 mx-auto px-4 transition-all duration-500 ease-out ${
+            isScrolled ? 'w-[70%] max-w-5xl' : 'w-[98%] max-w-7xl'
+        }`}>
+            <nav className="rounded-xl border border-border bg-card/50 shadow-black/2 shadow-sm backdrop-blur-sm transition-all duration-500 ease-out">
+                <div className={`flex items-center justify-between px-4 lg:px-6 transition-all duration-500 ease-out ${
+                    isScrolled ? 'py-2' : 'py-3'
                 }`}>
                     {/* Logo */}
                     <Link
