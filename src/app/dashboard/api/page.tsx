@@ -6,6 +6,8 @@ export const metadata: Metadata = {
     title: "API"
 }
 
+export const dynamic = 'force-dynamic'
+
 export default function APIKeysSettingsPage() {
   return (
     <div className="space-y-6">

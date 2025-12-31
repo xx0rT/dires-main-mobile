@@ -4,6 +4,8 @@ export const metadata = {
     title: "Integrations"
 }
 
+export const dynamic = 'force-dynamic'
+
 export default function IntegrationsPage() {
     return (
         <div className="space-y-6">

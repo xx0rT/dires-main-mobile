@@ -28,6 +28,8 @@ export const metadata = {
     title: "Billing & Subscription"
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function Plans() {
     const session = await auth.api.getSession({ headers: await headers() })
     const data = await getActiveSubscription()
