@@ -24,11 +24,10 @@ export const HeroSection = () => {
 
                     <div className="font-bold text-4xl md:text-5xl lg:text-6xl">
                         <h1>
-                            Ovládněte
-                            <span className="bg-gradient-to-r from-[#7033ff] to-primary bg-clip-text px-2 text-transparent">
-                                České Fyzioterapeutické
+                            Ovládněte{" "}
+                            <span className="bg-gradient-to-r from-[#7033ff] to-primary bg-clip-text text-transparent">
+                                České Fyzioterapeutické Techniky
                             </span>
-                            Techniky
                         </h1>
                     </div>
 

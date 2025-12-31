@@ -56,19 +56,21 @@ const featureList: FeaturesProps[] = [
 export const FeaturesSection = () => {
     return (
         <section id="features" className="container mx-auto px-4 py-16 sm:py-20">
-            <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
-                Vlastnosti Kurzů
-            </h2>
+            <div className="sticky top-24 z-10 bg-background/95 backdrop-blur-sm pb-6 -mx-4 px-4">
+                <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
+                    Vlastnosti Kurzů
+                </h2>
 
-            <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl" data-aos="fade-up" data-aos-delay="100">
-                Proč Si Vybrat Nás
-            </h2>
+                <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl" data-aos="fade-up" data-aos-delay="100">
+                    Proč Si Vybrat Nás
+                </h2>
 
-            <h3 className="mx-auto mb-8 text-center text-muted-foreground text-xl md:w-1/2" data-aos="fade-up" data-aos-delay="200">
-                Naše komplexní fyzioterapeutické kurzy kombinují tradiční české metody s moderními rehabilitačními technikami pro nejlepší vzdělávací zkušenost.
-            </h3>
+                <h3 className="mx-auto text-center text-muted-foreground text-xl md:w-1/2" data-aos="fade-up" data-aos-delay="200">
+                    Naše komplexní fyzioterapeutické kurzy kombinují tradiční české metody s moderními rehabilitačními technikami pro nejlepší vzdělávací zkušenost.
+                </h3>
+            </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-8">
                 {featureList.map(({ icon, title, description }, index) => (
                     <div key={title} data-aos="fade-up" data-aos-delay={index * 100}>
                         <Card className="h-full border-0 bg-background shadow-none">
