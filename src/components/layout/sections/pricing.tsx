@@ -73,19 +73,21 @@ const plans: PlanProps[] = [
 export const PricingSection = () => {
     return (
         <section id="pricing" className="container mx-auto px-4 py-16 sm:py-20">
-            <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
-                Ceník Kurzů
-            </h2>
+            <div className="sticky top-24 z-10 bg-background/95 backdrop-blur-sm pb-6 -mx-4 px-4">
+                <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
+                    Ceník Kurzů
+                </h2>
 
-            <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl" data-aos="fade-up" data-aos-delay="100">
-                Investujte do Své Kariéry
-            </h2>
+                <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl" data-aos="fade-up" data-aos-delay="100">
+                    Investujte do Své Kariéry
+                </h2>
 
-            <h3 className="mx-auto pb-14 text-center text-muted-foreground text-xl md:w-1/2" data-aos="fade-up" data-aos-delay="200">
-                Vyberte si úroveň kurzu, která odpovídá vašim zkušenostem a kariérním cílům. Všechny ceny zahrnují materiály a certifikaci.
-            </h3>
+                <h3 className="mx-auto text-center text-muted-foreground text-xl md:w-1/2" data-aos="fade-up" data-aos-delay="200">
+                    Vyberte si úroveň kurzu, která odpovídá vašim zkušenostem a kariérním cílům. Všechny ceny zahrnují materiály a certifikaci.
+                </h3>
+            </div>
 
-            <div className="grid space-x-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+            <div className="grid space-x-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-4 mt-8">
                 {plans.map(
                     ({
                         title,

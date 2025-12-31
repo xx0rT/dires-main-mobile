@@ -31,105 +31,105 @@ interface RouteProps {
 const routeList: RouteProps[] = [
     {
         href: "#features",
-        label: "Features"
+        label: "Vlastnosti"
     },
     {
         href: "#testimonials",
-        label: "Testimonials"
+        label: "Reference"
     },
     {
         href: "#pricing",
-        label: "Pricing"
+        label: "Ceník"
     },
     {
         href: "#contact",
-        label: "Contact"
+        label: "Kontakt"
     }
 ]
 
 const menuContent = {
     solutions: [
         {
-            title: "Showcase Your Value",
-            description: "Highlight how your product solves user problems effectively.",
+            title: "Kurzy Manuální Terapie",
+            description: "Ovládněte tradiční české techniky manuální terapie.",
             href: "#features"
         },
         {
-            title: "Build Trust",
-            description: "Leverage social proof elements to establish trust and credibility.",
-            href: "#testimonials"
+            title: "Sportovní Rehabilitace",
+            description: "Specializované kurzy pro léčbu sportovních zranění.",
+            href: "#services"
         },
         {
-            title: "Scale Fast",
-            description: "Built-in tools and integrations to help you scale your business.",
-            href: "#features"
+            title: "Neurologická Rehabilitace",
+            description: "Pokročilé techniky Vojtovy a Bobathovy metody.",
+            href: "#services"
         }
     ],
     features: [
         {
-            title: "Advanced Analytics",
-            description: "Track and analyze your key metrics in real-time.",
+            title: "Certifikované Vzdělávání",
+            description: "Všechny kurzy jsou mezinárodně uznávané.",
             href: "#features"
         },
         {
-            title: "Seamless Integration",
-            description: "Connect with your favorite tools and services.",
+            title: "Praktická Výuka",
+            description: "Rozsáhlé praktické lekce pod odborným dohledem.",
             href: "#features"
         },
         {
-            title: "Custom Workflows",
-            description: "Build automated workflows tailored to your needs.",
+            title: "Online Materiály",
+            description: "Celoživotní přístup ke studijním materiálům.",
             href: "#features"
         }
     ],
     testimonials: [
         {
-            title: "Customer Stories",
-            description: "Read how our customers achieved success.",
+            title: "Příběhy Absolventů",
+            description: "Přečtěte si, jak naši studenti dosáhli úspěchu.",
             href: "#testimonials"
         },
         {
-            title: "Case Studies",
-            description: "Detailed analysis of real-world implementations.",
+            title: "Případové Studie",
+            description: "Detailní analýzy reálných implementací.",
             href: "#testimonials"
         },
         {
-            title: "Reviews",
-            description: "See what our users are saying about us.",
+            title: "Hodnocení",
+            description: "Zjistěte, co o nás říkají naši studenti.",
             href: "#testimonials"
         }
     ],
     pricing: [
         {
-            title: "Starter Plan",
-            description: "Perfect for individuals and small teams.",
+            title: "Základní Kurz",
+            description: "Ideální pro začátečníky a malé týmy.",
             href: "#pricing"
         },
         {
-            title: "Professional",
-            description: "Advanced features for growing businesses.",
+            title: "Profesionální",
+            description: "Pokročilé techniky pro rostoucí praxi.",
             href: "#pricing"
         },
         {
-            title: "Enterprise",
-            description: "Custom solutions for large organizations.",
+            title: "Mistrovský",
+            description: "Individuální řešení pro zkušené odborníky.",
             href: "#pricing"
         }
     ],
     contact: [
         {
-            title: "Get in Touch",
-            description: "Reach out to our team for any questions.",
+            title: "Kontaktujte Nás",
+            description: "Ozvěte se našemu týmu s jakýmikoli dotazy.",
             href: "#contact"
         },
         {
-            title: "Sales Inquiry",
-            description: "Talk to our sales team about your needs.",
+            title: "Informace o Kurzech",
+            description: "Promluvte si s námi o vašich potřebách.",
             href: "#contact"
         },
         {
-            title: "Support",
-            description: "Get help from our support team.",
+            title: "Podpora",
+            description: "Získejte pomoc od našeho týmu podpory.",
             href: "#contact"
         }
     ]
@@ -181,7 +181,7 @@ export const Navbar = () => {
                             <NavigationMenuList className="space-x-2">
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger className="h-auto bg-transparent px-4 py-2 font-medium text-foreground hover:bg-accent/50">
-                                        Solutions
+                                        Kurzy
                                     </NavigationMenuTrigger>
                                     <NavigationMenuContent>
                                         <div className="grid w-[600px] grid-cols-2 gap-6 p-6">
@@ -230,7 +230,7 @@ export const Navbar = () => {
 
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger className="h-auto bg-transparent px-4 py-2 font-medium text-foreground hover:bg-accent/50">
-                                        Features
+                                        Vlastnosti
                                     </NavigationMenuTrigger>
                                     <NavigationMenuContent>
                                         <div className="grid w-[600px] grid-cols-2 gap-6 p-6">
@@ -279,7 +279,7 @@ export const Navbar = () => {
 
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger className="h-auto bg-transparent px-4 py-2 font-medium text-foreground hover:bg-accent/50">
-                                        Testimonials
+                                        Reference
                                     </NavigationMenuTrigger>
                                     <NavigationMenuContent>
                                         <div className="grid w-[600px] grid-cols-2 gap-6 p-6">
@@ -328,7 +328,7 @@ export const Navbar = () => {
 
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger className="h-auto bg-transparent px-4 py-2 font-medium text-foreground hover:bg-accent/50">
-                                        Pricing
+                                        Ceník
                                     </NavigationMenuTrigger>
                                     <NavigationMenuContent>
                                         <div className="grid w-[600px] grid-cols-2 gap-6 p-6">
@@ -377,7 +377,7 @@ export const Navbar = () => {
 
                                 <NavigationMenuItem>
                                     <NavigationMenuTrigger className="h-auto bg-transparent px-4 py-2 font-medium text-foreground hover:bg-accent/50">
-                                        Contact
+                                        Kontakt
                                     </NavigationMenuTrigger>
                                     <NavigationMenuContent>
                                         <div className="grid w-[600px] grid-cols-2 gap-6 p-6">
@@ -452,7 +452,7 @@ export const Navbar = () => {
                             className="ml-2"
                         >
                             <Link to="/auth/sign-in">
-                                Sign In
+                                Přihlásit se
                             </Link>
                         </Button>
                         <Button
@@ -461,7 +461,7 @@ export const Navbar = () => {
                             className="bg-primary hover:bg-primary/90"
                         >
                             <Link to="/auth/sign-up">
-                                Get Started
+                                Začít
                             </Link>
                         </Button>
                     </div>
@@ -558,7 +558,7 @@ export const Navbar = () => {
                                             onClick={() => setIsOpen(false)}
                                         >
                                             <Link to="/auth/sign-in">
-                                                Sign In
+                                                Přihlásit se
                                             </Link>
                                         </Button>
                                         <Button
@@ -567,7 +567,7 @@ export const Navbar = () => {
                                             onClick={() => setIsOpen(false)}
                                         >
                                             <Link to="/auth/sign-up">
-                                                Get Started
+                                                Začít
                                             </Link>
                                         </Button>
                                     </SheetFooter>
