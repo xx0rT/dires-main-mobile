@@ -26,51 +26,51 @@ interface ReviewProps {
 const reviewList: ReviewProps[] = [
     {
         image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=580&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        name: "John Doe",
-        userName: "Product Manager",
+        name: "Martin Novák",
+        userName: "Sports Physiotherapist",
         comment:
-            "Wow this is awesome!. This Starter Kit lets me change colors, fonts and images to match my brand identity. ",
+            "The manual therapy techniques I learned here transformed my practice. My patients see results faster and my confidence has grown tremendously.",
         rating: 5.0
     },
     {
         image: "https://images.unsplash.com/photo-1658281097220-eb7672eed00b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDN8fHByb2ZpbGUlMjBwaG90b3xlbnwwfDJ8MHx8fDA%3D",
-        name: "Sophia Collins",
-        userName: "Cybersecurity Analyst",
+        name: "Anna Schmidt",
+        userName: "Clinical Physiotherapist, Germany",
         comment:
-            "The security implementation is top-notch. Built-in authentication and proper data validation give me confidence in the platform. ",
+            "Exceptional instructors with deep knowledge of Czech methods. The hands-on practice sessions were invaluable for mastering advanced techniques.",
         rating: 4.8
     },
 
     {
         image: "https://images.unsplash.com/photo-1618018352910-72bdafdc82a6?q=80&w=580&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        name: "Adam Johnson",
-        userName: "Chief Technology Officer",
+        name: "David Williams",
+        userName: "Rehabilitation Specialist, UK",
         comment:
-            "Perfect architecture and clean code structure. Our development team was able to scale quickly without technical debt issues.",
+            "The neurological rehabilitation course exceeded my expectations. The Vojta method training was comprehensive and the patient outcomes speak for themselves.",
         rating: 4.9
     },
     {
         image: "https://images.unsplash.com/photo-1584999734482-0361aecad844?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHByb2ZpbGV8ZW58MHwyfDB8fHww",
-        name: "Ethan Parker",
-        userName: "Data Scientist",
+        name: "Elena Popescu",
+        userName: "Pediatric Physiotherapist, Romania",
         comment:
-            "The analytics integration capabilities are excellent. Easy to implement tracking and gather meaningful insights from user behavior.",
+            "Best investment in my career! The pediatric course gave me specialized skills that are in high demand. I now treat children with complex developmental needs.",
         rating: 5.0
     },
     {
         image: "https://images.unsplash.com/photo-1586297135537-94bc9ba060aa?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjh8fHByb2ZpbGUlMjBwaG90b3xlbnwwfDJ8MHx8fDA%3D",
-        name: "Ava Mitchell",
-        userName: "IT Project Manager",
+        name: "Marie Dubois",
+        userName: "Private Practice Owner, France",
         comment:
-            "Streamlined our deployment process significantly. The documentation and setup guide helped our team deliver projects faster.",
+            "The certification opened doors across Europe for me. The practical approach and lifetime access to materials means I keep learning and improving.",
         rating: 5.0
     },
     {
         image: "https://images.unsplash.com/photo-1623517006691-00db997b4c58?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTUwfHxwcm9maWxlJTIwcGhvdG98ZW58MHwyfDB8fHww",
-        name: "Isabella Reed",
-        userName: "DevOps Engineer",
+        name: "Jakub Kowalski",
+        userName: "Hospital Physiotherapist, Poland",
         comment:
-            "Amazing CI/CD integration and containerization support. The deployment pipeline configurations saved us weeks of setup time.",
+            "Small class sizes and expert mentorship made all the difference. I received personalized feedback that helped me perfect my technique rapidly.",
         rating: 4.9
     }
 ]
@@ -84,7 +84,7 @@ export const TestimonialSection = () => {
                 </h2>
 
                 <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl" data-aos="fade-up" data-aos-delay="100">
-                    Hear What Our 1000+ Clients Say
+                    Success Stories from Our Students
                 </h2>
             </div>
 

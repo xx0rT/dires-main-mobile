@@ -16,27 +16,27 @@ interface ServiceProps {
 }
 const serviceList: ServiceProps[] = [
     {
-        title: "Authentication System",
+        title: "Manual Therapy Techniques",
         description:
-            "Complete auth system with email and social login support. Includes session management and user roles.",
+            "Master soft tissue mobilization, joint manipulation, and myofascial release using traditional Czech methods.",
         pro: 0
     },
     {
-        title: "Dashboard & UI Kit",
+        title: "Sports Rehabilitation",
         description:
-            "Ready-to-use dashboard layout and beautiful UI components. Dark mode included.",
+            "Specialized training in sports injury treatment and athletic performance optimization.",
         pro: 0
     },
     {
-        title: "File Upload System",
+        title: "Neurological Rehabilitation",
         description:
-            "Secure file uploads with UploadThing integration for user content and avatars.",
+            "Advanced techniques for treating neurological conditions using Vojta and Bobath approaches.",
         pro: 0
     },
     {
-        title: "Payment Integration",
+        title: "Pediatric Physiotherapy",
         description:
-            "Stripe payment integration for your SaaS subscriptions.",
+            "Specialized courses in child development and treatment of pediatric conditions.",
         pro: 1
     }
 ]
@@ -48,16 +48,15 @@ export const ServicesSection = () => {
             className="container mx-auto px-4 py-16 sm:py-20"
         >
             <h2 className="mb-2 text-center text-lg text-primary tracking-wider">
-                Core Features
+                Course Specializations
             </h2>
 
             <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl">
-                Built-in Functionality
+                Areas of Expertise
             </h2>
             <h3 className="mx-auto mb-8 text-center text-muted-foreground text-xl md:w-1/2">
-                Start with a solid foundation. Our starter includes essential
-                features that every modern SaaS needs, saving you weeks of
-                development time.
+                Choose from our comprehensive range of specialized physiotherapy courses.
+                Each program is designed to provide deep expertise in specific treatment areas.
             </h3>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" />
 

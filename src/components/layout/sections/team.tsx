@@ -19,138 +19,53 @@ export const TeamSection = () => {
     const teamList: TeamProps[] = [
         {
             imageUrl:
-                "/indie.png",
-            firstName: "Indie",
-            lastName: "CEO",
-            positions: ["Fullstack Developer", "Creator Of This Website"],
+                "https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            firstName: "Dr. Petr",
+            lastName: "Svoboda",
+            positions: ["Manual Therapy Specialist", "30 Years Clinical Experience"],
             socialNetworks: [
-                
                 {
-                    name: "Github",
-                    url: "https://github.com/indieceo"
-                },
-                {
-                    name: "X",
-                    url: "https://x.com/indieceo"
+                    name: "LinkedIn",
+                    url: "https://www.linkedin.com/company/czech-physio-academy"
                 }
             ]
         },
         {
             imageUrl:
                 "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1528&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            firstName: "Elizabeth",
-            lastName: "Moore",
-            positions: ["UI/UX Designer"],
+            firstName: "Dr. Jana",
+            lastName: "Nováková",
+            positions: ["Sports Rehabilitation Expert", "Former Olympic Team Physiotherapist"],
             socialNetworks: [
                 {
                     name: "LinkedIn",
-                    url: "https://www.linkedin.com/company/posthyve"
-                },
-                {
-                    name: "X",
-                    url: "https://x.com/indieceo"
-                }
-            ]
-        },
-        {
-            imageUrl:
-                "https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=1760&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            firstName: "David",
-            lastName: "Diaz",
-            positions: ["Machine Learning Engineer", "TensorFlow Tinkerer"],
-            socialNetworks: [
-                {
-                    name: "LinkedIn",
-                    url: "https://www.linkedin.com/company/posthyve"
-                },
-                {
-                    name: "Github",
-                    url: "https://github.com/indieceo"
-                }
-            ]
-        },
-        {
-            imageUrl:
-                "https://images.unsplash.com/photo-1573497161161-c3e73707e25c?q=80&w=1587&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            firstName: "Sarah",
-            lastName: "Robinson",
-            positions: ["Cloud Native Developer", "Kubernetes Orchestrator"],
-            socialNetworks: [
-                {
-                    name: "LinkedIn",
-                    url: "https://www.linkedin.com/company/posthyve"
-                },
-                {
-                    name: "Github",
-                    url: "https://github.com/indieceo"
-                },
-                {
-                    name: "X",
-                    url: "https://x.com/indieceo"
-                }
-            ]
-        },
-        {
-            imageUrl:
-                "https://images.unsplash.com/photo-1616805765352-beedbad46b2a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            firstName: "Michael",
-            lastName: "Holland",
-            positions: ["DevOps Engineer", "CI/CD Pipeline Mastermind"],
-            socialNetworks: [
-                {
-                    name: "LinkedIn",
-                    url: "https://www.linkedin.com/company/posthyve"
-                }
-            ]
-        },
-        {
-            imageUrl:
-                "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1587&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            firstName: "Zoe",
-            lastName: "Garcia",
-            positions: ["JavaScript Evangelist", "Deno Champion"],
-            socialNetworks: [
-                {
-                    name: "LinkedIn",
-                    url: "https://www.linkedin.com/company/posthyve"
-                },
-                {
-                    name: "Github",
-                    url: "https://github.com/indieceo"
+                    url: "https://www.linkedin.com/company/czech-physio-academy"
                 }
             ]
         },
         {
             imageUrl:
                 "https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=1480&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            firstName: "Evan",
-            lastName: "James",
-            positions: ["Backend Developer"],
+            firstName: "Dr. Martin",
+            lastName: "Dvořák",
+            positions: ["Neurological Rehabilitation", "Vojta Method Certified Instructor"],
             socialNetworks: [
                 {
                     name: "LinkedIn",
-                    url: "https://www.linkedin.com/company/posthyve"
-                },
-                {
-                    name: "Github",
-                    url: "https://github.com/indieceo"
-                },
-                {
-                    name: "X",
-                    url: "https://x.com/indieceo"
+                    url: "https://www.linkedin.com/company/czech-physio-academy"
                 }
             ]
         },
         {
             imageUrl:
-                "https://images.unsplash.com/photo-1573497019236-17f8177b81e8?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            firstName: "Pam",
-            lastName: "Taylor",
-            positions: ["Fullstack Developer", "UX Researcher"],
+                "https://images.unsplash.com/photo-1573497161161-c3e73707e25c?q=80&w=1587&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            firstName: "Dr. Eva",
+            lastName: "Horáková",
+            positions: ["Pediatric Physiotherapy Lead", "Child Development Specialist"],
             socialNetworks: [
                 {
-                    name: "X",
-                    url: "https://x.com/indieceo"
+                    name: "LinkedIn",
+                    url: "https://www.linkedin.com/company/czech-physio-academy"
                 }
             ]
         }
@@ -174,7 +89,7 @@ export const TeamSection = () => {
                 </h2>
 
                 <h2 className="text-center font-bold text-3xl md:text-4xl">
-                    The Company Dream Team
+                    Our Expert Instructors
                 </h2>
             </div>
 

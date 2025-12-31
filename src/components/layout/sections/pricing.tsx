@@ -24,48 +24,48 @@ interface PlanProps {
 
 const plans: PlanProps[] = [
     {
-        title: "Free",
+        title: "Foundation",
         popular: 0,
-        price: 0,
+        price: 890,
         description:
-            "Perfect for getting started with basic features and exploring our platform.",
-        buttonText: "Start Free Trial",
+            "Perfect for beginners starting their physiotherapy journey with essential techniques.",
+        buttonText: "Enroll Now",
         benefitList: [
-            "1 team member",
-            "1 GB storage",
-            "Up to 2 pages",
-            "Community support",
-            "AI assistance"
+            "40 hours of training",
+            "Basic manual therapy",
+            "Online course materials",
+            "Certificate of completion",
+            "6 months resource access"
         ]
     },
     {
-        title: "Premium",
+        title: "Professional",
         popular: 1,
-        price: 45,
+        price: 1590,
         description:
-            "Ideal for growing teams that need advanced features and priority support.",
-        buttonText: "Get started",
+            "Comprehensive program for practitioners seeking advanced certification.",
+        buttonText: "Enroll Now",
         benefitList: [
-            "4 team member",
-            "8 GB storage",
-            "Up to 6 pages",
-            "Priority support",
-            "AI assistance"
+            "80 hours of training",
+            "Advanced manual techniques",
+            "Clinical practice sessions",
+            "International certificate",
+            "Lifetime resource access"
         ]
     },
     {
-        title: "Enterprise",
+        title: "Master",
         popular: 0,
-        price: 120,
+        price: 2890,
         description:
-            "Comprehensive solution for large organizations with extensive customization needs.",
+            "Elite training program for experienced professionals specializing in advanced methods.",
         buttonText: "Contact Us",
         benefitList: [
-            "10 team member",
-            "20 GB storage",
-            "Up to 10 pages",
-            "Phone & email support",
-            "AI assistance"
+            "120+ hours of training",
+            "Specialty certifications",
+            "One-on-one mentorship",
+            "Teaching certification",
+            "Alumni network access"
         ]
     }
 ]
@@ -74,15 +74,15 @@ export const PricingSection = () => {
     return (
         <section id="pricing" className="container mx-auto px-4 py-16 sm:py-20">
             <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
-                Pricing
+                Course Pricing
             </h2>
 
             <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl" data-aos="fade-up" data-aos-delay="100">
-                Get unlimited access
+                Invest in Your Career
             </h2>
 
             <h3 className="mx-auto pb-14 text-center text-muted-foreground text-xl md:w-1/2" data-aos="fade-up" data-aos-delay="200">
-                Choose the perfect plan that fits your needs and budget.
+                Select the course level that matches your experience and career goals. All prices include materials and certification.
             </h3>
 
             <div className="grid space-x-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-4">
@@ -114,11 +114,11 @@ export const PricingSection = () => {
 
                                 <div>
                                     <span className="font-bold text-3xl">
-                                        ${price}
+                                        €{price}
                                     </span>
                                     <span className="text-muted-foreground">
                                         {" "}
-                                        /month
+                                        /course
                                     </span>
                                 </div>
                             </CardHeader>

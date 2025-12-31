@@ -1,5 +1,4 @@
 import { ArrowRight, Lock } from "lucide-react"
-import { RiGithubFill } from "@remixicon/react"
 import { Link } from "react-router-dom"
 import { useTheme } from "next-themes"
 import { Badge } from "@/components/ui/badge"
@@ -20,22 +19,22 @@ export const HeroSection = () => {
                         <span className="mr-2 text-primary">
                             <Badge>New</Badge>
                         </span>
-                        <span> Launch your Saas app now! </span>
+                        <span> Enroll in our upcoming courses! </span>
                     </Badge>
 
                     <div className="font-bold text-4xl md:text-5xl lg:text-6xl">
                         <h1>
-                            Experience the
+                            Master
                             <span className="bg-gradient-to-r from-[#7033ff] to-primary bg-clip-text px-2 text-transparent">
-                                Indie Saas
+                                Czech Physiotherapy
                             </span>
-                            Starter
+                            Techniques
                         </h1>
                     </div>
 
                     <p className="mx-auto max-w-lg text-muted-foreground text-lg leading-relaxed md:mx-0 lg:text-xl xl:max-w-xl">
-                        {`A complete SaaS starter with authentication, beautiful UI components, 
-            and everything you need to launch your platform quickly and efficiently.`}
+                        {`Learn from certified Czech practitioners using proven rehabilitation methods.
+            Comprehensive courses combining theory, practice, and hands-on experience.`}
                     </p>
 
                     <div className="flex flex-col items-center space-y-4 md:flex-row md:space-x-4 md:space-y-0 md:justify-start">
@@ -45,7 +44,7 @@ export const HeroSection = () => {
                             className="group/arrow rounded-full"
                         >
                             <Link to="/auth/sign-up">
-                                Get Started
+                                Enroll Now
                                 <ArrowRight className="ml-2 size-5 transition-transform group-hover/arrow:translate-x-1" />
                             </Link>
                         </Button>
@@ -57,12 +56,10 @@ export const HeroSection = () => {
                             className="rounded-full"
                         >
                             <Link
-                                to={site.links.github}
-                                target="_blank"
+                                to="#courses"
                                 className="flex items-center gap-2"
                             >
-                                <RiGithubFill className="size-5 fill-foreground" />
-                                GitHub repository
+                                View Courses
                             </Link>
                         </Button>
                     </div>

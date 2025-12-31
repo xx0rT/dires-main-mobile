@@ -11,27 +11,27 @@ interface BenefitsProps {
 const benefitList: BenefitsProps[] = [
     {
         icon: "Rocket",
-        title: "Launch Faster",
+        title: "Fast-Track Learning",
         description:
-            "Skip weeks of setup and boilerplate. Get a production-ready foundation with authentication, UI, and core features already built."
+            "Accelerated programs designed to get you practicing effectively in months, not years. Intensive modules focused on practical skills."
     },
     {
-        icon: "Code",
-        title: "Modern Stack",
+        icon: "Award",
+        title: "International Recognition",
         description:
-            "Built with Next.js, TypeScript, and industry-leading tools. Your startup deserves a tech stack that scales with your growth."
+            "Certificates recognized across Europe and internationally. Open doors to practice in multiple countries with Czech-certified credentials."
     },
     {
-        icon: "Palette",
-        title: "Beautiful Design",
+        icon: "Users",
+        title: "Expert Mentorship",
         description:
-            "Polished UI components from shadcn/ui give your SaaS a professional look from day one. Fully customizable to match your brand."
+            "One-on-one guidance from experienced physiotherapists. Get personalized feedback and career advice throughout your journey."
     },
     {
         icon: "Shield",
-        title: "Production Ready",
+        title: "Proven Methods",
         description:
-            "Enterprise-grade authentication, type-safe database queries, and file upload capabilities. Everything you need to go live confidently."
+            "Learn time-tested Czech techniques backed by decades of clinical research and successful patient outcomes worldwide."
     }
 ]
 
@@ -45,10 +45,10 @@ export const BenefitsSection = () => {
                     </h2>
 
                     <h2 className="mb-4 font-bold text-3xl md:text-4xl">
-                        Why Choose This Starter
+                        Your Path to Excellence
                     </h2>
                     <p className="mb-8 text-muted-foreground text-xl">
-                        Stop wasting time on infrastructure. Get a battle-tested foundation that lets you focus on what matters - building your unique features and growing your business.
+                        Join hundreds of successful physiotherapists who have transformed their careers through our Czech-method training programs. Expert instruction, practical experience, and lifetime support.
                     </p>
                 </div>
 

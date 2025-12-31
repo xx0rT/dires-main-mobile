@@ -66,8 +66,8 @@ export const ContactSection = () => {
                         </h2>
                     </div>
                     <p className="mb-8 text-muted-foreground md:ml-auto md:w-5/6">
-                        We'd love to hear from you! Get in touch with us for any questions,
-                        inquiries, or collaboration opportunities. We're here to help.
+                        Ready to advance your physiotherapy career? Contact us for course information,
+                        enrollment details, or to schedule a facility tour. We're here to help you succeed.
                     </p>
 
                     <div className="flex flex-col gap-4">
@@ -78,7 +78,7 @@ export const ContactSection = () => {
                             </div>
 
                             <div>
-                                742 Evergreen Terrace, Springfield, IL 62704
+                                Karlovo náměstí 13, Prague 2, 120 00
                             </div>
                         </div>
 
@@ -88,7 +88,7 @@ export const ContactSection = () => {
                                 <div className="font-bold">Call us</div>
                             </div>
 
-                            <div>+1 (619) 123-4567</div>
+                            <div>+420 224 915 765</div>
                         </div>
 
                         <div>
@@ -108,7 +108,7 @@ export const ContactSection = () => {
 
                             <div>
                                 <div>Monday - Friday</div>
-                                <div>8AM - 4PM</div>
+                                <div>9AM - 6PM CET</div>
                             </div>
                         </div>
                     </div>

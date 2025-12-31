@@ -17,39 +17,39 @@ interface FeaturesProps {
 const featureList: FeaturesProps[] = [
     {
         icon: <RiShieldKeyholeLine size={24} className="text-primary" />,
-        title: "Better Auth",
+        title: "Certified Training",
         description:
-            "Complete authentication with social logins, email verification, and session management built-in."
+            "All courses are certified and recognized by Czech medical associations and international physiotherapy boards."
     },
     {
         icon: <RiDashboard3Line size={24} className="text-primary" />,
-        title: "Modern UI Kit",
+        title: "Hands-On Practice",
         description:
-            "Beautiful, accessible components powered by shadcn/ui. Dark mode included."
+            "Extensive practical sessions with real patients under expert supervision in modern facilities."
     },
     {
         icon: <RiUploadCloud2Line size={24} className="text-primary" />,
-        title: "File Uploads",
+        title: "Online Resources",
         description:
-            "Secure file upload system with UploadThing integration, perfect for user avatars and content."
+            "Access comprehensive video libraries, course materials, and documentation anytime, anywhere."
     },
     {
         icon: <RiDatabase2Line size={24} className="text-primary" />,
-        title: "Type-Safe DB",
+        title: "Expert Instructors",
         description:
-            "PostgreSQL database with Drizzle ORM for type-safe queries and easy schema management."
+            "Learn from experienced Czech physiotherapists with decades of clinical practice and teaching experience."
     },
     {
         icon: <RiFireFill size={24} className="text-primary" />,
-        title: "Performance",
+        title: "Small Groups",
         description:
-            "Built on Next.js for lightning-fast page loads, SEO optimization, and the best developer experience."
+            "Limited class sizes ensure personalized attention and optimal learning outcomes for every student."
     },
     {
         icon: <RiStackLine size={24} className="text-primary" />,
-        title: "Monorepo Ready",
+        title: "Lifetime Support",
         description:
-            "Turborepo setup for clean code organization and efficient builds as your project grows."
+            "Join our alumni network with continued access to resources, updates, and professional development opportunities."
     }
 ]
 
@@ -57,15 +57,15 @@ export const FeaturesSection = () => {
     return (
         <section id="features" className="container mx-auto px-4 py-16 sm:py-20">
             <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
-                Features
+                Course Features
             </h2>
 
             <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl" data-aos="fade-up" data-aos-delay="100">
-                Everything You Need
+                Why Choose Us
             </h2>
 
             <h3 className="mx-auto mb-8 text-center text-muted-foreground text-xl md:w-1/2" data-aos="fade-up" data-aos-delay="200">
-                Launch your SaaS faster with our carefully chosen tech stack and pre-built features. Focus on your unique value proposition, not boilerplate.
+                Our comprehensive physiotherapy courses combine traditional Czech methods with modern rehabilitation techniques to provide the best learning experience.
             </h3>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
