@@ -1,8 +1,17 @@
 import { Link } from "react-router-dom"
+import { useState } from "react"
 import GithubIcon from "@/components/icons/github-icon"
 import LinkedInIcon from "@/components/icons/linkedin-icon"
 import XIcon from "@/components/icons/x-icon"
 import { Card, CardFooter, CardTitle } from "@/components/ui/card"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 interface TeamProps {
     imageUrl: string
@@ -10,12 +19,19 @@ interface TeamProps {
     lastName: string
     positions: string[]
     socialNetworks: SocialNetworkProps[]
+    bio: string
+    education: string[]
+    specializations: string[]
+    yearsOfExperience: number
 }
 interface SocialNetworkProps {
     name: string
     url: string
 }
 export const TeamSection = () => {
+    const [selectedMember, setSelectedMember] = useState<TeamProps | null>(null)
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+
     const teamList: TeamProps[] = [
         {
             imageUrl:
@@ -28,7 +44,20 @@ export const TeamSection = () => {
                     name: "LinkedIn",
                     url: "https://www.linkedin.com/company/dires"
                 }
-            ]
+            ],
+            bio: "Dr. Petr Svoboda je uznávaný odborník v oblasti manuální terapie s více než třemi desetiletími klinické praxe. Jeho přístup kombinuje tradiční české metody s moderními rehabilitačními technikami, čímž poskytuje studentům komplexní vzdělání v této oblasti.",
+            education: [
+                "Lékařská fakulta Univerzity Karlovy, Praha",
+                "Certifikace v Manuální Terapii, Rakousko",
+                "Pokročilá certifikace v Myofasciální Terapii"
+            ],
+            specializations: [
+                "Manuální terapie páteře",
+                "Myofasciální terapie",
+                "Léčba chronické bolesti",
+                "Funkční diagnostika"
+            ],
+            yearsOfExperience: 30
         },
         {
             imageUrl:
@@ -41,7 +70,20 @@ export const TeamSection = () => {
                     name: "LinkedIn",
                     url: "https://www.linkedin.com/company/dires"
                 }
-            ]
+            ],
+            bio: "Dr. Jana Nováková přináší bohaté zkušenosti ze světa špičkového sportu. Jako bývalá fyzioterapeutka olympijského týmu pomáhala atletům dosahovat vrcholných výkonů a nyní předává své znalosti dalším generacím fyzioterapeutů.",
+            education: [
+                "Fakulta tělesné výchovy a sportu, Univerzita Karlova",
+                "Certifikace ve Sportovní Rehabilitaci, USA",
+                "Specializace v Prevenci Sportovních Zranění"
+            ],
+            specializations: [
+                "Sportovní zranění",
+                "Funkční trénink",
+                "Prevence zranění",
+                "Regenerace atletů"
+            ],
+            yearsOfExperience: 18
         },
         {
             imageUrl:
@@ -54,7 +96,20 @@ export const TeamSection = () => {
                     name: "LinkedIn",
                     url: "https://www.linkedin.com/company/dires"
                 }
-            ]
+            ],
+            bio: "Dr. Martin Dvořák je předním odborníkem v neurologické rehabilitaci a certifikovaným instruktorem Vojtovy metody. Jeho hluboké porozumění neurologickým poruchám a inovativní přístupy k terapii pomohly stovkám pacientů zlepšit kvalitu života.",
+            education: [
+                "Neurologická klinika, Fakultní nemocnice Motol",
+                "Certifikace Vojtovy Metody, Mnichov",
+                "Bobath Koncept, certifikace"
+            ],
+            specializations: [
+                "Vojtova metoda",
+                "Bobath koncept",
+                "Neurologická rehabilitace",
+                "Léčba mozkové obrny"
+            ],
+            yearsOfExperience: 22
         },
         {
             imageUrl:
@@ -67,9 +122,27 @@ export const TeamSection = () => {
                     name: "LinkedIn",
                     url: "https://www.linkedin.com/company/dires"
                 }
-            ]
+            ],
+            bio: "Dr. Eva Horáková je renomovaná specialistka v oblasti dětské fyzioterapie s hlubokým porozuměním vývojových milníků a poruch. Její laskavý přístup a odbornost vytvářejí ideální prostředí pro učení o péči o nejmenší pacienty.",
+            education: [
+                "Pediatrická klinika, Univerzita Karlova",
+                "Certifikace v Dětské Fyzioterapii",
+                "Specializace ve Vývojových Poruchách"
+            ],
+            specializations: [
+                "Dětská fyzioterapie",
+                "Vývojové poruchy",
+                "Senzomotorická stimulace",
+                "Raná intervence"
+            ],
+            yearsOfExperience: 15
         }
     ]
+
+    const handleCardClick = (member: TeamProps) => {
+        setSelectedMember(member)
+        setIsDialogOpen(true)
+    }
     const socialIcon = (socialName: string) => {
         switch (socialName) {
             case "LinkedIn":
@@ -94,72 +167,149 @@ export const TeamSection = () => {
             </div>
 
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {teamList.map(
-                    (
-                        {
-                            imageUrl,
-                            firstName,
-                            lastName,
-                            positions,
-                            socialNetworks
-                        },
-                        index
-                    ) => (
-                        <Card
-                            key={index}
-                            className="group flex h-full flex-col overflow-hidden bg-muted/60 py-0"
-                        >
-                            {/* Header - Image Section */}
-                            <div className="relative overflow-hidden">
-                                <img
-                                    src={imageUrl}
-                                    alt={`${firstName} ${lastName}`}
-                                    width={300}
-                                    height={300}
-                                    className="aspect-square w-full object-cover saturate-0 transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:saturate-100"
-                                />
+                {teamList.map((member, index) => (
+                    <Card
+                        key={index}
+                        className="group flex h-full flex-col overflow-hidden bg-muted/60 py-0 cursor-pointer transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
+                        onClick={() => handleCardClick(member)}
+                    >
+                        <div className="relative overflow-hidden">
+                            <img
+                                src={member.imageUrl}
+                                alt={`${member.firstName} ${member.lastName}`}
+                                width={300}
+                                height={300}
+                                className="aspect-square w-full object-cover saturate-0 transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:saturate-100"
+                            />
+                            <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-all duration-300" />
+                        </div>
+
+                        <div className="flex-1 px-6">
+                            <CardTitle className="mb-2 text-xl">
+                                {member.firstName}
+                                <span className="ml-2 font-semibold text-primary">
+                                    {member.lastName}
+                                </span>
+                            </CardTitle>
+
+                            <div className="space-y-1">
+                                {member.positions.map((position, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="text-muted-foreground text-sm leading-relaxed"
+                                    >
+                                        {position}
+                                    </div>
+                                ))}
                             </div>
+                        </div>
 
-                            {/* Content - Name and Positions Section */}
-                            <div className="flex-1 px-6">
-                                <CardTitle className="mb-2 text-xl">
-                                    {firstName}
-                                    <span className="ml-2 font-semibold text-primary">
-                                        {lastName}
-                                    </span>
-                                </CardTitle>
+                        <CardFooter className="mb-6 flex gap-3">
+                            {member.socialNetworks.map(({ name, url }, idx) => (
+                                <Link
+                                    key={idx}
+                                    to={url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="transition-all duration-200 hover:scale-110 hover:opacity-80"
+                                    aria-label={`Visit ${member.firstName}'s ${name} profile`}
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {socialIcon(name)}
+                                </Link>
+                            ))}
+                        </CardFooter>
+                    </Card>
+                ))}
+            </div>
 
-                                <div className="space-y-1">
-                                    {positions.map((position, index) => (
-                                        <div
-                                            key={index}
-                                            className="text-muted-foreground text-sm leading-relaxed"
-                                        >
-                                            {position}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+                    {selectedMember && (
+                        <>
+                            <DialogHeader>
+                                <div className="flex items-start gap-6 mb-4">
+                                    <img
+                                        src={selectedMember.imageUrl}
+                                        alt={`${selectedMember.firstName} ${selectedMember.lastName}`}
+                                        className="w-32 h-32 rounded-lg object-cover"
+                                    />
+                                    <div className="flex-1">
+                                        <DialogTitle className="text-3xl mb-2">
+                                            {selectedMember.firstName}{" "}
+                                            <span className="text-primary">
+                                                {selectedMember.lastName}
+                                            </span>
+                                        </DialogTitle>
+                                        <div className="space-y-1">
+                                            {selectedMember.positions.map((position, idx) => (
+                                                <p key={idx} className="text-muted-foreground text-sm">
+                                                    {position}
+                                                </p>
+                                            ))}
                                         </div>
+                                        <p className="text-sm text-muted-foreground mt-2">
+                                            {selectedMember.yearsOfExperience} let praxe
+                                        </p>
+                                    </div>
+                                </div>
+                                <DialogDescription className="text-base leading-relaxed">
+                                    {selectedMember.bio}
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="space-y-6 mt-6">
+                                <div>
+                                    <h3 className="font-semibold text-lg mb-3">Vzdělání a Certifikace</h3>
+                                    <ul className="space-y-2">
+                                        {selectedMember.education.map((edu, idx) => (
+                                            <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                                                <span className="text-primary mt-1">•</span>
+                                                <span>{edu}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h3 className="font-semibold text-lg mb-3">Specializace</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedMember.specializations.map((spec, idx) => (
+                                            <span
+                                                key={idx}
+                                                className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full"
+                                            >
+                                                {spec}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3 pt-4 border-t">
+                                    {selectedMember.socialNetworks.map(({ name, url }, idx) => (
+                                        <Button
+                                            key={idx}
+                                            variant="outline"
+                                            size="sm"
+                                            asChild
+                                        >
+                                            <Link
+                                                to={url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-2"
+                                            >
+                                                {socialIcon(name)}
+                                                <span>{name}</span>
+                                            </Link>
+                                        </Button>
                                     ))}
                                 </div>
                             </div>
-
-                            {/* Footer - Social Links Section */}
-                            <CardFooter className="mb-6 flex gap-3">
-                                {socialNetworks.map(({ name, url }, index) => (
-                                    <Link
-                                        key={index}
-                                        to={url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="transition-all duration-200 hover:scale-110 hover:opacity-80"
-                                        aria-label={`Visit ${firstName}'s ${name} profile`}
-                                    >
-                                        {socialIcon(name)}
-                                    </Link>
-                                ))}
-                            </CardFooter>
-                        </Card>
-                    )
-                )}
-            </div>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
         </section>
     )
 }
