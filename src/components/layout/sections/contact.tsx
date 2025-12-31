@@ -55,7 +55,7 @@ export const ContactSection = () => {
     return (
         <section id="contact" className="container mx-auto px-4 py-16 sm:py-20">
             <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                <div>
+                <div className="md:text-right md:pr-8">
                     <div className="mb-4">
                         <h2 className="mb-2 text-lg text-primary tracking-wider">
                             Contact
@@ -65,14 +65,14 @@ export const ContactSection = () => {
                             Connect with us
                         </h2>
                     </div>
-                    <p className="mb-8 text-muted-foreground lg:w-5/6">
-                        We'd love to hear from you! Get in touch with us for any questions, 
+                    <p className="mb-8 text-muted-foreground md:ml-auto md:w-5/6">
+                        We'd love to hear from you! Get in touch with us for any questions,
                         inquiries, or collaboration opportunities. We're here to help.
                     </p>
 
                     <div className="flex flex-col gap-4">
                         <div>
-                            <div className="mb-1 flex gap-2">
+                            <div className="mb-1 flex gap-2 md:justify-end">
                                 <Building2 />
                                 <div className="font-bold">Find us</div>
                             </div>
@@ -83,7 +83,7 @@ export const ContactSection = () => {
                         </div>
 
                         <div>
-                            <div className="mb-1 flex gap-2">
+                            <div className="mb-1 flex gap-2 md:justify-end">
                                 <Phone />
                                 <div className="font-bold">Call us</div>
                             </div>
@@ -92,7 +92,7 @@ export const ContactSection = () => {
                         </div>
 
                         <div>
-                            <div className="mb-1 flex gap-2">
+                            <div className="mb-1 flex gap-2 md:justify-end">
                                 <Mail />
                                 <div className="font-bold">Mail us</div>
                             </div>
@@ -101,7 +101,7 @@ export const ContactSection = () => {
                         </div>
 
                         <div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 md:justify-end">
                                 <Clock />
                                 <div className="font-bold">Visit us</div>
                             </div>
