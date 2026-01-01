@@ -23,36 +23,36 @@ interface FooterSectionProps {
 
 const footerSections: FooterSectionProps[] = [
     {
-        title: "Product",
+        title: "Kurzy",
         links: [
-            { href: "#features", label: "Features" },
-            { href: "#pricing", label: "Pricing" },
-            { href: "#integrations", label: "Integrations" },
-            { href: "#api", label: "API" }
+            { href: "#features", label: "Manuální Terapie" },
+            { href: "#services", label: "Sportovní Rehabilitace" },
+            { href: "#services", label: "Neurologická Rehabilitace" },
+            { href: "#pricing", label: "Ceník" }
         ]
     },
     {
-        title: "Company",
+        title: "Společnost",
         links: [
-            { href: "#about", label: "About Us" },
-            { href: "#careers", label: "Careers" },
-            { href: "#blog", label: "Blog" }
+            { href: "#about", label: "O Nás" },
+            { href: "#testimonials", label: "Reference" },
+            { href: "#contact", label: "Kontakt" }
         ]
     },
     {
-        title: "Resources",
+        title: "Zdroje",
         links: [
-            { href: "#documentation", label: "Documentation" },
-            { href: "#help", label: "Help Center" },
-            { href: "#status", label: "Status" }
+            { href: "#features", label: "Certifikace" },
+            { href: "#features", label: "Studijní Materiály" },
+            { href: "#contact", label: "Podpora" }
         ]
     },
     {
-        title: "Legal",
+        title: "Právní",
         links: [
-            { href: "#privacy", label: "Privacy Policy" },
-            { href: "#terms", label: "Terms of Service" },
-            { href: "#cookies", label: "Cookie Policy" }
+            { href: "#privacy", label: "Ochrana Soukromí" },
+            { href: "#terms", label: "Obchodní Podmínky" },
+            { href: "#cookies", label: "Soubory Cookie" }
         ]
     }
 ]
@@ -132,9 +132,8 @@ export const FooterSection = () => {
                                         </h3>
                                     </Link>
                                     <p className="mb-6 text-muted-foreground leading-relaxed">
-                                        Build and scale your SaaS faster with
-                                        our Starter Kit. From authentication to
-                                        payments, we've got you covered.
+                                        Profesionální fyzioterapeutické kurzy od certifikovaných českých odborníků.
+                                        Komplexní vzdělávání kombinující teorii, praxi a praktické zkušenosti.
                                     </p>
 
                                     {/* Social Links */}
@@ -214,9 +213,8 @@ export const FooterSection = () => {
                                         </h3>
                                     </Link>
                                     <p className="mb-6 max-w-sm text-muted-foreground text-sm leading-relaxed">
-                                        Build and scale your SaaS faster with
-                                        our Starter Kit. From authentication to
-                                        payments, we've got you covered.
+                                        Profesionální fyzioterapeutické kurzy od certifikovaných českých odborníků.
+                                        Komplexní vzdělávání kombinující teorii, praxi a praktické zkušenosti.
                                     </p>
 
                                     {/* Social Links Mobile */}
@@ -284,23 +282,23 @@ export const FooterSection = () => {
                         <div className="flex flex-col justify-between gap-4 lg:flex-row">
                             <div className="flex flex-col items-center gap-4 text-muted-foreground text-sm sm:flex-row">
                                 <p>
-                                    &copy; 2025 {site.name}. All rights reserved.
+                                    &copy; 2025 {site.name}. Všechna práva vyhrazena.
                                 </p>
                             </div>
 
                             <div className="flex flex-col items-center gap-3 lg:flex-row lg:gap-6">
-                               
-                                
+
+
                                 <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                                    <span>Made with love by</span>
+                                    <span>Vytvořeno s láskou od</span>
                                     <Link
                                         target="_blank"
                                         to="https://xx0rt.github.io/Tr0xx/"
-                                        className="flex items-center gap-1 font-semibold"
+                                        className="flex items-center gap-1 font-semibold hover:text-foreground transition-colors"
                                     >
                                         <img
-                                            src="public/logos/logo-website-world-wide-web-svg-png-icon-download-10.png"
-                                            alt="Indietech"
+                                            src="/logos/logo-website-world-wide-web-svg-png-icon-download-10.png"
+                                            alt="Troxx"
                                             width={16}
                                             height={16}
                                             className="inline-block"
