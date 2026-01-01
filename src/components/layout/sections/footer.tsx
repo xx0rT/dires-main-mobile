@@ -299,7 +299,7 @@ export const FooterSection = () => {
                                         className="flex items-center gap-1 font-semibold"
                                     >
                                         <img
-                                            src="https://indietech.dev/logo.svg"
+                                            src="public/logos/logo-website-world-wide-web-svg-png-icon-download-10.png"
                                             alt="Indietech"
                                             width={16}
                                             height={16}
