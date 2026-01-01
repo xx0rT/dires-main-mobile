@@ -7,7 +7,13 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card"
-import Marquee from "@/components/ui/marquee"
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious
+} from "@/components/ui/carousel"
 
 interface ReviewProps {
     image: string
@@ -60,94 +66,74 @@ const reviewList: ReviewProps[] = [
     }
 ]
 
-const ReviewCard = ({ review }: { review: ReviewProps }) => {
-    return (
-        <Card className="flex h-full w-[350px] flex-col bg-muted/50 backdrop-blur-sm border-muted">
-            <CardContent className="flex flex-grow flex-col pt-6">
-                <div className="flex gap-1 pb-4">
-                    <Star className="size-4 fill-primary text-primary" />
-                    <Star className="size-4 fill-primary text-primary" />
-                    <Star className="size-4 fill-primary text-primary" />
-                    <Star className="size-4 fill-primary text-primary" />
-                    <Star className="size-4 fill-primary text-primary" />
-                </div>
-                <div className="flex flex-1 items-start pb-4">
-                    <p className="text-sm leading-relaxed line-clamp-6">{`"${review.comment}"`}</p>
-                </div>
-            </CardContent>
-
-            <CardHeader>
-                <div className="flex flex-row items-center gap-4">
-                    <Avatar>
-                        <AvatarImage
-                            src={review.image}
-                            alt={review.name}
-                        />
-                        <AvatarFallback>
-                            {review.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                    </Avatar>
-
-                    <div className="flex flex-col">
-                        <CardTitle className="text-lg">
-                            {review.name}
-                        </CardTitle>
-                        <CardDescription>
-                            {review.userName}
-                        </CardDescription>
-                    </div>
-                </div>
-            </CardHeader>
-        </Card>
-    )
-}
-
 export const TestimonialSection = () => {
     return (
-        <section id="testimonials" className="relative overflow-hidden py-16 sm:py-20">
-            {/* Animated gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/10 animate-gradient-shift" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(var(--primary-rgb,59,130,246),0.1),transparent_50%)] animate-pulse-slow" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(var(--primary-rgb,59,130,246),0.08),transparent_50%)] animate-pulse-slower" />
+        <section id="testimonials" className="container mx-auto px-4 py-16 sm:py-20">
+            <div className="mb-8 text-center">
+                <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
+                    Reference
+                </h2>
 
-            <div className="container relative z-10 mx-auto px-4">
-                <div className="mb-12 text-center">
-                    <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
-                        Reference
-                    </h2>
-
-                    <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl" data-aos="fade-up" data-aos-delay="100">
-                        Co říkají naši klienti
-                    </h2>
-
-                    <div className="mt-4 flex items-center justify-center gap-2" data-aos="fade-up" data-aos-delay="200">
-                        <div className="flex gap-1">
-                            <Star className="size-5 fill-primary text-primary" />
-                            <Star className="size-5 fill-primary text-primary" />
-                            <Star className="size-5 fill-primary text-primary" />
-                            <Star className="size-5 fill-primary text-primary" />
-                            <Star className="size-5 fill-primary text-primary" />
-                        </div>
-                        <span className="font-semibold text-2xl">5.0</span>
-                        <span className="text-muted-foreground">na Google</span>
-                    </div>
-                </div>
-
-                <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-                    <Marquee className="[--duration:40s]" pauseOnHover={true}>
-                        {reviewList.map((review, idx) => (
-                            <ReviewCard key={`${review.name}-${idx}`} review={review} />
-                        ))}
-                    </Marquee>
-                    <Marquee className="[--duration:40s] mt-4" pauseOnHover={true} reverse>
-                        {reviewList.map((review, idx) => (
-                            <ReviewCard key={`${review.name}-reverse-${idx}`} review={review} />
-                        ))}
-                    </Marquee>
-                    <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background to-transparent" />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background to-transparent" />
-                </div>
+                <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl" data-aos="fade-up" data-aos-delay="100">
+                    Co říkají naši klienti
+                </h2>
             </div>
+
+            <Carousel
+                opts={{
+                    align: "start"
+                }}
+                className="relative mx-auto w-[80%] sm:w-[90%] lg:max-w-screen-xl"
+            >
+                <CarouselContent>
+                    {reviewList.map((review) => (
+                        <CarouselItem
+                            key={review.name}
+                            className="md:basis-1/2 lg:basis-1/3"
+                        >
+                            <Card className="flex h-full flex-col bg-muted/50">
+                                <CardContent className="flex flex-grow flex-col">
+                                    <div className="flex gap-1 pb-4">
+                                        <Star className="size-4 fill-primary text-primary" />
+                                        <Star className="size-4 fill-primary text-primary" />
+                                        <Star className="size-4 fill-primary text-primary" />
+                                        <Star className="size-4 fill-primary text-primary" />
+                                        <Star className="size-4 fill-primary text-primary" />
+                                    </div>
+                                    <div className="flex flex-1 items-start pb-4">
+                                        <p className="text-sm leading-relaxed">{`"${review.comment}"`}</p>
+                                    </div>
+                                </CardContent>
+
+                                <CardHeader >
+                                    <div className="flex flex-row items-center gap-4">
+                                        <Avatar>
+                                            <AvatarImage
+                                                src={review.image}
+                                                alt={review.name}
+                                            />
+                                            <AvatarFallback>
+                                                {review.name.split(' ').map(n => n[0]).join('')}
+                                            </AvatarFallback>
+                                        </Avatar>
+
+                                        <div className="flex flex-col">
+                                            <CardTitle className="text-lg">
+                                                {review.name}
+                                            </CardTitle>
+                                            <CardDescription>
+                                                {review.userName}
+                                            </CardDescription>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                            </Card>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+            </Carousel>
         </section>
     )
 }
