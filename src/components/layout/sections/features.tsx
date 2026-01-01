@@ -57,7 +57,12 @@ export const FeaturesSection = () => {
     return (
         <section id="features" className="container mx-auto px-4 py-16 sm:py-20 relative overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="text-[12rem] md:text-[16rem] lg:text-[20rem] font-black text-gray-100 dark:text-gray-900 opacity-50 select-none">
+                <span className="text-[12rem] md:text-[16rem] lg:text-[20rem] font-black select-none uppercase tracking-tighter"
+                      style={{
+                          WebkitTextStroke: '2px rgba(128, 128, 128, 0.1)',
+                          color: 'transparent',
+                          transform: 'rotate(3deg)',
+                      }}>
                     FUNKCE
                 </span>
             </div>

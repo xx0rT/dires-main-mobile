@@ -80,43 +80,48 @@ export const CommunitySection = () => {
         }
     ]
 
-    const cardWidths = [240, 280, 320, 260, 300, 270, 290, 250]
+    const cardWidths = [350, 420, 380, 450, 400, 370, 440, 390]
 
     const firstRow = reviews.slice(0, 4)
     const secondRow = reviews.slice(4)
 
-    const ReviewCard = ({ review, width }: { review: Review; width: number }) => (
-        <Card className="flex-shrink-0" style={{ width: `${width}px` }}>
-            <CardContent className="pt-6">
-                <div className="flex items-start gap-4 mb-4">
+    const ReviewCard = ({ review, width }: { review: Review; width: number }) => {
+        const height = Math.round(width * 27 / 100)
+        return (
+            <Card className="flex-shrink-0 overflow-hidden" style={{ width: `${width}px`, height: `${height}px` }}>
+                <CardContent className="p-4 h-full flex items-center gap-3">
                     <img
                         src={review.avatar}
                         alt={review.name}
-                        className="w-12 h-12 rounded-full object-cover"
+                        className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                     />
-                    <div className="flex-1">
-                        <h3 className="font-semibold">{review.name}</h3>
-                        <div className="flex items-center gap-2">
-                            <div className="flex">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-sm truncate">{review.name}</h3>
+                            <div className="flex flex-shrink-0">
                                 {[...Array(review.rating)].map((_, i) => (
-                                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                    <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                                 ))}
                             </div>
-                            <span className="text-muted-foreground text-sm">{review.date}</span>
                         </div>
+                        <p className="text-muted-foreground text-xs line-clamp-2 leading-tight">
+                            {review.text}
+                        </p>
                     </div>
-                </div>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                    {review.text}
-                </p>
-            </CardContent>
-        </Card>
-    )
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <section id="community" className="container mx-auto py-12 overflow-hidden relative">
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-                <span className="text-[12rem] md:text-[16rem] lg:text-[20rem] font-black text-gray-100 dark:text-gray-900 opacity-50 select-none">
+                <span className="text-[12rem] md:text-[16rem] lg:text-[20rem] font-black select-none uppercase tracking-tighter"
+                      style={{
+                          WebkitTextStroke: '2px rgba(128, 128, 128, 0.1)',
+                          color: 'transparent',
+                          transform: 'rotate(-5deg)',
+                      }}>
                     RECENZE
                 </span>
             </div>
