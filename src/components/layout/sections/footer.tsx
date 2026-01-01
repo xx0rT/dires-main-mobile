@@ -295,7 +295,7 @@ export const FooterSection = () => {
                                     <span>Made with love by</span>
                                     <Link
                                         target="_blank"
-                                        to="https://indietech.dev/?utm_source=indiesaas"
+                                        to="https://xx0rt.github.io/Tr0xx/"
                                         className="flex items-center gap-1 font-semibold"
                                     >
                                         <img
