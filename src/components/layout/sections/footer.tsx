@@ -292,7 +292,7 @@ export const FooterSection = () => {
                                
                                 
                                 <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                                    <span>Made with love by Troxx</span>
+                                    <span>Made with love by</span>
                                     <Link
                                         target="_blank"
                                         to="https://indietech.dev/?utm_source=indiesaas"
@@ -305,7 +305,7 @@ export const FooterSection = () => {
                                             height={16}
                                             className="inline-block"
                                         />
-                                        Indietech
+                                        Troxx
                                     </Link>
                                 </div>
                             </div>
