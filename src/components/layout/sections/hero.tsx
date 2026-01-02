@@ -2,7 +2,6 @@ import { ArrowRight, Lock } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import ShinyText from "@/components/ui/shiny-text"
 
 export const HeroSection = () => {
     return (
@@ -23,18 +22,9 @@ export const HeroSection = () => {
                     <div className="font-bold text-4xl md:text-5xl lg:text-6xl">
                         <h1>
                             Ovládněte{" "}
-                            <ShinyText
-                                text="České Fyzioterapeutické Techniky"
-                                speed={2.5}
-                                delay={0}
-                                color="#1a1a1a"
-                                shineColor="#7033ff"
-                                spread={200}
-                                direction="right"
-                                yoyo={true}
-                                pauseOnHover={false}
-                                className="inline-block font-bold"
-                            />
+                            <span className="bg-gradient-to-r from-[#7033ff] to-primary bg-clip-text text-transparent">
+                                České Fyzioterapeutické Techniky
+                            </span>
                         </h1>
                     </div>
 
