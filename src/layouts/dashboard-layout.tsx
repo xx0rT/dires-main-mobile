@@ -3,7 +3,6 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { useAuth } from '@/lib/auth-context'
 import { Separator } from '@/components/ui/separator'
-import { MinimalBackground } from '@/components/ui/background-shapes'
 
 export default function DashboardLayout() {
   const { user, loading } = useAuth()
@@ -22,11 +21,10 @@ export default function DashboardLayout() {
 
   return (
     <SidebarProvider>
-      <MinimalBackground />
       <div className="flex min-h-screen w-full">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="flex h-14 items-center gap-4 border-b px-6 bg-background/80 backdrop-blur-sm">
+          <header className="flex h-14 items-center gap-4 border-b px-6">
             <SidebarTrigger />
             <Separator orientation="vertical" className="h-6" />
           </header>

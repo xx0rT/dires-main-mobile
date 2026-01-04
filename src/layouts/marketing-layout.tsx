@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Navbar } from '@/components/layout/navbar'
 import { FooterSection } from '@/components/layout/sections/footer'
-import { BlobBackground } from '@/components/ui/background-shapes'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 
@@ -18,7 +17,6 @@ export default function MarketingLayout() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <BlobBackground />
       <Navbar />
       <main className="flex-1">
         <Outlet />
