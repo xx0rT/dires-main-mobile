@@ -1,10 +1,10 @@
 import {
   RiSettingsLine,
   RiSpeedUpLine,
-  RiHeartPulseLine,
+  RiBookOpenLine,
   RiUserLine,
-  RiCalendarLine,
   RiBillLine,
+  RiMailLine,
 } from '@remixicon/react'
 import { Link, useLocation } from 'react-router-dom'
 import type * as React from 'react'
@@ -26,14 +26,14 @@ import { site } from '@/config/site'
 const data = {
   navMain: [
     {
-      title: 'Main',
+      title: 'Hlavní',
       items: [
-        { title: 'Overview', url: '/dashboard', icon: RiSpeedUpLine },
-        { title: 'Patients', url: '/dashboard/integrations', icon: RiUserLine },
-        { title: 'Appointments', url: '/dashboard/api', icon: RiCalendarLine },
-        { title: 'Treatments', url: '/dashboard/analytics', icon: RiHeartPulseLine },
-        { title: 'Billing', url: '/dashboard/billing', icon: RiBillLine },
-        { title: 'Settings', url: '/dashboard/settings', icon: RiSettingsLine },
+        { title: 'Přehled', url: '/dashboard', icon: RiSpeedUpLine },
+        { title: 'Moje Kurzy', url: '/dashboard/integrations', icon: RiBookOpenLine },
+        { title: 'Platby', url: '/dashboard/billing', icon: RiBillLine },
+        { title: 'Profil', url: '/dashboard/settings', icon: RiUserLine },
+        { title: 'Nastavení', url: '/dashboard/api', icon: RiSettingsLine },
+        { title: 'Kontakt', url: '/dashboard/analytics', icon: RiMailLine },
       ],
     },
   ],
