@@ -1,7 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
+interface BentoItem {
+  title: string;
+  description: string;
+  icon: string;
+  span: string;
+  href?: string;
+}
+
 interface MagicBentoProps {
+  items?: BentoItem[];
   textAutoHide?: boolean;
   enableStars?: boolean;
   enableSpotlight?: boolean;
@@ -16,6 +25,7 @@ interface MagicBentoProps {
 }
 
 const MagicBento = ({
+  items,
   textAutoHide = true,
   enableStars = true,
   enableSpotlight = true,
@@ -71,7 +81,7 @@ const MagicBento = ({
     }, 1000);
   };
 
-  const bentoItems = [
+  const defaultItems: BentoItem[] = [
     {
       title: 'Real-Time Analytics',
       description: 'Monitor your data with live updates and comprehensive dashboards',
@@ -104,10 +114,12 @@ const MagicBento = ({
     }
   ];
 
+  const bentoItems = items || defaultItems;
+
   return (
     <div
       ref={containerRef}
-      className={cn('relative w-full max-w-6xl mx-auto p-4', className)}
+      className={cn('relative w-full max-w-6xl mx-auto p-4 overflow-visible', className)}
       onClick={handleClick}
     >
       {enableSpotlight && (
@@ -149,50 +161,63 @@ const MagicBento = ({
       ))}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
-        {bentoItems.map((item, index) => (
-          <div
-            key={index}
-            className={cn(
-              'group relative rounded-2xl p-6 transition-all duration-300',
-              'bg-gradient-to-br from-background to-muted/50',
-              'border border-border/50',
-              enableBorderGlow && 'hover:border-primary/50',
-              enableTilt && 'hover:scale-[1.02]',
-              item.span
-            )}
-            style={
-              enableMagnetism
-                ? {
-                    transform: `translate(${(mousePosition.x - 400) * 0.01}px, ${(mousePosition.y - 300) * 0.01}px)`
-                  }
-                : undefined
-            }
-          >
-            {enableBorderGlow && (
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"
-                style={{
-                  background: `linear-gradient(135deg, rgba(${glowColor}, 0.3), transparent)`
-                }}
-              />
-            )}
+        {bentoItems.map((item, index) => {
+          const ItemWrapper = item.href ? 'a' : 'div';
+          const linkProps = item.href
+            ? {
+                href: item.href,
+                target: '_blank',
+                rel: 'noopener noreferrer'
+              }
+            : {};
 
-            <div className="flex flex-col h-full">
-              <div className="text-4xl mb-4">{item.icon}</div>
-              <h3 className="text-xl font-bold mb-2 transition-opacity duration-300 group-hover:opacity-100">
-                {item.title}
-              </h3>
-              <p
-                className={cn(
-                  'text-muted-foreground transition-opacity duration-300',
-                  textAutoHide && 'opacity-70 group-hover:opacity-100'
-                )}
-              >
-                {item.description}
-              </p>
-            </div>
-          </div>
-        ))}
+          return (
+            <ItemWrapper
+              key={index}
+              {...linkProps}
+              className={cn(
+                'group relative rounded-2xl p-6 transition-all duration-300 overflow-visible',
+                'bg-gradient-to-br from-background to-muted/50',
+                'border border-border/50',
+                enableBorderGlow && 'hover:border-primary/50',
+                enableTilt && 'hover:scale-[1.02]',
+                item.href && 'cursor-pointer',
+                item.span
+              )}
+              style={
+                enableMagnetism
+                  ? {
+                      transform: `translate(${(mousePosition.x - 400) * 0.01}px, ${(mousePosition.y - 300) * 0.01}px)`
+                    }
+                  : undefined
+              }
+            >
+              {enableBorderGlow && (
+                <div
+                  className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-2xl"
+                  style={{
+                    background: `linear-gradient(135deg, rgba(${glowColor}, 0.5), transparent)`
+                  }}
+                />
+              )}
+
+              <div className="flex flex-col h-full">
+                <div className="text-4xl mb-4">{item.icon}</div>
+                <h3 className="text-xl font-bold mb-2 transition-opacity duration-300 group-hover:opacity-100">
+                  {item.title}
+                </h3>
+                <p
+                  className={cn(
+                    'text-muted-foreground transition-opacity duration-300',
+                    textAutoHide && 'opacity-70 group-hover:opacity-100'
+                  )}
+                >
+                  {item.description}
+                </p>
+              </div>
+            </ItemWrapper>
+          );
+        })}
       </div>
     </div>
   );
