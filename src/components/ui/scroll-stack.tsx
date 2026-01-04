@@ -149,23 +149,23 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       }
 
       const newTransform = {
-        translateY: Math.round(translateY * 100) / 100,
-        scale: Math.round(scale * 1000) / 1000,
-        rotation: Math.round(rotation * 100) / 100,
-        blur: Math.round(blur * 100) / 100
+        translateY: Math.round(translateY),
+        scale: Math.round(scale * 10000) / 10000,
+        rotation: Math.round(rotation),
+        blur: Math.round(blur * 10) / 10
       };
 
       const lastTransform = lastTransformsRef.current.get(i);
       const hasChanged =
         !lastTransform ||
-        Math.abs(lastTransform.translateY - newTransform.translateY) > 0.1 ||
-        Math.abs(lastTransform.scale - newTransform.scale) > 0.001 ||
-        Math.abs(lastTransform.rotation - newTransform.rotation) > 0.1 ||
-        Math.abs(lastTransform.blur - newTransform.blur) > 0.1;
+        Math.abs(lastTransform.translateY - newTransform.translateY) > 0.5 ||
+        Math.abs(lastTransform.scale - newTransform.scale) > 0.0001 ||
+        Math.abs(lastTransform.rotation - newTransform.rotation) > 0.5 ||
+        Math.abs(lastTransform.blur - newTransform.blur) > 0.5;
 
       if (hasChanged) {
         const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`;
-        const filter = newTransform.blur > 0 ? `blur(${newTransform.blur}px)` : '';
+        const filter = newTransform.blur > 0 ? `blur(${newTransform.blur}px)` : 'none';
 
         card.style.transform = transform;
         card.style.filter = filter;
@@ -208,15 +208,15 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   const setupLenis = useCallback(() => {
     if (useWindowScroll) {
       const lenis = new Lenis({
-        duration: 1.2,
+        duration: 1.5,
         easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
         touchMultiplier: 2,
         infinite: false,
         wheelMultiplier: 1,
-        lerp: 0.1,
+        lerp: 0.15,
         syncTouch: true,
-        syncTouchLerp: 0.075
+        syncTouchLerp: 0.1
       });
 
       lenis.on('scroll', handleScroll);
@@ -236,16 +236,16 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       const lenis = new Lenis({
         wrapper: scroller,
         content: scroller.querySelector('.scroll-stack-inner') as HTMLElement,
-        duration: 1.2,
+        duration: 1.5,
         easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
         touchMultiplier: 2,
         infinite: false,
         gestureOrientation: 'vertical',
         wheelMultiplier: 1,
-        lerp: 0.1,
+        lerp: 0.15,
         syncTouch: true,
-        syncTouchLerp: 0.075
+        syncTouchLerp: 0.1
       });
 
       lenis.on('scroll', handleScroll);
@@ -277,13 +277,14 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       if (i < cards.length - 1) {
         card.style.marginBottom = `${itemDistance}px`;
       }
-      card.style.willChange = 'transform, filter';
+      card.style.willChange = 'transform';
       card.style.transformOrigin = 'top center';
       card.style.backfaceVisibility = 'hidden';
-      card.style.transform = 'translateZ(0)';
-      card.style.webkitTransform = 'translateZ(0)';
+      card.style.transform = 'translate3d(0, 0, 0)';
+      card.style.webkitTransform = 'translate3d(0, 0, 0)';
       card.style.perspective = '1000px';
       card.style.webkitPerspective = '1000px';
+      (card.style as any).webkitFontSmoothing = 'antialiased';
     });
 
     setupLenis();
