@@ -56,7 +56,11 @@ const featureList: FeaturesProps[] = [
 
 export const FeaturesSection = () => {
     return (
-        <section id="features" className="container mx-auto px-4 py-16 sm:py-20">
+        <section id="features" className="container mx-auto px-4 py-16 sm:py-20 relative">
+            <div className="absolute inset-0 -z-10 pointer-events-none">
+                <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[60%] w-[75%] animate-pulse bg-gradient-to-r from-primary/20 via-purple-500/20 to-primary/20 blur-3xl" />
+            </div>
+
             <div className="sticky top-24 z-10 bg-background/95 backdrop-blur-sm pb-6 -mx-4 px-4">
                 <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
                     Vlastnosti Kurzů

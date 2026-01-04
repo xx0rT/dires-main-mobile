@@ -1,304 +1,539 @@
 import { useAuth } from '@/lib/auth-context'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { RiUserLine, RiCalendarLine, RiBillLine, RiHeartPulseLine, RiArrowRightLine } from '@remixicon/react'
 import { Button } from '@/components/ui/button'
-import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Progress } from '@/components/ui/progress'
+import { RiBookOpenLine, RiTimeLine, RiTrophyLine, RiLockLine, RiCheckLine, RiPlayCircleLine, RiBillLine, RiSettingsLine, RiMailLine } from '@remixicon/react'
+import { supabase } from '@/lib/supabase'
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 
-const stats = [
-  {
-    title: 'Total Patients',
-    value: '142',
-    change: '+8 this month',
-    icon: RiUserLine,
-    trend: 'up'
-  },
-  {
-    title: 'Appointments Today',
-    value: '12',
-    change: '3 completed',
-    icon: RiCalendarLine,
-    trend: 'neutral'
-  },
-  {
-    title: 'Active Treatments',
-    value: '87',
-    change: '+15 this week',
-    icon: RiHeartPulseLine,
-    trend: 'up'
-  },
-  {
-    title: 'Revenue This Month',
-    value: '$24,500',
-    change: '+12% from last month',
-    icon: RiBillLine,
-    trend: 'up'
-  }
-]
+interface Course {
+  id: string
+  title: string
+  description: string
+  image_url: string
+  price: number
+  order_index: number
+}
 
-const upcomingAppointments = [
-  {
-    id: 1,
-    patient: 'Sarah Johnson',
-    treatment: 'Sports Injury Rehabilitation',
-    time: '10:00 AM',
-    status: 'confirmed',
-    type: 'Follow-up'
-  },
-  {
-    id: 2,
-    patient: 'Michael Chen',
-    treatment: 'Post-Surgery Therapy',
-    time: '11:30 AM',
-    status: 'confirmed',
-    type: 'Initial Assessment'
-  },
-  {
-    id: 3,
-    patient: 'Emma Davis',
-    treatment: 'Chronic Pain Management',
-    time: '2:00 PM',
-    status: 'pending',
-    type: 'Follow-up'
-  },
-  {
-    id: 4,
-    patient: 'James Wilson',
-    treatment: 'Mobility Enhancement',
-    time: '3:30 PM',
-    status: 'confirmed',
-    type: 'Regular Session'
-  }
-]
+interface CourseModule {
+  id: string
+  course_id: string
+  title: string
+  description: string
+  order_index: number
+  duration_minutes: number
+}
 
-const recentActivity = [
-  {
-    id: 1,
-    title: 'New Patient Registered',
-    description: 'Sarah Mitchell completed registration for lower back pain treatment',
-    time: '15 minutes ago',
-    type: 'patient'
-  },
-  {
-    id: 2,
-    title: 'Treatment Completed',
-    description: 'Michael Chen finished post-surgery rehabilitation session',
-    time: '1 hour ago',
-    type: 'treatment'
-  },
-  {
-    id: 3,
-    title: 'Payment Received',
-    description: '$250 payment received from Emma Davis for therapy sessions',
-    time: '2 hours ago',
-    type: 'payment'
-  },
-  {
-    id: 4,
-    title: 'Appointment Scheduled',
-    description: 'James Wilson booked follow-up appointment for next week',
-    time: '1 day ago',
-    type: 'appointment'
-  }
-]
+interface Enrollment {
+  id: string
+  course_id: string
+  progress_percentage: number
+  enrolled_at: string
+  completed_at: string | null
+  course: Course
+}
+
+interface ModuleProgress {
+  module_id: string
+  is_completed: boolean
+  completed_at: string | null
+}
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([])
+  const [availableCourses, setAvailableCourses] = useState<Course[]>([])
+  const [courseModules, setCourseModules] = useState<Record<string, CourseModule[]>>({})
+  const [moduleProgress, setModuleProgress] = useState<Record<string, ModuleProgress>>({})
+  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState({
+    completedCourses: 0,
+    inProgressCourses: 0,
+    totalHoursSpent: 0,
+    completedModules: 0
+  })
+
+  useEffect(() => {
+    loadDashboardData()
+  }, [user])
+
+  const loadDashboardData = async () => {
+    if (!user) return
+
+    try {
+      const { data: enrollmentsData } = await supabase
+        .from('user_course_enrollments')
+        .select(`
+          *,
+          course:courses(*)
+        `)
+        .eq('user_id', user.id)
+        .order('enrolled_at', { ascending: false })
+
+      const { data: coursesData } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('is_published', true)
+        .order('order_index', { ascending: true })
+
+      const { data: progressData } = await supabase
+        .from('user_module_progress')
+        .select('*')
+        .eq('user_id', user.id)
+
+      if (enrollmentsData) {
+        setEnrollments(enrollmentsData as Enrollment[])
+
+        const enrolledCourseIds = enrollmentsData.map((e: Enrollment) => e.course_id)
+        for (const courseId of enrolledCourseIds) {
+          const { data: modules } = await supabase
+            .from('course_modules')
+            .select('*')
+            .eq('course_id', courseId)
+            .order('order_index', { ascending: true })
+
+          if (modules) {
+            setCourseModules(prev => ({ ...prev, [courseId]: modules }))
+          }
+        }
+      }
+
+      if (coursesData) {
+        setAvailableCourses(coursesData)
+      }
+
+      if (progressData) {
+        const progressMap: Record<string, ModuleProgress> = {}
+        progressData.forEach((p: ModuleProgress) => {
+          progressMap[p.module_id] = p
+        })
+        setModuleProgress(progressMap)
+
+        const completedModulesCount = progressData.filter((p: ModuleProgress) => p.is_completed).length
+        const totalMinutes = progressData.filter((p: ModuleProgress) => p.is_completed).length * 60
+
+        setStats({
+          completedCourses: enrollmentsData?.filter((e: Enrollment) => e.completed_at).length || 0,
+          inProgressCourses: enrollmentsData?.filter((e: Enrollment) => !e.completed_at).length || 0,
+          totalHoursSpent: Math.round(totalMinutes / 60),
+          completedModules: completedModulesCount
+        })
+      }
+    } catch (error) {
+      console.error('Error loading dashboard data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const enrollInCourse = async (courseId: string) => {
+    if (!user) return
+
+    try {
+      const { error } = await supabase
+        .from('user_course_enrollments')
+        .insert({
+          user_id: user.id,
+          course_id: courseId,
+          progress_percentage: 0
+        })
+
+      if (!error) {
+        loadDashboardData()
+      }
+    } catch (error) {
+      console.error('Error enrolling in course:', error)
+    }
+  }
+
+  const markModuleComplete = async (moduleId: string, courseId: string) => {
+    if (!user) return
+
+    try {
+      const { error } = await supabase
+        .from('user_module_progress')
+        .upsert({
+          user_id: user.id,
+          module_id: moduleId,
+          course_id: courseId,
+          is_completed: true,
+          completed_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,module_id'
+        })
+
+      if (!error) {
+        const modules = courseModules[courseId] || []
+        const completedCount = Object.values(moduleProgress).filter(p =>
+          p.is_completed && modules.some(m => m.id === p.module_id)
+        ).length + 1
+
+        const progressPercentage = (completedCount / modules.length) * 100
+
+        await supabase
+          .from('user_course_enrollments')
+          .update({
+            progress_percentage: progressPercentage,
+            completed_at: progressPercentage === 100 ? new Date().toISOString() : null
+          })
+          .eq('user_id', user.id)
+          .eq('course_id', courseId)
+
+        loadDashboardData()
+      }
+    } catch (error) {
+      console.error('Error marking module complete:', error)
+    }
+  }
 
   const getGreeting = () => {
     const hour = new Date().getHours()
-    if (hour < 12) return 'Good morning'
-    if (hour < 18) return 'Good afternoon'
-    return 'Good evening'
+    if (hour < 12) return 'Dobré ráno'
+    if (hour < 18) return 'Dobré odpoledne'
+    return 'Dobrý večer'
+  }
+
+  const isModuleUnlocked = (courseId: string, moduleIndex: number) => {
+    if (moduleIndex === 0) return true
+
+    const modules = courseModules[courseId] || []
+    const previousModule = modules[moduleIndex - 1]
+
+    if (!previousModule) return false
+
+    return moduleProgress[previousModule.id]?.is_completed || false
+  }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5
+      }
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-8">
-      <div>
+    <div className="space-y-8 relative">
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/3 left-1/2 h-[40%] w-[60%] animate-pulse bg-gradient-to-r from-primary/15 via-purple-500/15 to-primary/15 blur-3xl" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <h1 className="text-3xl font-bold">
-          {getGreeting()}, Dr. {user?.email?.split('@')[0] || 'Therapist'}
+          {getGreeting()}, {user?.email?.split('@')[0] || 'Studente'}
         </h1>
         <p className="text-muted-foreground mt-2">
-          Here's your clinic overview and today's schedule.
+          Vítejte zpět na vaší vzdělávací platformě. Pokračujte ve svém učení.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
+      <motion.div
+        className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {[
+          { title: 'Dokončené Kurzy', value: stats.completedCourses, icon: RiTrophyLine, color: 'text-green-600' },
+          { title: 'Probíhající Kurzy', value: stats.inProgressCourses, icon: RiBookOpenLine, color: 'text-blue-600' },
+          { title: 'Hodin Studia', value: stats.totalHoursSpent, icon: RiTimeLine, color: 'text-purple-600' },
+          { title: 'Dokončené Lekce', value: stats.completedModules, icon: RiCheckLine, color: 'text-orange-600' }
+        ].map((stat) => {
           const Icon = stat.icon
           return (
-            <Card key={stat.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className={`text-xs ${stat.trend === 'up' ? 'text-green-600 dark:text-green-400' : stat.trend === 'down' ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}>
-                  {stat.change}
-                </p>
-              </CardContent>
-            </Card>
+            <motion.div key={stat.title} variants={itemVariants}>
+              <Card className="relative overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {stat.title}
+                  </CardTitle>
+                  <Icon className={`h-4 w-4 ${stat.color}`} />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                </CardContent>
+              </Card>
+            </motion.div>
           )
         })}
-      </div>
+      </motion.div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Today's Appointments</CardTitle>
-                <CardDescription>
-                  You have {upcomingAppointments.length} appointments scheduled for today
-                </CardDescription>
-              </div>
-              <Button asChild variant="outline" size="sm">
-                <Link to="/dashboard/api">
-                  View All
-                  <RiArrowRightLine className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {upcomingAppointments.map((appointment) => (
-                <div key={appointment.id} className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
-                  <div className="flex items-start gap-4 flex-1">
-                    <div className="flex flex-col items-center justify-center min-w-[60px] p-2 rounded-lg bg-primary/10">
-                      <span className="text-sm font-bold text-primary">{appointment.time}</span>
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold">{appointment.patient}</p>
-                        <Badge variant={appointment.status === 'confirmed' ? 'default' : 'secondary'} className="text-xs">
-                          {appointment.status}
-                        </Badge>
+      <Tabs defaultValue="learning" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
+          <TabsTrigger value="learning">
+            <RiBookOpenLine className="h-4 w-4 mr-2" />
+            Učení
+          </TabsTrigger>
+          <TabsTrigger value="billing">
+            <RiBillLine className="h-4 w-4 mr-2" />
+            Platby
+          </TabsTrigger>
+          <TabsTrigger value="settings">
+            <RiSettingsLine className="h-4 w-4 mr-2" />
+            Nastavení
+          </TabsTrigger>
+          <TabsTrigger value="contact">
+            <RiMailLine className="h-4 w-4 mr-2" />
+            Kontakt
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="learning" className="space-y-6">
+          {enrollments.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Moje Kurzy</CardTitle>
+                  <CardDescription>
+                    Pokračujte tam, kde jste skončili
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {enrollments.map((enrollment) => {
+                    const modules = courseModules[enrollment.course_id] || []
+                    const completedModules = modules.filter(m =>
+                      moduleProgress[m.id]?.is_completed
+                    ).length
+
+                    return (
+                      <div key={enrollment.id} className="space-y-4 p-4 border rounded-lg">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-1 flex-1">
+                            <h3 className="font-semibold text-lg">{enrollment.course.title}</h3>
+                            <p className="text-sm text-muted-foreground">{enrollment.course.description}</p>
+                            <div className="flex items-center gap-4 mt-2">
+                              <span className="text-sm text-muted-foreground">
+                                {completedModules} / {modules.length} lekcí
+                              </span>
+                              {enrollment.completed_at && (
+                                <Badge variant="default" className="bg-green-600">
+                                  <RiTrophyLine className="h-3 w-3 mr-1" />
+                                  Dokončeno
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Pokrok</span>
+                            <span className="font-medium">{Math.round(enrollment.progress_percentage)}%</span>
+                          </div>
+                          <Progress value={enrollment.progress_percentage} className="h-2" />
+                        </div>
+
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-sm">Lekce:</h4>
+                          {modules.map((module, index) => {
+                            const isCompleted = moduleProgress[module.id]?.is_completed
+                            const isUnlocked = isModuleUnlocked(enrollment.course_id, index)
+
+                            return (
+                              <div
+                                key={module.id}
+                                className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                                  isCompleted
+                                    ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'
+                                    : isUnlocked
+                                    ? 'bg-background hover:bg-accent cursor-pointer'
+                                    : 'bg-muted opacity-60'
+                                }`}
+                              >
+                                <div className="flex items-center gap-3 flex-1">
+                                  {isCompleted ? (
+                                    <div className="rounded-full bg-green-600 p-1.5">
+                                      <RiCheckLine className="h-4 w-4 text-white" />
+                                    </div>
+                                  ) : isUnlocked ? (
+                                    <div className="rounded-full bg-primary/20 p-1.5">
+                                      <RiPlayCircleLine className="h-4 w-4 text-primary" />
+                                    </div>
+                                  ) : (
+                                    <div className="rounded-full bg-muted p-1.5">
+                                      <RiLockLine className="h-4 w-4 text-muted-foreground" />
+                                    </div>
+                                  )}
+                                  <div className="flex-1">
+                                    <p className="text-sm font-medium">{module.title}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {module.duration_minutes} minut
+                                    </p>
+                                  </div>
+                                </div>
+                                {isUnlocked && !isCompleted && (
+                                  <Button
+                                    size="sm"
+                                    onClick={() => markModuleComplete(module.id, enrollment.course_id)}
+                                  >
+                                    Označit jako hotové
+                                  </Button>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground">{appointment.treatment}</p>
-                      <p className="text-xs text-muted-foreground">{appointment.type}</p>
-                    </div>
+                    )
+                  })}
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
+          {availableCourses.filter(course =>
+            !enrollments.some(e => e.course_id === course.id)
+          ).length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Dostupné Kurzy</CardTitle>
+                  <CardDescription>
+                    Zapište se do nových kurzů a rozšiřte své znalosti
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {availableCourses
+                      .filter(course => !enrollments.some(e => e.course_id === course.id))
+                      .map((course) => (
+                        <Card key={course.id} className="overflow-hidden">
+                          <div className="aspect-video bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
+                            <RiBookOpenLine className="h-16 w-16 text-primary/50" />
+                          </div>
+                          <CardHeader>
+                            <CardTitle className="text-lg">{course.title}</CardTitle>
+                            <CardDescription>{course.description}</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <span className="text-2xl font-bold">€{course.price}</span>
+                              <Button onClick={() => enrollInCourse(course.id)}>
+                                Zapsat se
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
                   </div>
-                  <Button variant="ghost" size="sm">
-                    View Details
-                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="billing">
+          <Card>
+            <CardHeader>
+              <CardTitle>Platby a Fakturace</CardTitle>
+              <CardDescription>Spravujte své platby a prohlížejte faktury</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-center py-12">
+                  <RiBillLine className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Historie plateb</h3>
+                  <p className="text-muted-foreground">
+                    Zde se zobrazí vaše platební historie a faktury
+                  </p>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Latest updates from your clinic
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-4">
-                  <div className="mt-1 rounded-full bg-primary/10 p-2">
-                    <div className="h-2 w-2 rounded-full bg-primary" />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {activity.title}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {activity.description}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {activity.time}
-                    </p>
+        <TabsContent value="settings">
+          <Card>
+            <CardHeader>
+              <CardTitle>Nastavení Účtu</CardTitle>
+              <CardDescription>Upravte své osobní údaje a předvolby</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Email</label>
+                  <div className="p-3 bg-muted rounded-lg">
+                    {user?.email}
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                <div className="text-center py-8">
+                  <RiSettingsLine className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">
+                    Další nastavení budou brzy k dispozici
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>
-              Common tasks and shortcuts
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button asChild variant="outline" className="w-full justify-start">
-              <Link to="/dashboard/api">
-                <RiCalendarLine className="mr-2 h-4 w-4" />
-                Schedule New Appointment
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="w-full justify-start">
-              <Link to="/dashboard/integrations">
-                <RiUserLine className="mr-2 h-4 w-4" />
-                Add New Patient
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="w-full justify-start">
-              <Link to="/dashboard/analytics">
-                <RiHeartPulseLine className="mr-2 h-4 w-4" />
-                Create Treatment Plan
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="w-full justify-start">
-              <Link to="/dashboard/billing">
-                <RiBillLine className="mr-2 h-4 w-4" />
-                Process Payment
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Getting Started</CardTitle>
-            <CardDescription>
-              Complete these steps to set up your clinic
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 rounded-full bg-green-500/20 p-1">
-                <svg className="h-3 w-3 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
+        <TabsContent value="contact">
+          <Card>
+            <CardHeader>
+              <CardTitle>Kontaktujte Podporu</CardTitle>
+              <CardDescription>Máte dotazy? Jsme tu, abychom vám pomohli</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="text-center py-8">
+                  <RiMailLine className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Potřebujete pomoc?</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Náš tým podpory je připraven odpovědět na vaše dotazy
+                  </p>
+                  <Button>Odeslat zprávu</Button>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-semibold mb-2">Email Podpora</h4>
+                    <p className="text-sm text-muted-foreground">podpora@fyzioterapie.cz</p>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-semibold mb-2">Telefonická Podpora</h4>
+                    <p className="text-sm text-muted-foreground">+420 123 456 789</p>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium">Create Account</p>
-                <p className="text-xs text-muted-foreground">Successfully registered as a therapist</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 rounded-full bg-primary/20 p-1">
-                <div className="h-3 w-3 rounded-full border-2 border-primary" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium">Add Your First Patient</p>
-                <p className="text-xs text-muted-foreground">Start managing patient records and treatments</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 rounded-full bg-muted p-1">
-                <div className="h-3 w-3 rounded-full border-2 border-muted-foreground" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium">Schedule Appointments</p>
-                <p className="text-xs text-muted-foreground">Book your first therapy session</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

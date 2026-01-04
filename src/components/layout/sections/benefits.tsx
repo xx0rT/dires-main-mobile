@@ -37,7 +37,11 @@ const benefitList: BenefitsProps[] = [
 
 export const BenefitsSection = () => {
     return (
-        <section id="benefits" className="container mx-auto px-4 py-16 sm:py-20">
+        <section id="benefits" className="container mx-auto px-4 py-16 sm:py-20 relative">
+            <div className="absolute inset-0 -z-10 pointer-events-none">
+                <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[50%] w-[70%] animate-pulse bg-gradient-to-r from-primary/20 via-purple-500/20 to-primary/20 blur-3xl" />
+            </div>
+
             <div className="grid place-items-start lg:grid-cols-2 lg:gap-24">
                 <div className="sticky top-32 self-start" data-aos="fade-right">
                     <h2 className="mb-2 text-lg text-primary tracking-wider">
