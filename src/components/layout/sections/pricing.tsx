@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export const PricingSection = () => {
   return (
-    <section className="py-32 text-background md:container md:max-w-5xl">
+    <section className="py-32 text-background md:container md:max-w-5xl mx-auto">
       <div className="relative isolate container grid items-center overflow-hidden bg-linear-to-r from-primary to-primary/75 py-8 max-lg:gap-10 max-md:gap-6 md:rounded-3xl lg:grid-cols-2 lg:px-8">
         <div className="absolute inset-0 -z-10 [mask-image:linear-gradient(to_left,black_50%,transparent_100%)]">
           <PlusSigns className="h-full w-full text-background/[0.05]" />
