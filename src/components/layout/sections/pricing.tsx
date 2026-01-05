@@ -7,6 +7,7 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card"
+import { Link } from "react-router-dom"
 
 enum PopularPlan {
     NO = 0,
@@ -86,7 +87,7 @@ export const PricingSection = () => {
             </h2>
 
             <h3 className="mx-auto pb-14 text-center text-muted-foreground text-xl md:w-1/2" data-aos="fade-up" data-aos-delay="200">
-                Vyberte si úroveň kurzu, která odpovídá vašim zkušenostem a kariérním cílům. Všechny ceny zahrnují materiály a certifikaci.
+                Vyberte si kurz podle svých zkušeností. <span className="font-semibold text-foreground">Zahrnuje vše:</span> materiály, certifikát, podporu.
             </h3>
 
             <div className="grid space-x-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-4">
@@ -142,6 +143,7 @@ export const PricingSection = () => {
 
                             <CardFooter>
                                 <Button
+                                    asChild
                                     variant={
                                         popular === PopularPlan?.YES
                                             ? "default"
@@ -149,7 +151,9 @@ export const PricingSection = () => {
                                     }
                                     className="w-full"
                                 >
-                                    {buttonText}
+                                    <Link to="/auth/sign-up">
+                                        {buttonText}
+                                    </Link>
                                 </Button>
                             </CardFooter>
                         </Card>

@@ -18,39 +18,39 @@ interface FeaturesProps {
 const featureList: FeaturesProps[] = [
     {
         icon: <RiShieldKeyholeLine size={24} className="text-primary" />,
-        title: "Certifikované Vzdělávání",
+        title: "Certifikované Kurzy",
         description:
-            "Všechny kurzy jsou certifikované a uznávané českými lékařskými asociacemi a mezinárodními fyzioterapeutickými radami."
+            "Uznávané české i mezinárodní certifikáty pro praxi po celé Evropě."
     },
     {
         icon: <RiDashboard3Line size={24} className="text-primary" />,
         title: "Praktická Výuka",
         description:
-            "Rozsáhlé praktické lekce se skutečnými pacienty pod odborným dohledem v moderních zařízeních."
+            "Reálná praxe se skutečnými pacienty v moderních zařízeních."
     },
     {
         icon: <RiUploadCloud2Line size={24} className="text-primary" />,
-        title: "Online Materiály",
+        title: "Online Přístup",
         description:
-            "Přístup ke komplexním video knihovnám, studijním materiálům a dokumentaci kdykoli a kdekoli."
+            "Video lekce a materiály dostupné kdykoli, odkudkoli."
     },
     {
         icon: <RiDatabase2Line size={24} className="text-primary" />,
         title: "Zkušení Lektoři",
         description:
-            "Učte se od zkušených českých fyzioterapeutů s desetiletími klinické praxe a výukových zkušeností."
+            "Profesionálové s desetiletími praktických zkušeností."
     },
     {
         icon: <RiFireFill size={24} className="text-primary" />,
         title: "Malé Skupiny",
         description:
-            "Omezená velikost tříd zajišťuje individuální pozornost a optimální výsledky pro každého studenta."
+            "Maximálně 12 studentů pro individuální pozornost."
     },
     {
         icon: <RiStackLine size={24} className="text-primary" />,
         title: "Celoživotní Podpora",
         description:
-            "Připojte se k naší síti absolventů s neustálým přístupem ke zdrojům, aktualizacím a možnostem profesního rozvoje."
+            "Trvalý přístup k materiálům a síti absolventů."
     }
 ]
 
@@ -79,7 +79,7 @@ export const FeaturesSection = () => {
                 </div>
 
                 <h3 className="mx-auto text-center text-muted-foreground text-xl md:w-1/2" data-aos="fade-up" data-aos-delay="200">
-                    Naše komplexní fyzioterapeutické kurzy kombinují tradiční české metody s moderními rehabilitačními technikami pro nejlepší vzdělávací zkušenost.
+                    České metody + moderní techniky = <span className="font-semibold text-foreground">Vaše úspěšná kariéra</span>
                 </h3>
             </div>
 

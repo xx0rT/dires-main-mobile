@@ -1,6 +1,9 @@
 import type { icons } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Icon } from "@/components/ui/icon"
+import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom"
+import { ArrowRight } from "lucide-react"
 
 interface BenefitsProps {
     icon: string
@@ -11,27 +14,27 @@ interface BenefitsProps {
 const benefitList: BenefitsProps[] = [
     {
         icon: "Rocket",
-        title: "Rychlé Vzdělávání",
+        title: "Rychlý Start Kariéry",
         description:
-            "Zrychlené programy navržené tak, abyste mohli efektivně praktikovat během měsíců, ne let. Intenzivní moduly zaměřené na praktické dovednosti."
+            "Získejte certifikát během 3-6 měsíců a začněte praktikovat rychleji než tradičními programy."
     },
     {
         icon: "Award",
-        title: "Mezinárodní Uznání",
+        title: "Mezinárodní Certifikát",
         description:
-            "Certifikáty uznávané v celé Evropě a mezinárodně. Otevřete si dveře k praxi v mnoha zemích s českými certifikovanými referencemi."
+            "Uznávaný v celé Evropě. Otevřete si možnosti práce v jakékoli zemi."
     },
     {
         icon: "Users",
-        title: "Odborné Mentorství",
+        title: "Osobní Mentoring",
         description:
-            "Individuální vedení od zkušených fyzioterapeutů. Získejte osobní zpětnou vazbu a kariérní rady během celé vaší cesty."
+            "Individuální vedení od zkušených fyzioterapeutů pro vaše nejlepší výsledky."
     },
     {
         icon: "Shield",
-        title: "Osvědčené Metody",
+        title: "Ověřené Techniky",
         description:
-            "Učte se časem ověřené české techniky podložené desetiletími klinického výzkumu a úspěšnými výsledky pacientů po celém světě."
+            "České metody prověřené desetiletími úspěšné klinické praxe."
     }
 ]
 
@@ -49,11 +52,17 @@ export const BenefitsSection = () => {
                     </h2>
 
                     <h2 className="mb-4 font-bold text-3xl md:text-4xl">
-                        Vaše Cesta k Dokonalosti
+                        Proč Si Vybrat Naše Kurzy
                     </h2>
                     <p className="mb-8 text-muted-foreground text-xl">
-                        Připojte se ke stovkám úspěšných fyzioterapeutů, kteří transformovali své kariéry prostřednictvím našich vzdělávacích programů českých metod. Odborná výuka, praktické zkušenosti a celoživotní podpora.
+                        Staňte se certifikovaným fyzioterapeutem rychleji a efektivněji. <span className="font-semibold text-foreground">Začněte svou kariéru ještě dnes.</span>
                     </p>
+                    <Button asChild size="lg" className="group/arrow rounded-full">
+                        <Link to="/auth/sign-up">
+                            Vytvořit účet zdarma
+                            <ArrowRight className="ml-2 size-5 transition-transform group-hover/arrow:translate-x-1" />
+                        </Link>
+                    </Button>
                 </div>
 
                 <div className="grid w-full gap-4 lg:grid-cols-2" data-aos="fade-left">
