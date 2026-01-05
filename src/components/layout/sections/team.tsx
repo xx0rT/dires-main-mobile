@@ -12,7 +12,6 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { ShapeDivider } from "@/components/ui/shape-divider"
 
 interface TeamProps {
     imageUrl: string
@@ -156,9 +155,7 @@ export const TeamSection = () => {
     }
 
     return (
-        <section id="team" className="relative w-full py-16 sm:py-20 bg-muted">
-            <ShapeDivider position="top" flip={true} fill="fill-muted" />
-            <div className="container mx-auto px-4">
+        <section id="team" className="container mx-auto px-4 py-16 sm:py-20">
             <div className="mb-8 text-center">
                 <h2 className="mb-2 text-center text-lg text-primary tracking-wider">
                     Tým
@@ -313,8 +310,6 @@ export const TeamSection = () => {
                     )}
                 </DialogContent>
             </Dialog>
-            </div>
-            <ShapeDivider position="bottom" fill="fill-background" />
         </section>
     )
 }
