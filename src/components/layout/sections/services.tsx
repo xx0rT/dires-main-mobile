@@ -1,4 +1,5 @@
 import MagicBento from '@/components/ui/magic-bento'
+import { ShapeDivider } from '@/components/ui/shape-divider'
 
 const physioItems = [
     {
@@ -42,8 +43,9 @@ export const ServicesSection = () => {
     return (
         <section
             id="services"
-            className="w-full py-16 sm:py-20 overflow-visible"
+            className="relative w-full py-16 sm:py-20 overflow-visible"
         >
+            <ShapeDivider position="top" variant="waves" flip={true} />
             <div className="container mx-auto px-4 mb-12">
                 <h2 className="mb-2 text-center text-lg text-primary tracking-wider">
                     Specializace Kurzů
@@ -73,6 +75,7 @@ export const ServicesSection = () => {
                     glowColor="132, 0, 255"
                 />
             </div>
+            <ShapeDivider position="bottom" variant="curve" />
         </section>
     )
 }

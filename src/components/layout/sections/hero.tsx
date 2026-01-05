@@ -2,10 +2,11 @@ import { ArrowRight, Lock } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ShapeDivider } from "@/components/ui/shape-divider"
 
 export const HeroSection = () => {
     return (
-        <section className="container mx-auto w-full px-4">
+        <section className="container relative mx-auto w-full px-4">
             <div className="grid gap-12 py-24 md:grid-cols-2 md:items-center md:gap-14 lg:grid-cols-[0.8fr,1.2fr] lg:gap-20 xl:gap-24 xl:py-32">
                 {/* Left side - Copy */}
                 <div className="space-y-8 text-center md:space-y-10 md:text-left" data-aos="fade-right">
@@ -106,6 +107,7 @@ export const HeroSection = () => {
                     <div className="-top-8 -left-8 absolute -z-10 size-28 rounded-full bg-primary/30 blur-3xl lg:size-36" />
                 </div>
             </div>
+            <ShapeDivider position="bottom" variant="waves" />
         </section>
     )
 }

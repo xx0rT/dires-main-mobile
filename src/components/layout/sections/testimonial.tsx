@@ -14,6 +14,7 @@ import {
     CarouselNext,
     CarouselPrevious
 } from "@/components/ui/carousel"
+import { ShapeDivider } from "@/components/ui/shape-divider"
 
 interface ReviewProps {
     image: string
@@ -68,7 +69,8 @@ const reviewList: ReviewProps[] = [
 
 export const TestimonialSection = () => {
     return (
-        <section id="testimonials" className="container mx-auto px-4 py-16 sm:py-20">
+        <section id="testimonials" className="container relative mx-auto px-4 py-16 sm:py-20">
+            <ShapeDivider position="top" variant="tilt" flip={true} />
             <div className="mb-8 text-center">
                 <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
                     Reference
@@ -134,6 +136,7 @@ export const TestimonialSection = () => {
                 <CarouselPrevious />
                 <CarouselNext />
             </Carousel>
+            <ShapeDivider position="bottom" variant="waves" />
         </section>
     )
 }

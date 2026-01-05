@@ -7,6 +7,7 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card"
+import { ShapeDivider } from "@/components/ui/shape-divider"
 
 enum PopularPlan {
     NO = 0,
@@ -73,6 +74,7 @@ const plans: PlanProps[] = [
 export const PricingSection = () => {
     return (
         <section id="pricing" className="container mx-auto px-4 py-16 sm:py-20 relative">
+            <ShapeDivider position="top" variant="waves" flip={true} />
             <div className="absolute inset-0 -z-10 pointer-events-none">
                 <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[55%] w-[80%] animate-pulse bg-gradient-to-r from-primary/25 via-purple-500/25 to-primary/25 blur-3xl" />
             </div>
@@ -156,6 +158,7 @@ export const PricingSection = () => {
                     )
                 )}
             </div>
+            <ShapeDivider position="bottom" variant="curve" />
         </section>
     )
 }

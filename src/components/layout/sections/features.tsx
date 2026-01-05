@@ -8,6 +8,7 @@ import {
 } from "@remixicon/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import RotatingText from "@/components/ui/rotating-text"
+import { ShapeDivider } from "@/components/ui/shape-divider"
 
 interface FeaturesProps {
     icon: React.ReactNode
@@ -56,7 +57,8 @@ const featureList: FeaturesProps[] = [
 
 export const FeaturesSection = () => {
     return (
-        <section id="features" className="container mx-auto px-4 py-16 sm:py-20">
+        <section id="features" className="container relative mx-auto px-4 py-16 sm:py-20">
+            <ShapeDivider position="top" variant="curve" flip={true} />
             <div className="sticky top-24 z-10 bg-background/95 backdrop-blur-sm pb-6 -mx-4 px-4">
                 <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
                     Vlastnosti Kurzů
@@ -102,6 +104,7 @@ export const FeaturesSection = () => {
                     </div>
                 ))}
             </div>
+            <ShapeDivider position="bottom" variant="tilt" />
         </section>
     )
 }
