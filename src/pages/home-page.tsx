@@ -17,67 +17,43 @@ export default function HomePage() {
         <HeroSection />
       </div>
 
-      <div className="bg-muted/30">
+      <div className="bg-background">
         <LogoCloud />
       </div>
 
-      <div className="bg-background">
-        <div className="container mx-auto px-4 py-16">
-          <div className="rounded-3xl bg-card border border-border/50 shadow-lg p-8 md:p-12">
-            <BenefitsSection />
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-muted/30">
-        <div className="container mx-auto px-4 py-16">
-          <div className="rounded-3xl bg-card border border-border/50 shadow-lg p-8 md:p-12">
-            <FeaturesSection />
-          </div>
-        </div>
+      <div className="bg-muted/40">
+        <BenefitsSection />
       </div>
 
       <div className="bg-background">
-        <div className="container mx-auto px-4 py-16">
-          <div className="rounded-3xl bg-card border border-border/50 shadow-lg p-8 md:p-12">
-            <ServicesSection />
-          </div>
-        </div>
+        <FeaturesSection />
       </div>
 
-      <div className="bg-muted/30">
+      <div className="bg-muted/40">
+        <ServicesSection />
+      </div>
+
+      <div className="bg-background">
         <TestimonialSection />
       </div>
 
-      <div className="bg-background">
-        <div className="container mx-auto px-4 py-16">
-          <div className="rounded-3xl bg-card border border-border/50 shadow-lg p-8 md:p-12">
-            <TeamSection />
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-muted/30">
-        <div className="container mx-auto px-4 py-16">
-          <div className="rounded-3xl bg-card border border-border/50 shadow-lg p-8 md:p-12">
-            <CommunitySection />
-          </div>
-        </div>
+      <div className="bg-muted/40">
+        <TeamSection />
       </div>
 
       <div className="bg-background">
+        <CommunitySection />
+      </div>
+
+      <div className="bg-muted/40">
         <PricingSection />
       </div>
 
-      <div className="bg-muted/30">
-        <div className="container mx-auto px-4 py-16">
-          <div className="rounded-3xl bg-card border border-border/50 shadow-lg p-8 md:p-12">
-            <ContactSection />
-          </div>
-        </div>
+      <div className="bg-background">
+        <ContactSection />
       </div>
 
-      <div className="bg-background">
+      <div className="bg-muted/40">
         <FAQSection />
       </div>
     </>
