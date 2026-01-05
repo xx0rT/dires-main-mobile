@@ -177,7 +177,6 @@ html {
 
 body {
   letter-spacing: var(--tracking-normal);
-  zoom: 90%;
 }
 
 @layer base {
