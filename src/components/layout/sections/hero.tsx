@@ -107,7 +107,7 @@ export const HeroSection = () => {
                     <div className="-top-8 -left-8 absolute -z-10 size-28 rounded-full bg-primary/30 blur-3xl lg:size-36" />
                 </div>
             </div>
-            <ShapeDivider position="bottom" variant="waves" />
+            <ShapeDivider position="bottom" fill="fill-background" />
         </section>
     )
 }

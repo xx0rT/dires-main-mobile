@@ -45,7 +45,7 @@ export const ServicesSection = () => {
             id="services"
             className="relative w-full py-16 sm:py-20 overflow-visible"
         >
-            <ShapeDivider position="top" variant="waves" flip={true} />
+            <ShapeDivider position="top" flip={true} fill="fill-background" />
             <div className="container mx-auto px-4 mb-12">
                 <h2 className="mb-2 text-center text-lg text-primary tracking-wider">
                     Specializace Kurzů
@@ -75,7 +75,7 @@ export const ServicesSection = () => {
                     glowColor="132, 0, 255"
                 />
             </div>
-            <ShapeDivider position="bottom" variant="curve" />
+            <ShapeDivider position="bottom" fill="fill-muted" />
         </section>
     )
 }
