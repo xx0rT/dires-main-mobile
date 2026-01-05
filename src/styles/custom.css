@@ -77,21 +77,8 @@ html {
   .animate-marquee {
     animation: marquee var(--duration) linear infinite;
   }
-
+  
   .animate-marquee-vertical {
     animation: marquee-vertical var(--duration) linear infinite;
   }
-}
-
-.wave-section {
-  position: relative;
-  overflow-x: hidden;
-}
-
-.wave-divider {
-  width: 100%;
-  aspect-ratio: 960/300;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
 }
