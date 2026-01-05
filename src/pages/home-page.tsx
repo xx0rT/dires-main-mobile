@@ -13,47 +13,47 @@ import LogoCloud from '@/components/logo-cloud'
 export default function HomePage() {
   return (
     <>
-      <div className="bg-background">
+      <div className="bg-background transition-colors duration-700">
         <HeroSection />
       </div>
 
-      <div className="bg-background">
+      <div className="bg-background transition-colors duration-700">
         <LogoCloud />
       </div>
 
-      <div className="bg-muted/40">
+      <div className="bg-muted/70 transition-colors duration-700">
         <BenefitsSection />
       </div>
 
-      <div className="bg-background">
+      <div className="bg-background transition-colors duration-700">
         <FeaturesSection />
       </div>
 
-      <div className="bg-muted/40">
+      <div className="bg-muted/70 transition-colors duration-700">
         <ServicesSection />
       </div>
 
-      <div className="bg-background">
+      <div className="bg-background transition-colors duration-700">
         <TestimonialSection />
       </div>
 
-      <div className="bg-muted/40">
+      <div className="bg-muted/70 transition-colors duration-700">
         <TeamSection />
       </div>
 
-      <div className="bg-background">
+      <div className="bg-background transition-colors duration-700">
         <CommunitySection />
       </div>
 
-      <div className="bg-muted/40">
+      <div className="bg-muted/70 transition-colors duration-700">
         <PricingSection />
       </div>
 
-      <div className="bg-background">
+      <div className="bg-background transition-colors duration-700">
         <ContactSection />
       </div>
 
-      <div className="bg-muted/40">
+      <div className="bg-muted/70 transition-colors duration-700">
         <FAQSection />
       </div>
     </>
