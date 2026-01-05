@@ -1,5 +1,4 @@
 import { Menu, X } from "lucide-react"
-import { RiGithubFill } from "@remixicon/react"
 import { Link } from "react-router-dom"
 import React from "react"
 import { ModeToggle } from "./mode-toggle"
@@ -396,20 +395,6 @@ export const Navbar = () => {
 
                     {/* Desktop Actions */}
                     <div className="hidden items-center gap-2 lg:flex">
-                    <Button
-                            asChild
-                            variant="outline"
-                            size="icon"
-                            className="size-10 rounded-full"
-                        >
-                            <Link
-                                to={site.links.github}
-                                target="_blank"
-                                aria-label="View on GitHub"
-                            >
-                                <RiGithubFill className="size-5 fill-foreground" />
-                            </Link>
-                        </Button>
                         <ModeToggle />
 
                         <Button
@@ -435,20 +420,6 @@ export const Navbar = () => {
 
                     {/* Mobile Menu Button */}
                     <div className="flex items-center gap-2 lg:hidden">
-                        <Button
-                            asChild
-                            variant="outline"
-                            size="icon"
-                            className="size-10 rounded-full"
-                        >
-                            <Link
-                                to={site.links.github}
-                                target="_blank"
-                                aria-label="View on GitHub"
-                            >
-                                <RiGithubFill className="size-5 fill-foreground" />
-                            </Link>
-                        </Button>
                         <ModeToggle />
                         <Sheet open={isOpen} onOpenChange={setIsOpen}>
                             <SheetTrigger asChild>
