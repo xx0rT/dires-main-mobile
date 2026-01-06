@@ -96,7 +96,15 @@ const Pricing20 = ({ className }: Pricing20Props) => {
       <div className="container mx-auto mt-10 lg:mt-14">
         <section className="grid border max-lg:divide-y lg:grid-cols-3 lg:divide-x">
           {pricingPlans.map((plan, index) => (
-            <div key={index} className="flex flex-col justify-between p-6">
+            <div
+              key={index}
+              className={cn(
+                "flex flex-col justify-between p-6 relative",
+                index === 0 && "bg-gradient-to-r from-background to-muted/30",
+                index === 1 && "bg-muted/30",
+                index === 2 && "bg-gradient-to-l from-background to-muted/30"
+              )}
+            >
               <div className="space-y-2 border-b pb-6">
                 <div className="flex items-center gap-2.5 text-muted-foreground">
                   <plan.icon className="size-4" />
