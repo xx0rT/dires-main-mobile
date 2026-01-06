@@ -1,78 +1,62 @@
-import MagicBento from '@/components/ui/magic-bento'
+import { Timeline2 } from '@/components/ui/timeline-2'
+import { Separator } from '@/components/ui/separator'
 
-const physioItems = [
+const testimonials = [
     {
-        title: 'Manuální Terapie',
-        description: 'Pokročilé techniky mobilizace kloubů a měkkých tkání pro efektivní léčbu pohybových dysfunkcí',
-        icon: '🤲',
-        span: 'md:col-span-2 md:row-span-2',
-        href: 'https://www.physio-pedia.com/Manual_Therapy'
+        subTitle: "Dr. Karel Lewit",
+        title: "Průkopník Manuální Medicíny",
+        description: "\"Funkce určuje strukturu. Bez správné diagnostiky funkčních poruch nelze dosáhnout trvalého léčebného úspěchu. Manuální medicína je uměním i vědou současně.\"",
+        image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-dark-1.svg",
     },
     {
-        title: 'Sportovní Rehabilitace',
-        description: 'Specializované postupy pro návrat sportovců k maximálnímu výkonu',
-        icon: '⚽',
-        span: 'md:col-span-1 md:row-span-1',
-        href: 'https://www.physio-pedia.com/Sports_Physiotherapy'
+        subTitle: "Berta Bobath",
+        title: "Zakladatelka Bobath Konceptu",
+        description: "\"Pohyb je životem. Každý pacient má potenciál ke zlepšení, pokud mu poskytneme správnou stimulaci a podmínky pro rozvoj.\"",
+        image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-dark-2.svg",
     },
     {
-        title: 'Neurologická Rehabilitace',
-        description: 'Vojtova metoda, Bobath koncept a další přístupy k neurologickým pacientům',
-        icon: '🧠',
-        span: 'md:col-span-1 md:row-span-1',
-        href: 'https://www.physio-pedia.com/Neurological_Physiotherapy'
+        subTitle: "Prof. Václav Vojta",
+        title: "Tvůrce Vojtovy Metody",
+        description: "\"Reflexní lokomoce otevírá cestu k aktivaci vrozených pohybových vzorců, které mohou být narušeny. Tělo má schopnost obnovit si správnou funkci, pokud mu ukážeme cestu.\"",
+        image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-dark-3.svg",
     },
     {
-        title: 'Dětská Fyzioterapie',
-        description: 'Komplexní péče o vývojové obtíže a pediatrické diagnózy',
-        icon: '👶',
-        span: 'md:col-span-1 md:row-span-2',
-        href: 'https://www.physio-pedia.com/Paediatric_Physiotherapy'
+        subTitle: "Robin McKenzie",
+        title: "Zakladatel McKenzie Metody",
+        description: "\"Pacienti jsou nejlepšími terapeuty sami sobě. Naším úkolem je naučit je techniky, které jim umožní ovládat svou bolest a předcházet jejímu návratu.\"",
+        image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-dark-1.svg",
     },
-    {
-        title: 'Respirační Fyzioterapie',
-        description: 'Moderní techniky dechové rehabilitace a plicní hygieny',
-        icon: '💨',
-        span: 'md:col-span-2 md:row-span-1',
-        href: 'https://www.physio-pedia.com/Respiratory_Physiotherapy'
-    }
 ]
 
 export const ServicesSection = () => {
     return (
-        <section
-            id="services"
-            className="w-full py-16 sm:py-20 overflow-visible"
-        >
-            <div className="container mx-auto px-4 mb-12">
-                <h2 className="mb-2 text-center text-lg text-primary tracking-wider">
-                    Specializace Kurzů
-                </h2>
+        <>
+            <section
+                id="services"
+                className="w-full py-16 sm:py-20 overflow-visible"
+            >
+                <div className="container mx-auto px-4 mb-8">
+                    <h2 className="mb-2 text-center text-lg text-primary tracking-wider">
+                        Známá Jména
+                    </h2>
 
-                <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl">
-                    Oblasti Odbornosti
-                </h2>
-                <h3 className="mx-auto mb-8 text-center text-muted-foreground text-xl md:w-1/2">
-                    Vyberte si z naší komplexní nabídky specializovaných fyzioterapeutických kurzů.
-                    Každý program je navržen tak, aby poskytoval hlubokou expertízu v konkrétních léčebných oblastech.
-                </h3>
-            </div>
+                    <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl">
+                        Možná jste již slyšeli o těchto slavných jménech
+                    </h2>
+                    <h3 className="mx-auto mb-8 text-center text-muted-foreground text-xl md:w-2/3">
+                        Inspirace od průkopníků fyzioterapie a rehabilitace, jejichž metody formují moderní přístup k léčbě a vzdělávání.
+                    </h3>
+                </div>
 
-            <div className="w-full flex justify-center px-4">
-                <MagicBento
-                    items={physioItems}
-                    textAutoHide={true}
-                    enableStars={true}
-                    enableSpotlight={true}
-                    enableBorderGlow={true}
-                    enableTilt={true}
-                    enableMagnetism={true}
-                    clickEffect={true}
-                    spotlightRadius={300}
-                    particleCount={12}
-                    glowColor="132, 0, 255"
+                <Separator className="container mb-12" />
+
+                <Timeline2
+                    sections={testimonials}
+                    heading="Moudrost legend fyzioterapie"
                 />
-            </div>
-        </section>
+
+                <Separator className="container mt-16" />
+            </section>
+        </>
     )
 }
