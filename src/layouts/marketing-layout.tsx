@@ -17,15 +17,17 @@ export default function MarketingLayout() {
   }, [])
 
   return (
-    <div className="relative flex min-h-screen flex-col">
-      <PatternPlaceholder />
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background:
-            "radial-gradient(125% 125% at 50% 90%, var(--background) 40%, var(--primary) 100%)",
-        }}
-      />
+    <>
+      <div className="fixed inset-0 z-0">
+        <PatternPlaceholder />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(125% 125% at 50% 90%, var(--background) 40%, var(--primary) 100%)",
+          }}
+        />
+      </div>
       <div className="relative z-10 flex min-h-screen flex-col">
         <Navbar />
         <main className="flex-1">
@@ -33,6 +35,6 @@ export default function MarketingLayout() {
         </main>
         <FooterSection />
       </div>
-    </div>
+    </>
   )
 }
