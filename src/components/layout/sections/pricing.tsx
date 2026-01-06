@@ -170,12 +170,12 @@ interface Pricing11Props {
   className?: string;
 }
 
-export const PricingSection = ({ className }: Pricing11Props) => {
+const Pricing11 = ({ className }: Pricing11Props) => {
   const [billing, setBilling] = useState<"monthly" | "annually">("monthly");
   return (
     <section className={cn("py-32", className)}>
       <div className="container mb-8 lg:mb-0">
-        <div className="flex flex-col items-center text-center gap-y-12 md:gap-y-16 mb-12">
+        <div className="flex flex-col items-center text-center gap-y-12 md:gap-y-16">
           <div className="flex flex-col items-center max-w-3xl mx-auto">
             <h1 className="my-6 text-3xl font-bold text-pretty md:text-4xl xl:text-5xl">
               Pricing Plans
@@ -323,3 +323,6 @@ export const PricingSection = ({ className }: Pricing11Props) => {
     </section>
   );
 };
+
+export { Pricing11 };
+export { Pricing11 as PricingSection };
