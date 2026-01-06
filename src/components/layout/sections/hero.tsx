@@ -2,11 +2,21 @@ import { ArrowRight, Lock } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { PatternPlaceholder } from "@/components/shadcnblocks/pattern-placeholder"
 
 export const HeroSection = () => {
     return (
-        <section className="container mx-auto w-full px-4">
-            <div className="grid gap-12 py-24 md:grid-cols-2 md:items-center md:gap-14 lg:grid-cols-[0.8fr,1.2fr] lg:gap-20 xl:gap-24 xl:py-32">
+        <section className="relative min-h-screen w-full">
+            <PatternPlaceholder />
+            <div
+                className="absolute inset-0 z-0"
+                style={{
+                    background:
+                        "radial-gradient(125% 125% at 50% 90%, var(--background) 40%, var(--primary) 100%)",
+                }}
+            />
+            <div className="container relative z-10 mx-auto w-full px-4">
+                <div className="grid gap-12 py-24 md:grid-cols-2 md:items-center md:gap-14 lg:grid-cols-[0.8fr,1.2fr] lg:gap-20 xl:gap-24 xl:py-32">
                 {/* Left side - Copy */}
                 <div className="space-y-8 text-center md:space-y-10" data-aos="fade-right">
                     <Badge
@@ -104,6 +114,7 @@ export const HeroSection = () => {
                     <div className="-right-8 -bottom-8 absolute -z-10 size-32 rounded-full bg-primary/30 blur-3xl lg:size-40" />
                     <div className="-top-8 -left-8 absolute -z-10 size-28 rounded-full bg-primary/30 blur-3xl lg:size-36" />
                 </div>
+            </div>
             </div>
         </section>
     )
