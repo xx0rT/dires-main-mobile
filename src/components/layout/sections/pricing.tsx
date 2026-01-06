@@ -1,219 +1,157 @@
-import { Check, ChevronRight } from "lucide-react";
-import { type SVGProps, useId } from "react";
+"use client";
+
+import {
+  BadgeCheck,
+  BadgeDollarSign,
+  Briefcase,
+  Building,
+  Rocket,
+} from "lucide-react";
+import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-type PricingTier = {
-  name: string;
-  price: string;
-  description: string;
-  features: string[];
-  cta: {
-    text: string;
-    href: string;
-  };
-};
-const ITEMS: PricingTier[] = [
+const pricingPlans = [
   {
-    name: "STARTER",
-    price: "$0",
-    description: "Free for everyone",
-    features: ["Unlimited members", "250 transactions", "No support"],
-    cta: {
-      text: "Start for free",
-      href: "/signup",
+    icon: Rocket,
+    name: "Basic plan",
+    price: {
+      monthly: 19,
+      yearly: 199,
     },
+    features: [
+      "Basic task management tools",
+      "Calendar sync with limited integrations",
+      "Access to 1 dashboard for tracking tasks",
+      "Limited AI suggestions and insights",
+      "Basic support and community access",
+    ],
   },
   {
-    name: "BASIC",
-    price: "$29.99",
-    description: "per user per month",
-    features: [
-      "All free plan features and...",
-      "Mainline AI",
-      "Unlimited teams",
-    ],
-    cta: {
-      text: "7 days free",
-      href: "/signup",
+    icon: Briefcase,
+    name: "Business plan",
+    price: {
+      monthly: 29,
+      yearly: 299,
     },
+    features: [
+      "All Free Plan features, plus:",
+      "Unlimited task lists",
+      "Advanced calendar sync",
+      "AI-driven insights",
+      "Access to custom dashboards",
+      "Priority email support",
+    ],
   },
   {
-    name: "ENTERPRISE",
-    price: "$ENT",
-    description: "Custom pricing",
-    features: [
-      "All basic plan features and...",
-      "Advanced security controls",
-      "Migration support",
-    ],
-    cta: {
-      text: "Book a demo",
-      href: "/",
+    icon: Building,
+    name: "Enterprise plan",
+    price: {
+      monthly: 49,
+      yearly: 499,
     },
+    features: [
+      "All Pro Plan features, plus:",
+      "Dedicated account manager",
+      "Custom integrations",
+      "Real-time collaboration",
+      "Role-based permissions",
+      "24/7 priority support",
+    ],
   },
 ];
-export const Pricing29 = () => {
+
+interface Pricing20Props {
+  className?: string;
+}
+
+const Pricing20 = ({ className }: Pricing20Props) => {
+  const [isMonthly] = useState(true);
+
   return (
-    <section className="relative overflow-hidden py-32">
-      <div className="container">
-        <div className="flex flex-col items-center text-center">
-          <h1 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
-            Pricing
-          </h1>
-          <div className="mx-auto mt-4 max-w-[45rem] space-y-2">
-            <p className="text-2xl text-muted-foreground md:text-3xl">
-              Use Charter for free with your whole team. Upgrade to enable
-              enhanced features.
+    <section className={cn("py-32", className)}>
+      <div className="border-y">
+        <div className="container mx-auto flex flex-col gap-6 border-x py-4 max-lg:border-x lg:py-8">
+          <div className="flex flex-col items-center text-center">
+            <Badge
+              variant="outline"
+              className="w-fit gap-1 bg-card px-3 text-sm font-normal tracking-tight shadow-sm"
+            >
+              <BadgeDollarSign className="size-4" />
+              <span>Spenders Lounge</span>
+            </Badge>
+            <h2 className="mt-6 text-3xl leading-tight tracking-tight md:text-4xl lg:text-6xl">
+              Pricing for everyone
+            </h2>
+            <p className="mt-4 max-w-[600px] tracking-[-0.32px] text-muted-foreground">
+              Choose the Plan that Fits Your Productivity Need
             </p>
           </div>
         </div>
+      </div>
 
-        <div className="relative mt-8 overflow-hidden md:mt-12 lg:mt-20">
-          <div className="absolute inset-0 hidden rounded-3xl bg-linear-to-r from-primary to-primary/80 md:block">
-            <PlusSigns className="h-full w-full text-foreground/[0.05]" />
-          </div>
+      <div className="container mx-auto mt-10 lg:mt-14">
+        <section className="grid border max-lg:divide-y lg:grid-cols-3 lg:divide-x">
+          {pricingPlans.map((plan, index) => (
+            <div key={index} className="flex flex-col justify-between p-6">
+              <div className="space-y-2 border-b pb-6">
+                <div className="flex items-center gap-2.5 text-muted-foreground">
+                  <plan.icon className="size-4" />
+                  <h3 className="text-xl tracking-[-0.8px]">{plan.name}</h3>
+                </div>
 
-          <div className="relative space-y-6 md:grid md:grid-cols-3 md:space-y-0 md:divide-x md:divide-background/20 md:p-6 lg:p-8">
-            {ITEMS.map((tier, index) => (
-              <PricingCard
-                key={tier.name}
-                tier={tier}
-                isHighlighted={index === 1}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="absolute -inset-40 z-[-1] [mask-image:radial-gradient(circle_at_center,black_0%,black_20%,transparent_75%)]">
-          <PlusSigns className="size-full text-foreground/[0.05]" />
-        </div>
+                <>
+                  <div className="flex items-baseline font-medium">
+                    <span className="text-[3.5rem] leading-[120%] tracking-[-3.92px]">
+                      ${isMonthly ? plan.price.monthly : plan.price.yearly}
+                    </span>
+                    <span className="text-muted-foreground-subtle text-2xl tracking-[-0.96px]">
+                      {isMonthly ? "/mo" : "/yr"}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground">
+                    {isMonthly
+                      ? `or $${plan.price.yearly} yearly`
+                      : `or $${plan.price.monthly}/mo monthly`}
+                  </p>
+                </>
+              </div>
+
+              <div className="pt-6">
+                <h4 className="text-muted-foreground-subtle">
+                  Features Included
+                </h4>
+                <ul className="mt-4 space-y-4">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-center gap-4">
+                      <BadgeCheck className="size-6 text-muted-foreground" />
+                      <span className="tracking-[-0.32px] text-muted-foreground">
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <Button
+                variant={index === 1 ? "default" : "secondary"}
+                className="mt-12"
+              >
+                Get started
+              </Button>
+            </div>
+          ))}
+        </section>
+      </div>
+
+      <div className="mt-12 h-8 w-full border-y md:h-12 lg:h-[112px]">
+        <div className="container mx-auto h-full w-full border-x"></div>
       </div>
     </section>
   );
 };
 
-function PricingCard({
-  tier,
-  isHighlighted,
-}: {
-  tier: PricingTier;
-  isHighlighted: boolean;
-}) {
-  const styles = {
-    card: cn(
-      "flex flex-col gap-6 rounded-xl p-6 sm:rounded-2xl md:rounded-none lg:p-8",
-      isHighlighted
-        ? "max-md:from-primary max-md:to-primary/80 max-md:bg-linear-to-r"
-        : "bg-background max-md:border",
-      "md:bg-transparent",
-    ),
-    title: cn(
-      "font-mono text-sm tracking-widest",
-      isHighlighted ? "text-background/70" : "text-foreground/70",
-      "md:text-background/70",
-    ),
-    price: cn(
-      "text-5xl font-semibold tracking-tight",
-      isHighlighted ? "text-background" : "text-foreground",
-      "md:text-background",
-    ),
-    description: cn(
-      "mt-2 text-xl font-medium",
-      isHighlighted ? "text-background/70" : "text-foreground/70",
-      "md:text-background/70",
-    ),
-    features: cn(
-      "space-y-3 text-sm",
-      isHighlighted ? "text-background/70" : "text-foreground/70",
-      "md:text-background/70",
-    ),
-    button: cn(
-      "group border-foreground/20 relative w-full",
-      "after:from-border after:via-border after:absolute after:inset-0 after:bg-linear-to-t after:to-transparent after:content-[''] after:group-hover:opacity-100 isolate after:z-[-1]",
-      "md:border-background/40 md:text-background md:bg-transparent md:after:opacity-0",
-      isHighlighted &&
-        "md:bg-background md:text-primary hover:md:bg-background/90",
-    ),
-  };
-
-  return (
-    <div className={styles.card}>
-      <h3 className={styles.title}>{tier.name}</h3>
-      <div>
-        <p className={styles.price}>{tier.price}</p>
-        <p className={styles.description}>{tier.description}</p>
-      </div>
-      <ul className={styles.features}>
-        {tier.features.map((feature) => (
-          <li key={feature} className="flex items-center gap-2">
-            <Check className="size-4 shrink-0" />
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="flex flex-1 items-end">
-        <Button
-          asChild
-          variant={isHighlighted ? "secondary" : "outline"}
-          size="lg"
-          className={styles.button}
-        >
-          <a href={tier.cta.href}>
-            {tier.cta.text}
-            <ChevronRight className="ml-1 size-4 transition-transform group-hover:translate-x-0.5" />
-          </a>
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-interface PlusSignsProps extends SVGProps<SVGSVGElement> {
-  className?: string;
-}
-
-const PlusSigns = ({ className, ...props }: PlusSignsProps) => {
-  const GAP = 16;
-  const STROKE_WIDTH = 1;
-  const PLUS_SIZE = 6;
-  const id = useId();
-  const patternId = `plus-pattern-${id}`;
-
-  return (
-    <svg width={GAP * 2} height={GAP * 2} className={className} {...props}>
-      <defs>
-        <pattern
-          id={patternId}
-          x="0"
-          y="0"
-          width={GAP}
-          height={GAP}
-          patternUnits="userSpaceOnUse"
-        >
-          <line
-            x1={GAP / 2}
-            y1={(GAP - PLUS_SIZE) / 2}
-            x2={GAP / 2}
-            y2={(GAP + PLUS_SIZE) / 2}
-            stroke="currentColor"
-            strokeWidth={STROKE_WIDTH}
-          />
-          <line
-            x1={(GAP - PLUS_SIZE) / 2}
-            y1={GAP / 2}
-            x2={(GAP + PLUS_SIZE) / 2}
-            y2={GAP / 2}
-            stroke="currentColor"
-            strokeWidth={STROKE_WIDTH}
-          />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill={`url(#${patternId})`} />
-    </svg>
-  );
-};
-
-export { Pricing29 as PricingSection };
+export { Pricing20 as PricingSection };
