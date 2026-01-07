@@ -55,7 +55,7 @@ const Timeline2 = ({ className, sections, heading }: Timeline2Props) => {
         <h1 className="mb-14 mx-auto max-w-2xl text-center text-4xl font-semibold text-balance md:text-5xl">
           {heading}
         </h1>
-        <div className="flex justify-between gap-20 mx-auto">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-20 mx-auto max-w-6xl">
           <div className="flex flex-col gap-16 md:w-1/2">
             {sections.map((section, index) => (
               <div
@@ -63,7 +63,7 @@ const Timeline2 = ({ className, sections, heading }: Timeline2Props) => {
                 ref={(el) => {
                   sectionRefs.current[index] = el;
                 }}
-                className="flex flex-col gap-4 md:h-[50vh]"
+                className="flex flex-col gap-4 md:h-[50vh] text-center md:text-left items-center md:items-start"
               >
                 <div className="block rounded-2xl border bg-muted p-4 md:hidden">
                   <img
@@ -82,7 +82,7 @@ const Timeline2 = ({ className, sections, heading }: Timeline2Props) => {
               </div>
             ))}
           </div>
-          <div className="sticky top-56 right-0 hidden h-fit w-full items-center justify-center md:flex">
+          <div className="sticky top-56 hidden h-fit w-full md:w-1/2 items-center justify-center md:flex">
             <img
               src={sections[sections.length - 1].image}
               alt={sections[sections.length - 1].title}
