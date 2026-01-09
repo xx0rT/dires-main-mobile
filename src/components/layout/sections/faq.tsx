@@ -50,8 +50,8 @@ interface Faq10Props {
 export const FAQSection = ({ className }: Faq10Props) => {
   return (
     <section className={cn("py-32", className)}>
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col items-center gap-6 pb-8 lg:pb-12">
+      <div className="border-y">
+        <div className="container flex flex-col items-center gap-6 border-x py-4 max-lg:border-x lg:py-8">
           <Badge
             variant="outline"
             className="w-fit gap-1 bg-card px-3 text-sm font-normal tracking-tight shadow-sm"
@@ -67,8 +67,10 @@ export const FAQSection = ({ className }: Faq10Props) => {
             <span className="underline">FAQ section</span>.
           </p>
         </div>
+      </div>
 
-        <div className="mx-auto max-w-3xl">
+      <div className="container">
+        <div className="mx-auto max-w-3xl pt-8 pb-4 md:pb-8 lg:pt-[3.75rem] lg:pb-[50px]">
           <Accordion type="single" collapsible className="space-y-4">
             {DATA.map((item, index) => (
               <AccordionItem
@@ -86,6 +88,9 @@ export const FAQSection = ({ className }: Faq10Props) => {
             ))}
           </Accordion>
         </div>
+      </div>
+      <div className="h-8 w-full border-y md:h-12 lg:h-[112px]">
+        <div className="container h-full w-full border-x"></div>
       </div>
     </section>
   );
