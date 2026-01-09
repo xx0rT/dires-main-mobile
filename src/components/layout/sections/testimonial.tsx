@@ -7,7 +7,13 @@ import {
     CardHeader,
     CardTitle
 } from "@/components/ui/card"
-import Marquee from "@/components/ui/marquee"
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious
+} from "@/components/ui/carousel"
 
 interface ReviewProps {
     image: string
@@ -57,99 +63,77 @@ const reviewList: ReviewProps[] = [
         comment:
             "Skvělý osobní přístup, velice doporučuji a děkuji 🙏",
         rating: 5.0
-    },
-    {
-        image: "",
-        name: "Martin Novák",
-        userName: "Před 3 měsíci",
-        comment:
-            "Profesionální přístup a rychlé výsledky. Po několika sezeních s panem Kottasem se můj stav výrazně zlepšil. Velmi doporučuji!",
-        rating: 5.0
     }
 ]
-
-const firstRow = reviewList.slice(0, Math.ceil(reviewList.length / 2))
-const secondRow = reviewList.slice(Math.ceil(reviewList.length / 2))
-
-const ReviewCard = ({ review }: { review: ReviewProps }) => {
-    return (
-        <Card className="w-[350px] flex-shrink-0 flex flex-col bg-muted/50 mx-2">
-            <CardContent className="flex flex-grow flex-col pt-6">
-                <div className="flex gap-1 pb-4">
-                    <Star className="size-4 fill-primary text-primary" />
-                    <Star className="size-4 fill-primary text-primary" />
-                    <Star className="size-4 fill-primary text-primary" />
-                    <Star className="size-4 fill-primary text-primary" />
-                    <Star className="size-4 fill-primary text-primary" />
-                </div>
-                <div className="flex flex-1 items-start pb-4">
-                    <p className="text-sm leading-relaxed">{`"${review.comment}"`}</p>
-                </div>
-            </CardContent>
-
-            <CardHeader>
-                <div className="flex flex-row items-center gap-4">
-                    <Avatar>
-                        <AvatarImage
-                            src={review.image}
-                            alt={review.name}
-                        />
-                        <AvatarFallback>
-                            {review.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                    </Avatar>
-
-                    <div className="flex flex-col">
-                        <CardTitle className="text-lg">
-                            {review.name}
-                        </CardTitle>
-                        <CardDescription>
-                            {review.userName}
-                        </CardDescription>
-                    </div>
-                </div>
-            </CardHeader>
-        </Card>
-    )
-}
 
 export const TestimonialSection = () => {
     return (
         <section id="testimonials" className="container mx-auto px-4 py-16 sm:py-20">
-            <div className="mb-12 text-center">
+            <div className="mb-8 text-center">
                 <h2 className="mb-2 text-center text-lg text-primary tracking-wider" data-aos="fade-up">
-                    Recenze
+                    Reference
                 </h2>
 
                 <h2 className="mb-4 text-center font-bold text-3xl md:text-4xl" data-aos="fade-up" data-aos-delay="100">
-                    Co říkají naši studenti
+                    Co říkají naši klienti
                 </h2>
-
-                <div className="flex items-center justify-center gap-2 mt-4">
-                    <div className="flex gap-0.5">
-                        <Star className="size-6 fill-primary text-primary" />
-                        <Star className="size-6 fill-primary text-primary" />
-                        <Star className="size-6 fill-primary text-primary" />
-                        <Star className="size-6 fill-primary text-primary" />
-                        <Star className="size-6 fill-primary text-primary" />
-                    </div>
-                    <span className="text-2xl font-bold">5.0</span>
-                    <span className="text-muted-foreground">na Google</span>
-                </div>
             </div>
 
-            <div className="relative flex flex-col gap-4 overflow-hidden">
-                <Marquee pauseOnHover className="[--duration:40s]">
-                    {firstRow.map((review) => (
-                        <ReviewCard key={review.name} review={review} />
+            <Carousel
+                opts={{
+                    align: "start"
+                }}
+                className="relative mx-auto w-[80%] sm:w-[90%] lg:max-w-screen-xl"
+            >
+                <CarouselContent>
+                    {reviewList.map((review) => (
+                        <CarouselItem
+                            key={review.name}
+                            className="md:basis-1/2 lg:basis-1/3"
+                        >
+                            <Card className="flex h-full flex-col bg-muted/50">
+                                <CardContent className="flex flex-grow flex-col">
+                                    <div className="flex gap-1 pb-4">
+                                        <Star className="size-4 fill-primary text-primary" />
+                                        <Star className="size-4 fill-primary text-primary" />
+                                        <Star className="size-4 fill-primary text-primary" />
+                                        <Star className="size-4 fill-primary text-primary" />
+                                        <Star className="size-4 fill-primary text-primary" />
+                                    </div>
+                                    <div className="flex flex-1 items-start pb-4">
+                                        <p className="text-sm leading-relaxed">{`"${review.comment}"`}</p>
+                                    </div>
+                                </CardContent>
+
+                                <CardHeader >
+                                    <div className="flex flex-row items-center gap-4">
+                                        <Avatar>
+                                            <AvatarImage
+                                                src={review.image}
+                                                alt={review.name}
+                                            />
+                                            <AvatarFallback>
+                                                {review.name.split(' ').map(n => n[0]).join('')}
+                                            </AvatarFallback>
+                                        </Avatar>
+
+                                        <div className="flex flex-col">
+                                            <CardTitle className="text-lg">
+                                                {review.name}
+                                            </CardTitle>
+                                            <CardDescription>
+                                                {review.userName}
+                                            </CardDescription>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                            </Card>
+                        </CarouselItem>
                     ))}
-                </Marquee>
-                <Marquee reverse pauseOnHover className="[--duration:40s]">
-                    {secondRow.map((review) => (
-                        <ReviewCard key={review.name} review={review} />
-                    ))}
-                </Marquee>
-            </div>
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+            </Carousel>
         </section>
     )
 }
