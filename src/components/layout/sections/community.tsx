@@ -13,7 +13,11 @@ interface Review {
 
 export const CommunitySection = () => {
     const [scrollY, setScrollY] = useState(0)
+    const [autoScroll1, setAutoScroll1] = useState(0)
+    const [autoScroll2, setAutoScroll2] = useState(0)
+    const [isUserScrolling, setIsUserScrolling] = useState(false)
     const sectionRef = useRef<HTMLDivElement>(null)
+    const scrollTimeoutRef = useRef<number | null>(null)
 
     const reviews: Review[] = [
         {
@@ -84,6 +88,16 @@ export const CommunitySection = () => {
 
     useEffect(() => {
         const handleScroll = () => {
+            setIsUserScrolling(true)
+
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current)
+            }
+
+            scrollTimeoutRef.current = window.setTimeout(() => {
+                setIsUserScrolling(false)
+            }, 2000)
+
             if (sectionRef.current) {
                 const rect = sectionRef.current.getBoundingClientRect()
                 const sectionTop = rect.top
@@ -100,11 +114,36 @@ export const CommunitySection = () => {
         window.addEventListener('scroll', handleScroll)
         handleScroll()
 
-        return () => window.removeEventListener('scroll', handleScroll)
+        return () => {
+            window.removeEventListener('scroll', handleScroll)
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current)
+            }
+        }
     }, [])
 
-    const row1Transform = scrollY * 300
-    const row2Transform = scrollY * -300
+    useEffect(() => {
+        if (isUserScrolling) return
+
+        let animationFrameId: number
+
+        const animate = () => {
+            setAutoScroll1(prev => (prev + 0.5) % 2000)
+            setAutoScroll2(prev => (prev + 0.5) % 2000)
+            animationFrameId = requestAnimationFrame(animate)
+        }
+
+        animationFrameId = requestAnimationFrame(animate)
+
+        return () => {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId)
+            }
+        }
+    }, [isUserScrolling])
+
+    const row1Transform = isUserScrolling ? scrollY * 300 : autoScroll1
+    const row2Transform = isUserScrolling ? scrollY * -300 : -autoScroll2
 
     return (
         <section id="community" ref={sectionRef} className="container mx-auto py-12 overflow-hidden">
