@@ -34,7 +34,7 @@ export default function HomePage() {
         <ServicesSection />
       </div>
 
-      <div className="bg-background transition-colors duration-700">
+      <div className="ml-30px bg-background transition-colors duration-700">
         <Feature283 />
       </div>
 
