@@ -51,7 +51,7 @@ const Feature283 = ({ className }: Feature283Props) => {
   return (
     <section className={cn("h-full h-screen overflow-hidden py-32", className)}>
       <div className="container flex h-full w-full flex-col items-center justify-center px-4">
-        <div className="relative flex flex-col items-center justify-center mx-auto max-w-4xl">
+        <div className="relative flex flex-col items-center justify-center">
           <h2 className="relative py-2 text-center font-sans text-4xl font-semibold tracking-tighter md:text-5xl">
             Built by and for Developers
           </h2>
@@ -60,10 +60,10 @@ const Feature283 = ({ className }: Feature283Props) => {
             suscipit dolor blanditiis voluptatum minus est labore amet
             necessitatibus quod distinctio! ipsum dolor sit
           </p>
-          <Button className="mt-10 h-10 rounded-xl mx-auto">
+          <Button className="mt-10 h-10 rounded-xl">
             Be a contributor <Forward />
           </Button>
-          <div className="relative w-full flex items-center justify-center">
+          <div>
             {images.map((image, index) => (
               <motion.div
                 drag
