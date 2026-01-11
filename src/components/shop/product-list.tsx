@@ -1,9 +1,11 @@
 import { Eye, ShoppingCart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
 
 import { Price, PriceValue } from "@/components/shadcnblocks/price";
+import { ProductQuickView5 } from "@/components/shop/product-detail-modal";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -390,43 +392,48 @@ interface ProductList10Props {
 }
 
 const ProductList10 = ({ className }: ProductList10Props) => {
-  const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleQuickView = () => {
-    navigate("/product/1");
+    setIsModalOpen(true);
   };
 
   return (
-    <section className={cn("py-32", className)}>
-      <div className="flex flex-col gap-5">
-        {PRODUCTS_LIST.map((item, index) => (
-          <div
-            className="flex flex-col gap-5 lg:flex-row lg:even:flex-row-reverse"
-            key={`product-list-10-featured-promo-${index}`}
-          >
-            <div className="flex-1/3">
-              <FeaturedPromotionCard {...item.featuredPromotion} />
-            </div>
-            <div className="flex-2/3">
-              <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
-                {item.products.map((product, index) => (
-                  <ProductCard
-                    {...product}
-                    key={`product-10-list-card-${index}`}
-                    onQuickView={handleQuickView}
-                  />
-                ))}
+    <>
+      <section className={cn("py-32", className)}>
+        <div className="flex flex-col gap-5">
+          {PRODUCTS_LIST.map((item, index) => (
+            <div
+              className="flex flex-col gap-5 lg:flex-row lg:even:flex-row-reverse"
+              key={`product-list-10-featured-promo-${index}`}
+            >
+              <div className="flex-1/3">
+                <FeaturedPromotionCard {...item.featuredPromotion} />
+              </div>
+              <div className="flex-2/3">
+                <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
+                  {item.products.map((product, index) => (
+                    <ProductCard
+                      {...product}
+                      key={`product-10-list-card-${index}`}
+                      onQuickView={handleQuickView}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </section>
+          ))}
+        </div>
+      </section>
+      <ProductQuickView5
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+      />
+    </>
   );
 };
 
 const ProductCard = ({
-  link,
   image,
   name,
   price,
@@ -437,7 +444,7 @@ const ProductCard = ({
 
   return (
     <Card className="group relative block rounded-none border-none bg-background p-0 shadow-none">
-      <a href={link} className="absolute inset-0 z-10 size-full"></a>
+      <Link to="/product/1" className="absolute inset-0 z-10 size-full"></Link>
       <CardContent className="p-0">
         <div className="relative overflow-hidden">
           <AspectRatio

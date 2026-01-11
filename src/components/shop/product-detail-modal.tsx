@@ -162,7 +162,7 @@ interface Product {
   socialLinks?: SocialLink[];
 }
 
-type ProductQuickView5Props = Product & {
+type ProductQuickView5Props = Partial<Product> & {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
@@ -279,7 +279,7 @@ const PRODUCT_DETAILS: Product = {
       max: 90,
     },
   },
-  link: "#",
+  link: "/product/1",
   accordion: [
     {
       value: "description",
@@ -391,7 +391,7 @@ const ProductQuickView5 = ({
                   variant="link"
                   className="px-0 underline underline-offset-4"
                 >
-                  <a href={link}>View details</a>
+                  <a href={link} target="_blank" rel="noopener noreferrer">View details</a>
                 </Button>
                 <AccordionSection section={accordion} />
               </div>
