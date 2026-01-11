@@ -150,18 +150,18 @@ interface QuantityProps {
 }
 
 const PRODUCT_DETAILS = {
-  name: "Leather Sofa",
-  color: "Brown",
+  name: "Profesionální masážní stůl",
+  color: "Modrá",
   thumbnail: {
     src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-kseniachernaya-11112729-3.jpg",
-    alt: "Leather Sofa",
+    alt: "Profesionální masážní stůl",
   },
   images: [
     {
       srcset:
         "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-kseniachernaya-11112729-3.jpg 1920w, https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-kseniachernaya-11112729-2.jpg 1280w, https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-kseniachernaya-11112729-1.jpg 640w",
       src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-kseniachernaya-11112729-3.jpg",
-      alt: "Leather Sofa",
+      alt: "Profesionální masážní stůl",
       width: 1920,
       height: 1080,
       sizes: "(max-width: 1240px) 100vw, 60vw",
@@ -170,7 +170,7 @@ const PRODUCT_DETAILS = {
       srcset:
         "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-mathilde-14792096-3.jpg 1920w, https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-mathilde-14792096-2.jpg 1280w, https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-mathilde-14792096-1.jpg 640w",
       src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-mathilde-14792096-3.jpg",
-      alt: "Leather Chair",
+      alt: "Detail čalounění",
       width: 1920,
       height: 1080,
       sizes: "(max-width: 1240px) 100vw, 60vw",
@@ -179,62 +179,62 @@ const PRODUCT_DETAILS = {
       srcset:
         "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-cottonbro-6626409-3.jpg 1920w, https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-cottonbro-6626409-2.jpg 1280w, https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-cottonbro-6626409-1.jpg 640w",
       src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-cottonbro-6626409-3.jpg",
-      alt: "Dining Chair",
+      alt: "Nastavitelná výška",
       width: 1920,
       height: 1080,
       sizes: "(max-width: 1240px) 100vw, 60vw",
     },
   ],
   description:
-    "Experience ultimate comfort and elegance with this premium leather sofa. Handcrafted with high-quality materials for lasting durability and timeless style.",
+    "Zažijte profesionální úroveň rehabilitace s tímto prémiové masážním stolem. Navržen speciálně pro fyzioterapeuty a maséry s ohledem na maximální pohodlí pacientů i dlouhodobou odolnost.",
   hinges: {
     color: {
-      label: "Color",
+      label: "Barva",
       id: "color",
       name: "color",
       options: [
         {
-          id: "brown",
-          value: "brown",
-          label: "Brown",
+          id: "modra",
+          value: "modra",
+          label: "Modrá",
           stockInfo: {
             stockStatusCode: "IN_STOCK" as StockStatusCode,
           },
           price: {
-            regular: 899.0,
-            sale: 799.0,
-            currency: "USD",
+            regular: 25990.0,
+            sale: 21990.0,
+            currency: "CZK",
           },
         },
         {
-          id: "black",
-          value: "black",
-          label: "Black",
+          id: "cerna",
+          value: "cerna",
+          label: "Černá",
           stockInfo: {
             stockStatusCode: "IN_STOCK" as StockStatusCode,
             stockQuantity: 10,
           },
           price: {
-            regular: 899.0,
-            currency: "USD",
+            regular: 25990.0,
+            currency: "CZK",
           },
         },
         {
-          id: "white",
-          value: "white",
-          label: "White",
+          id: "bila",
+          value: "bila",
+          label: "Bílá",
           stockInfo: {
             stockStatusCode: "OUT_OF_STOCK" as StockStatusCode,
           },
           price: {
-            regular: 899.0,
-            currency: "USD",
+            regular: 25990.0,
+            currency: "CZK",
           },
         },
       ],
     },
     quantity: {
-      label: "Quantity",
+      label: "Množství",
       id: "quantity",
       name: "quantity",
       min: 1,
@@ -243,58 +243,58 @@ const PRODUCT_DETAILS = {
   } as Record<FieldName, Hinges>,
   accordion: [
     {
-      title: "Product Overview",
+      title: "Popis produktu",
       content:
-        "This premium leather sofa combines comfort and style. Handcrafted with genuine leather and solid wood frame, it's built to last for years while maintaining its elegant appearance.",
+        "Tento profesionální masážní stůl kombinuje ergonomický design s vynikající stabilitou. Vyrobený z vysoce kvalitních materiálů odolných dezinfekci, je ideální pro fyzioterapeutické ordinace, rehabilitační centra i mobilní maséry.",
     },
     {
-      title: "Care Instructions",
+      title: "Pokyny k údržbě",
       content:
-        "Clean with a soft, dry cloth. For deeper cleaning, use a leather cleaner specifically designed for furniture. Avoid direct sunlight to prevent fading.",
+        "Čistěte měkkým hadříkem s dezinfekčním roztokem vhodným pro zdravotnické pomůcky. Pravidelně kontrolujte stabilitu šroubových spojů. Skladujte v suchém prostředí bez přímého slunečního záření.",
     },
     {
-      title: "Materials & Dimensions",
+      title: "Materiály a rozměry",
       content: [
-        "Genuine leather upholstery",
-        "Solid hardwood frame",
-        "High-density foam cushions",
-        "Dimensions: 84\" W x 38\" D x 34\" H",
-        "Weight capacity: 500 lbs",
+        "Vysoce odolné PU čalounění odolné dezinfekci",
+        "Kovová konstrukce s práškovým lakováním",
+        "Vysoce hustý molitan 8 cm",
+        "Rozměry: 190 cm D x 70 cm Š x 60-85 cm V",
+        "Nosnost: 250 kg",
       ],
     },
     {
-      title: "Shipping & Returns",
+      title: "Doprava a vrácení zboží",
       content:
-        "Free shipping on orders over $50. Returns are accepted within 30 days of purchase. White glove delivery available for an additional fee.",
+        "Doprava zdarma při objednávce nad 1 500 Kč. Zboží lze vrátit do 30 dnů od zakoupení. Nabízíme také osobní odběr v našem showroomu v Praze.",
     },
   ],
 };
 
 const RECOMMENDED_PRODUCTS = [
   {
-    category: "Chair",
-    name: "Wooden Chair",
+    category: "Rehabilitace",
+    name: "Balanční podložka",
     image: {
       src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-kseniachernaya-11112738-1.jpg",
-      alt: "Wooden Chair",
+      alt: "Balanční podložka",
     },
     link: "#",
     price: {
-      regular: 49.0,
-      currency: "USD",
+      regular: 1290.0,
+      currency: "CZK",
     },
   },
   {
-    category: "Cabinet",
-    name: "Wooden Cabinet",
+    category: "Vybavení",
+    name: "Terapeutické míče",
     image: {
       src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/furniture/pexels-kseniachernaya-11112749-1.jpg",
-      alt: "Wooden Cabinet",
+      alt: "Terapeutické míče",
     },
     link: "#",
     price: {
-      regular: 699.0,
-      currency: "USD",
+      regular: 890.0,
+      currency: "CZK",
     },
   },
 ];
@@ -303,7 +303,7 @@ export default function ProductDetailPage() {
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      color: PRODUCT_DETAILS.color,
+      color: "modra",
       quantity: 1,
     },
   });
@@ -361,17 +361,17 @@ export default function ProductDetailPage() {
                 <div className="flex items-center gap-2">
                   <Truck className="h-5 w-5" />
                   <span className="text-sm">
-                    Free shipping on orders over $50
+                    Doprava zdarma při objednávce nad 1 500 Kč
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <RotateCcw className="h-5 w-5" />
-                  <span className="text-sm">Easy 30-day returns</span>
+                  <span className="text-sm">Vrácení do 30 dnů zdarma</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Store className="h-5 w-5" />
                   <span className="text-sm">
-                    Ready for pickup at our showroom
+                    Možnost vyzvednutí v našem showroomu v Praze
                   </span>
                 </div>
               </div>
@@ -687,7 +687,7 @@ const ProductForm = ({
               disabled={stockInfo?.stockStatusCode === "OUT_OF_STOCK"}
               ref={cartButtonRef}
             >
-              Add to Cart
+              Přidat do košíku
             </Button>
           </div>
         </div>
@@ -697,7 +697,7 @@ const ProductForm = ({
             size="lg"
             disabled={stockInfo?.stockStatusCode === "OUT_OF_STOCK"}
           >
-            Buy it now
+            Koupit nyní
           </Button>
         </div>
         <div
@@ -775,7 +775,7 @@ const ProductForm = ({
                   className="w-full"
                   disabled={stockInfo?.stockStatusCode === "OUT_OF_STOCK"}
                 >
-                  Add to Cart
+                  Přidat do košíku
                 </Button>
               </div>
             </div>
@@ -895,7 +895,7 @@ const RecommendedProducts = ({ products }: RecommendedProductsProps) => {
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div className="text-base font-medium tracking-tighter xl:text-xl">
-          Related Items
+          Související produkty
         </div>
         <div className="flex items-center">
           <Button variant="ghost" size="icon" onClick={() => api?.scrollPrev()}>
