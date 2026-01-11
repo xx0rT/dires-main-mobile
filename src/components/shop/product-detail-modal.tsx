@@ -84,6 +84,7 @@ interface ProductImagesProps {
   images: Image[];
   galleryID?: string;
   badges?: string[];
+  link?: string;
 }
 
 interface StockStatusProps {
@@ -345,7 +346,7 @@ const ProductQuickView5 = ({
       >
         <div className="grid grid-cols-1 gap-5 max-md:p-10 max-sm:px-5 md:h-[var(--dialog-height)] md:max-h-[var(--dialog-max-height)] md:grid-cols-2">
           <div className="hide-scrollbar max-h-[var(--dialog-max-height)] md:h-[var(--dialog-height)] md:overflow-auto md:py-10 md:pl-10">
-            <ProductImages badges={badges} images={images} />
+            <ProductImages badges={badges} images={images} link={link} />
           </div>
           <div className="hide-scrollbar md:h-[var(--dialog-height)] md:max-h-[var(--dialog-max-height)] md:overflow-auto md:py-10 md:pr-10">
             <div className="space-y-6">
@@ -358,7 +359,14 @@ const ProductQuickView5 = ({
                   <p className="text-sm">({rate})</p>
                 </div>
                 <DialogTitle className="text-3xl leading-tight font-bold">
-                  {name}
+                  <a
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline cursor-pointer"
+                  >
+                    {name}
+                  </a>
                 </DialogTitle>
                 <Price
                   onSale={sale != null}
@@ -398,7 +406,7 @@ const ProductQuickView5 = ({
   );
 };
 
-const ProductImages = ({ images, galleryID, badges }: ProductImagesProps) => {
+const ProductImages = ({ images, galleryID, badges, link }: ProductImagesProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const lightboxRef = useRef<PhotoSwipeLightbox | null>(null);
@@ -545,17 +553,15 @@ const ProductImages = ({ images, galleryID, badges }: ProductImagesProps) => {
               <CarouselItem className="pl-0 max-md:pl-4" key={index}>
                 <AspectRatio>
                   <a
-                    href={img.src}
-                    data-pswp-width={img.width}
-                    data-pswp-height={img.height}
+                    href={link}
                     target="_blank"
-                    rel="noreferrer"
-                    data-cropped="true"
+                    rel="noopener noreferrer"
+                    className="cursor-pointer"
                   >
                     <img
                       src={img.src}
                       alt={img.alt}
-                      className="block size-full object-cover object-center"
+                      className="block size-full object-cover object-center hover:opacity-95 transition-opacity"
                     />
                   </a>
                 </AspectRatio>
