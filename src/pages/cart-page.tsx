@@ -112,7 +112,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <section className="py-32">
-        <div className="container max-w-lg text-center">
+        <div className="container mx-auto max-w-lg text-center">
           <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-full bg-muted">
             <ShoppingCart className="size-8 text-muted-foreground" />
           </div>
@@ -130,7 +130,7 @@ export default function CartPage() {
 
   return (
     <section className="py-32">
-      <div className="container">
+      <div className="container mx-auto">
         <h1 className="mb-8 text-3xl font-semibold">Shopping Cart</h1>
 
         <div className="grid gap-8 lg:grid-cols-3">
