@@ -19,11 +19,13 @@ import SignInPage from './pages/sign-in-page'
 import SignUpPage from './pages/sign-up-page'
 import ForgotPasswordPage from './pages/forgot-password-page'
 import { CoursePlayerPage } from './pages/course-player-page'
+import ScrollToTop from './components/layout/scroll-to-top'
 
 export default function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthProvider>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<MarketingLayout />}>
             <Route index element={<HomePage />} />
