@@ -60,7 +60,7 @@ export const CoursePlayerPage = () => {
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
   const [watchedTime, setWatchedTime] = useState(0);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [isHeaderMinimized, setIsHeaderMinimized] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const videoRef = useRef<HTMLIFrameElement>(null);
 
@@ -94,11 +94,11 @@ export const CoursePlayerPage = () => {
       const currentScrollY = window.scrollY;
 
       if (currentScrollY < 100) {
-        setIsHeaderVisible(true);
-      } else if (currentScrollY > lastScrollY) {
-        setIsHeaderVisible(false);
+        setIsHeaderMinimized(false);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsHeaderMinimized(true);
       } else if (currentScrollY < lastScrollY) {
-        setIsHeaderVisible(true);
+        setIsHeaderMinimized(false);
       }
 
       setLastScrollY(currentScrollY);
@@ -339,58 +339,63 @@ export const CoursePlayerPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div
-        className={`border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 transition-transform duration-300 ease-in-out ${
-          isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
-        }`}
-      >
+      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container max-w-7xl mx-auto py-4 px-4">
-          <Breadcrumb className="w-fit rounded-lg border px-3 py-2 mb-3">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/">
-                    <Home className="size-4" />
-                  </Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link to="/courses">Kurzy</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{course.title}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <div className="flex items-center justify-between mb-3">
+            <Breadcrumb className="w-fit rounded-lg border px-3 py-2">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link to="/">
+                      <Home className="size-4" />
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link to="/courses">Kurzy</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{course.title}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge variant="outline" className="gap-1">
-                  <Target className="h-3 w-3" />
-                  Kurz {course.order_index + 1}
-                </Badge>
-                <Badge variant="outline">
-                  Modul {currentModuleIndex + 1} z {modules.length}
-                </Badge>
-                {courseProgress === 100 && (
-                  <Badge className="bg-green-500/20 text-green-600 border-green-500/30 gap-1">
-                    <Trophy className="h-3 w-3" />
-                    Kurz dokončen
-                  </Badge>
-                )}
-              </div>
-              <h1 className="text-2xl font-bold">{currentModule.title}</h1>
-            </div>
             <div className="text-right">
               <p className="text-sm text-muted-foreground mb-1">Celkový pokrok</p>
               <div className="flex items-center gap-2">
                 <Progress value={courseProgress} className="h-2 w-32" />
                 <span className="text-sm font-medium">{Math.round(courseProgress)}%</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              isHeaderMinimized ? 'max-h-0 opacity-0' : 'max-h-20 opacity-100'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline" className="gap-1">
+                    <Target className="h-3 w-3" />
+                    Kurz {course.order_index + 1}
+                  </Badge>
+                  <Badge variant="outline">
+                    Modul {currentModuleIndex + 1} z {modules.length}
+                  </Badge>
+                  {courseProgress === 100 && (
+                    <Badge className="bg-green-500/20 text-green-600 border-green-500/30 gap-1">
+                      <Trophy className="h-3 w-3" />
+                      Kurz dokončen
+                    </Badge>
+                  )}
+                </div>
+                <h1 className="text-2xl font-bold">{currentModule.title}</h1>
               </div>
             </div>
           </div>
