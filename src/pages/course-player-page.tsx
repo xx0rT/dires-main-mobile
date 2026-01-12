@@ -92,16 +92,17 @@ export const CoursePlayerPage = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      const scrollDifference = currentScrollY - lastScrollY;
 
       if (currentScrollY < 100) {
         setIsHeaderMinimized(false);
-      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      } else if (scrollDifference > 50) {
         setIsHeaderMinimized(true);
-      } else if (currentScrollY < lastScrollY) {
+        setLastScrollY(currentScrollY);
+      } else if (scrollDifference < -50) {
         setIsHeaderMinimized(false);
+        setLastScrollY(currentScrollY);
       }
-
-      setLastScrollY(currentScrollY);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
