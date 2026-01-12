@@ -1,13 +1,33 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams, Navigate } from "react-router-dom";
-import { CheckCircle2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { useParams, Navigate, Link } from "react-router-dom";
+import {
+  CheckCircle2,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  Clock,
+  PlayCircle,
+  BookOpen,
+  ArrowRight,
+  Trophy,
+  Target
+} from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 interface Course {
   id: string;
@@ -38,6 +58,8 @@ export const CoursePlayerPage = () => {
   const [completedModules, setCompletedModules] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [watchedTime, setWatchedTime] = useState(0);
   const videoRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -45,6 +67,25 @@ export const CoursePlayerPage = () => {
       loadCourseData();
     }
   }, [user, courseId]);
+
+  useEffect(() => {
+    setVideoProgress(0);
+    setWatchedTime(0);
+
+    const interval = setInterval(() => {
+      setWatchedTime(prev => {
+        const newTime = prev + 1;
+        if (modules[currentModuleIndex]) {
+          const totalSeconds = modules[currentModuleIndex].duration_minutes * 60;
+          const progress = Math.min((newTime / totalSeconds) * 100, 100);
+          setVideoProgress(progress);
+        }
+        return newTime;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [currentModuleIndex, modules]);
 
   const loadCourseData = async () => {
     try {
@@ -264,71 +305,191 @@ export const CoursePlayerPage = () => {
   const courseProgress = (completedModules.size / modules.length) * 100;
   const isLastModule = currentModuleIndex === modules.length - 1;
   const allModulesCompleted = completedModules.size === modules.length;
+  const nextModule = !isLastModule ? modules[currentModuleIndex + 1] : null;
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const totalSeconds = currentModule.duration_minutes * 60;
+  const remainingSeconds = Math.max(0, totalSeconds - watchedTime);
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container max-w-7xl mx-auto py-8 px-4">
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Badge variant="outline">Kurz {course.order_index + 1}</Badge>
-            <Badge variant="outline">
-              Modul {currentModuleIndex + 1} z {modules.length}
-            </Badge>
-            {courseProgress === 100 && (
-              <Badge className="bg-green-500/20 text-green-600 border-green-500/30">
-                <CheckCircle2 className="h-3 w-3 mr-1" />
-                Kurz dokončen
-              </Badge>
-            )}
+      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="container max-w-7xl mx-auto py-4 px-4">
+          <Breadcrumb className="w-fit rounded-lg border px-3 py-2 mb-3">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/">
+                    <Home className="size-4" />
+                  </Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/courses">Kurzy</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{course.title}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="outline" className="gap-1">
+                  <Target className="h-3 w-3" />
+                  Kurz {course.order_index + 1}
+                </Badge>
+                <Badge variant="outline">
+                  Modul {currentModuleIndex + 1} z {modules.length}
+                </Badge>
+                {courseProgress === 100 && (
+                  <Badge className="bg-green-500/20 text-green-600 border-green-500/30 gap-1">
+                    <Trophy className="h-3 w-3" />
+                    Kurz dokončen
+                  </Badge>
+                )}
+              </div>
+              <h1 className="text-2xl font-bold">{currentModule.title}</h1>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground mb-1">Celkový pokrok</p>
+              <div className="flex items-center gap-2">
+                <Progress value={courseProgress} className="h-2 w-32" />
+                <span className="text-sm font-medium">{Math.round(courseProgress)}%</span>
+              </div>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold mb-2">{course.title}</h1>
-          <h2 className="text-xl text-muted-foreground">{currentModule.title}</h2>
         </div>
+      </div>
+
+      <div className="container max-w-7xl mx-auto py-8 px-4">
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             {currentModule.video_url && (
-              <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden shadow-2xl">
-                <iframe
-                  key={currentModule.id}
-                  ref={videoRef}
-                  src={currentModule.video_url}
-                  title={currentModule.title}
-                  className="absolute inset-0 w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
+              <Card className="overflow-hidden">
+                <div className="relative aspect-video w-full bg-muted">
+                  <iframe
+                    key={currentModule.id}
+                    ref={videoRef}
+                    src={currentModule.video_url}
+                    title={currentModule.title}
+                    className="absolute inset-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="p-4 border-t bg-muted/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <PlayCircle className="h-4 w-4 text-primary" />
+                      <span className="font-medium">Průběh videa</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="text-muted-foreground">
+                        Sledováno: {formatTime(watchedTime)}
+                      </span>
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-muted-foreground">
+                        Zbývá: {formatTime(remainingSeconds)}
+                      </span>
+                    </div>
+                  </div>
+                  <Progress value={videoProgress} className="h-2" />
+                </div>
+              </Card>
             )}
 
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">O tomto modulu</h3>
-                  {!isCurrentModuleCompleted && (
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-5 w-5 text-primary" />
+                      <CardTitle>O tomto modulu</CardTitle>
+                    </div>
+                    <CardDescription className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      Délka modulu: {currentModule.duration_minutes} minut
+                    </CardDescription>
+                  </div>
+                  {!isCurrentModuleCompleted ? (
                     <Button
                       onClick={() => markModuleComplete(currentModule.id)}
                       variant="default"
+                      className="shrink-0"
                     >
                       <CheckCircle2 className="h-4 w-4 mr-2" />
                       Označit jako dokončené
                     </Button>
-                  )}
-                  {isCurrentModuleCompleted && (
-                    <Badge className="bg-green-500/20 text-green-600 border-green-500/30">
+                  ) : (
+                    <Badge className="bg-green-500/20 text-green-600 border-green-500/30 shrink-0">
                       <CheckCircle2 className="h-3 w-3 mr-1" />
                       Dokončeno
                     </Badge>
                   )}
                 </div>
-                <p className="text-muted-foreground mb-4">{currentModule.description}</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 rounded-lg bg-muted/50 border">
+                  <p className="text-sm font-medium mb-2">Popis modulu</p>
+                  <p className="text-muted-foreground leading-relaxed">{currentModule.description}</p>
+                </div>
                 {currentModule.content && (
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <div dangerouslySetInnerHTML={{ __html: currentModule.content }} />
+                  <div>
+                    <p className="text-sm font-medium mb-3">Detailní obsah</p>
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                      <div dangerouslySetInnerHTML={{ __html: currentModule.content }} />
+                    </div>
                   </div>
                 )}
               </CardContent>
             </Card>
+
+            {nextModule && (
+              <Card className="border-primary/20 bg-primary/5">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <ArrowRight className="h-4 w-4 text-primary" />
+                        <span className="text-xs font-medium text-primary uppercase tracking-wider">
+                          Další modul
+                        </span>
+                      </div>
+                      <CardTitle className="text-lg">{nextModule.title}</CardTitle>
+                      <CardDescription className="flex items-center gap-1 mt-1">
+                        <Clock className="h-3 w-3" />
+                        {nextModule.duration_minutes} min
+                      </CardDescription>
+                    </div>
+                    <Button
+                      onClick={goToNextModule}
+                      size="sm"
+                      className="shrink-0"
+                    >
+                      Přehrát
+                      <PlayCircle className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {nextModule.description}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
 
             <div className="flex items-center justify-between">
               <Button
@@ -361,65 +522,116 @@ export const CoursePlayerPage = () => {
 
           <div className="space-y-6">
             <Card>
-              <CardContent className="pt-6">
-                <h3 className="text-lg font-semibold mb-4">Pokrok kurzu</h3>
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Dokončeno</span>
-                    <span className="font-medium">
-                      {completedModules.size} / {modules.length} modulů
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-primary" />
+                  Pokrok kurzu
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium">Dokončeno</span>
+                    <span className="text-2xl font-bold">
+                      {completedModules.size}<span className="text-sm text-muted-foreground">/{modules.length}</span>
                     </span>
                   </div>
-                  <Progress value={courseProgress} className="h-3" />
-                  <p className="text-xs text-muted-foreground">
-                    {Math.round(courseProgress)}% dokončeno
+                  <Progress value={courseProgress} className="h-3 mb-2" />
+                  <p className="text-xs text-muted-foreground text-center">
+                    {Math.round(courseProgress)}% kurzu dokončeno
                   </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-lg border bg-muted/50">
+                    <p className="text-xs text-muted-foreground mb-1">Celkový čas</p>
+                    <p className="text-lg font-semibold">
+                      {modules.reduce((acc, m) => acc + m.duration_minutes, 0)} min
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-lg border bg-muted/50">
+                    <p className="text-xs text-muted-foreground mb-1">Zbývá</p>
+                    <p className="text-lg font-semibold">
+                      {modules
+                        .filter(m => !completedModules.has(m.id))
+                        .reduce((acc, m) => acc + m.duration_minutes, 0)} min
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="pt-6">
-                <h3 className="text-lg font-semibold mb-4">Moduly kurzu</h3>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                  Moduly kurzu
+                </CardTitle>
+                <CardDescription>
+                  {modules.length} modulů • {modules.reduce((acc, m) => acc + m.duration_minutes, 0)} minut celkem
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-2">
                   {modules.map((module, index) => {
                     const isPreviousCompleted = index === 0 || completedModules.has(modules[index - 1].id);
                     const isLocked = !isPreviousCompleted && !completedModules.has(module.id);
+                    const isCompleted = completedModules.has(module.id);
+                    const isCurrent = index === currentModuleIndex;
 
                     return (
                       <button
                         key={module.id}
                         onClick={() => !isLocked && setCurrentModuleIndex(index)}
                         disabled={isLocked}
-                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                          index === currentModuleIndex
-                            ? "border-primary bg-primary/5"
+                        className={`w-full text-left p-3 rounded-lg border transition-all hover:shadow-md ${
+                          isCurrent
+                            ? "border-primary bg-primary/10 shadow-sm"
                             : isLocked
                             ? "border-border opacity-50 cursor-not-allowed"
-                            : "border-border hover:border-primary/50"
+                            : "border-border hover:border-primary/50 hover:bg-muted/50"
                         }`}
                       >
                         <div className="flex items-start gap-3">
                           <div
-                            className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                              completedModules.has(module.id)
-                                ? "bg-green-500/20 text-green-600"
+                            className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                              isCompleted
+                                ? "bg-green-500 text-white"
+                                : isCurrent
+                                ? "bg-primary text-primary-foreground"
                                 : "bg-muted text-muted-foreground"
                             }`}
                           >
-                            {completedModules.has(module.id) ? (
-                              <CheckCircle2 className="h-4 w-4" />
+                            {isCompleted ? (
+                              <CheckCircle2 className="h-5 w-5" />
                             ) : (
                               index + 1
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{module.title}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {module.duration_minutes} min
-                              {isLocked && " • Zamčeno"}
+                            <p className={`text-sm font-medium mb-1 ${isCurrent ? 'text-primary' : ''}`}>
+                              {module.title}
                             </p>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              <span>{module.duration_minutes} min</span>
+                              {isLocked && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-yellow-600 dark:text-yellow-500">Zamčeno</span>
+                                </>
+                              )}
+                              {isCompleted && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-green-600 dark:text-green-500">Dokončeno</span>
+                                </>
+                              )}
+                            </div>
                           </div>
+                          {isCurrent && (
+                            <PlayCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                          )}
                         </div>
                       </button>
                     );
