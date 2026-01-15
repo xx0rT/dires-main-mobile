@@ -429,7 +429,8 @@ export const CoursePlayerPage = () => {
     const currentModule = modules.find(m => m.id === moduleId);
     if (!currentModule) return;
 
-    const requiredWatchTime = Math.floor(currentModule.duration_minutes * 60 * 0.9);
+    const actualDuration = videoDuration > 0 ? videoDuration : currentModule.duration_minutes * 60;
+    const requiredWatchTime = Math.floor(actualDuration * 0.9);
     const currentWatchTime = watchTimeRef.current;
 
     if (currentWatchTime < requiredWatchTime) {
@@ -721,16 +722,16 @@ export const CoursePlayerPage = () => {
                   <Progress value={videoProgress} className="h-2 mb-3" />
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">
-                      Sledováno: {formatTime(actualWatchTime)} / {formatTime(currentModule.duration_minutes * 60)}
+                      Sledováno: {formatTime(actualWatchTime)} / {formatTime(totalSeconds)}
                     </span>
                     <span className={`font-medium ${
-                      actualWatchTime >= currentModule.duration_minutes * 60 * 0.9
+                      actualWatchTime >= totalSeconds * 0.9
                         ? 'text-green-600'
                         : 'text-amber-600'
                     }`}>
-                      {actualWatchTime >= currentModule.duration_minutes * 60 * 0.9
+                      {actualWatchTime >= totalSeconds * 0.9
                         ? '✓ Splněno'
-                        : `Požadováno: 90% (${formatTime(Math.floor(currentModule.duration_minutes * 60 * 0.9))})`
+                        : `Požadováno: 90% (${formatTime(Math.floor(totalSeconds * 0.9))})`
                       }
                     </span>
                   </div>
@@ -748,7 +749,7 @@ export const CoursePlayerPage = () => {
                     </div>
                     <CardDescription className="flex items-center gap-2">
                       <Clock className="h-4 w-4" />
-                      Délka modulu: {currentModule.duration_minutes} minut
+                      Délka modulu: {Math.ceil(totalSeconds / 60)} minut
                     </CardDescription>
                   </div>
                   {!isCurrentModuleCompleted ? (
