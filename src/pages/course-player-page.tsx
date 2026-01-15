@@ -480,6 +480,13 @@ export const CoursePlayerPage = () => {
   const totalSeconds = videoDuration > 0 ? videoDuration : currentModule.duration_minutes * 60;
   const remainingSeconds = Math.max(0, totalSeconds - watchedTime);
 
+  const totalCourseMinutes = modules.reduce((acc, m) => acc + m.duration_minutes, 0);
+  const completedMinutes = modules
+    .filter(m => completedModules.has(m.id))
+    .reduce((acc, m) => acc + m.duration_minutes, 0);
+  const currentModuleWatchedMinutes = Math.floor(watchedTime / 60);
+  const remainingCourseMinutes = Math.max(0, totalCourseMinutes - completedMinutes - currentModuleWatchedMinutes);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -551,7 +558,7 @@ export const CoursePlayerPage = () => {
           <div className="lg:col-span-2 space-y-6">
             {currentModule.video_url && (
               <Card className="overflow-hidden">
-                <div className="relative aspect-video w-full bg-muted">
+                <div className="relative w-full bg-muted" style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}>
                   <div
                     ref={videoRef}
                     className="absolute inset-0 w-full h-full"
@@ -714,15 +721,13 @@ export const CoursePlayerPage = () => {
                   <div className="p-3 rounded-lg border bg-muted/50">
                     <p className="text-xs text-muted-foreground mb-1">Celkový čas</p>
                     <p className="text-lg font-semibold">
-                      {modules.reduce((acc, m) => acc + m.duration_minutes, 0)} min
+                      {totalCourseMinutes} min
                     </p>
                   </div>
                   <div className="p-3 rounded-lg border bg-muted/50">
                     <p className="text-xs text-muted-foreground mb-1">Zbývá</p>
                     <p className="text-lg font-semibold">
-                      {modules
-                        .filter(m => !completedModules.has(m.id))
-                        .reduce((acc, m) => acc + m.duration_minutes, 0)} min
+                      {remainingCourseMinutes} min
                     </p>
                   </div>
                 </div>
