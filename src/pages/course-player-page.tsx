@@ -697,7 +697,7 @@ export const CoursePlayerPage = () => {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 sticky top-24 self-start">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
