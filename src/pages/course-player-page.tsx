@@ -93,6 +93,16 @@ export const CoursePlayerPage = () => {
 
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+
+    if (playerRef.current) {
+      try {
+        playerRef.current.destroy();
+      } catch (e) {
+        console.warn('Error destroying player:', e);
+      }
+      playerRef.current = null;
     }
 
     const initializePlayer = () => {
@@ -102,64 +112,71 @@ export const CoursePlayerPage = () => {
       const videoIdMatch = currentVideoUrl.match(/embed\/([^?]+)/);
       const videoId = videoIdMatch ? videoIdMatch[1] : null;
 
-      if (videoId && (window as any).YT && (window as any).YT.Player) {
-        if (playerRef.current) {
-          playerRef.current.destroy();
-        }
+      if (videoId && (window as any).YT && (window as any).YT.Player && videoRef.current) {
+        const containerElement = videoRef.current;
+        containerElement.innerHTML = '';
 
-        setTimeout(() => {
-          if (videoRef.current) {
-            playerRef.current = new (window as any).YT.Player(videoRef.current, {
-              videoId: videoId,
-              playerVars: {
-                enablejsapi: 1,
-                origin: window.location.origin
-              },
-              events: {
-                onReady: () => {
-                  const duration = Math.floor(playerRef.current.getDuration());
-                  setVideoDuration(duration);
+        playerRef.current = new (window as any).YT.Player(containerElement, {
+          videoId: videoId,
+          playerVars: {
+            enablejsapi: 1,
+            origin: window.location.origin
+          },
+          events: {
+            onReady: () => {
+              if (playerRef.current) {
+                const duration = Math.floor(playerRef.current.getDuration());
+                setVideoDuration(duration);
 
-                  progressIntervalRef.current = setInterval(() => {
-                    if (playerRef.current && playerRef.current.getCurrentTime) {
-                      const currentTime = Math.floor(playerRef.current.getCurrentTime());
-                      const duration = playerRef.current.getDuration();
+                progressIntervalRef.current = setInterval(() => {
+                  if (playerRef.current && playerRef.current.getCurrentTime) {
+                    const currentTime = Math.floor(playerRef.current.getCurrentTime());
+                    const duration = playerRef.current.getDuration();
 
-                      setWatchedTime(currentTime);
+                    setWatchedTime(currentTime);
 
-                      if (duration > 0) {
-                        const progress = Math.min((currentTime / duration) * 100, 100);
-                        setVideoProgress(progress);
-                      }
-                    }
-                  }, 1000);
-                },
-                onStateChange: (event: any) => {
-                  if (event.data === (window as any).YT.PlayerState.ENDED) {
-                    if (progressIntervalRef.current) {
-                      clearInterval(progressIntervalRef.current);
+                    if (duration > 0) {
+                      const progress = Math.min((currentTime / duration) * 100, 100);
+                      setVideoProgress(progress);
                     }
                   }
+                }, 1000);
+              }
+            },
+            onStateChange: (event: any) => {
+              if (event.data === (window as any).YT.PlayerState.ENDED) {
+                if (progressIntervalRef.current) {
+                  clearInterval(progressIntervalRef.current);
+                  progressIntervalRef.current = null;
                 }
               }
-            });
+            }
           }
-        }, 100);
+        });
       }
     };
 
-    if ((window as any).YT && (window as any).YT.Player) {
-      initializePlayer();
-    } else {
-      (window as any).onYouTubeIframeAPIReady = initializePlayer;
-    }
+    const timeoutId = setTimeout(() => {
+      if ((window as any).YT && (window as any).YT.Player) {
+        initializePlayer();
+      } else {
+        (window as any).onYouTubeIframeAPIReady = initializePlayer;
+      }
+    }, 100);
 
     return () => {
+      clearTimeout(timeoutId);
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
       }
-      if (playerRef.current && playerRef.current.destroy) {
-        playerRef.current.destroy();
+      if (playerRef.current) {
+        try {
+          playerRef.current.destroy();
+        } catch (e) {
+          console.warn('Error destroying player on cleanup:', e);
+        }
+        playerRef.current = null;
       }
     };
   }, [currentModuleIndex, modules]);
