@@ -136,6 +136,8 @@ export const CoursePlayerPage = () => {
         try {
           playerRef.current = new (window as any).YT.Player(playerDiv, {
             videoId: videoId,
+            width: '100%',
+            height: '100%',
             playerVars: {
               enablejsapi: 1,
               origin: window.location.origin
@@ -561,7 +563,7 @@ export const CoursePlayerPage = () => {
                 <div className="relative w-full bg-muted" style={{ height: '75vh', minHeight: '600px' }}>
                   <div
                     ref={videoRef}
-                    className="absolute inset-0 w-full h-full"
+                    className="absolute inset-0 w-full h-full [&>div]:w-full [&>div]:h-full [&_iframe]:w-full [&_iframe]:h-full"
                   />
                 </div>
                 <div className="p-4 border-t bg-muted/50">
