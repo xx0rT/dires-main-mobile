@@ -552,13 +552,13 @@ export const CoursePlayerPage = () => {
         </div>
       </div>
 
-      <div className="container max-w-7xl mx-auto py-8 px-4">
+      <div className="container max-w-[1800px] mx-auto py-6 px-4">
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6">
+          <div className="space-y-6">
             {currentModule.video_url && (
               <Card className="overflow-hidden">
-                <div className="relative aspect-video w-full bg-muted">
+                <div className="relative w-full bg-muted" style={{ height: '75vh', minHeight: '600px' }}>
                   <div
                     ref={videoRef}
                     className="absolute inset-0 w-full h-full"
