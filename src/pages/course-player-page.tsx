@@ -63,10 +63,15 @@ export const CoursePlayerPage = () => {
   const [videoDuration, setVideoDuration] = useState(0);
   const [isHeaderMinimized, setIsHeaderMinimized] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [actualWatchTime, setActualWatchTime] = useState(0);
+  const [lastPosition, setLastPosition] = useState(0);
   const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const progressIntervalRef = useRef<any>(null);
   const isMountedRef = useRef(true);
+  const watchTimeRef = useRef(0);
+  const lastSavedTimeRef = useRef(0);
+  const saveIntervalRef = useRef<any>(null);
 
   useEffect(() => {
     if (user && courseId) {
@@ -87,6 +92,61 @@ export const CoursePlayerPage = () => {
     loadYouTubeAPI();
   }, []);
 
+  const saveWatchTime = async () => {
+    if (!user || !modules[currentModuleIndex]) return;
+
+    const moduleId = modules[currentModuleIndex].id;
+    const currentWatchTime = watchTimeRef.current;
+
+    if (currentWatchTime > lastSavedTimeRef.current) {
+      try {
+        await supabase.from("user_module_progress").upsert({
+          user_id: user.id,
+          module_id: moduleId,
+          course_id: courseId,
+          watch_time_seconds: Math.floor(currentWatchTime),
+          last_watched_position: Math.floor(watchedTime),
+          is_completed: completedModules.has(moduleId),
+        }, {
+          onConflict: 'user_id,module_id'
+        });
+
+        lastSavedTimeRef.current = currentWatchTime;
+      } catch (error) {
+        console.error("Error saving watch time:", error);
+      }
+    }
+  };
+
+  const loadModuleProgress = async () => {
+    if (!user || !modules[currentModuleIndex]) return;
+
+    const moduleId = modules[currentModuleIndex].id;
+
+    try {
+      const { data } = await supabase
+        .from("user_module_progress")
+        .select("watch_time_seconds, last_watched_position")
+        .eq("user_id", user.id)
+        .eq("module_id", moduleId)
+        .maybeSingle();
+
+      if (data) {
+        watchTimeRef.current = data.watch_time_seconds || 0;
+        lastSavedTimeRef.current = data.watch_time_seconds || 0;
+        setActualWatchTime(data.watch_time_seconds || 0);
+        setLastPosition(data.last_watched_position || 0);
+      } else {
+        watchTimeRef.current = 0;
+        lastSavedTimeRef.current = 0;
+        setActualWatchTime(0);
+        setLastPosition(0);
+      }
+    } catch (error) {
+      console.error("Error loading module progress:", error);
+    }
+  };
+
   useEffect(() => {
     isMountedRef.current = true;
     setVideoProgress(0);
@@ -97,6 +157,13 @@ export const CoursePlayerPage = () => {
       clearInterval(progressIntervalRef.current);
       progressIntervalRef.current = null;
     }
+
+    if (saveIntervalRef.current) {
+      clearInterval(saveIntervalRef.current);
+      saveIntervalRef.current = null;
+    }
+
+    loadModuleProgress();
 
     const cleanupPlayer = async () => {
       if (playerRef.current) {
@@ -152,6 +219,10 @@ export const CoursePlayerPage = () => {
                     setVideoDuration(duration);
                   }
 
+                  if (lastPosition > 0 && lastPosition < duration - 10) {
+                    playerRef.current.seekTo(lastPosition, true);
+                  }
+
                   progressIntervalRef.current = setInterval(() => {
                     if (!isMountedRef.current || !playerRef.current || !playerRef.current.getCurrentTime) {
                       if (progressIntervalRef.current) {
@@ -164,9 +235,15 @@ export const CoursePlayerPage = () => {
                     try {
                       const currentTime = Math.floor(playerRef.current.getCurrentTime());
                       const duration = playerRef.current.getDuration();
+                      const playerState = playerRef.current.getPlayerState();
 
                       if (isMountedRef.current) {
                         setWatchedTime(currentTime);
+
+                        if (playerState === 1) {
+                          watchTimeRef.current += 1;
+                          setActualWatchTime(watchTimeRef.current);
+                        }
 
                         if (duration > 0) {
                           const progress = Math.min((currentTime / duration) * 100, 100);
@@ -177,15 +254,24 @@ export const CoursePlayerPage = () => {
 
                     }
                   }, 1000);
+
+                  saveIntervalRef.current = setInterval(() => {
+                    saveWatchTime();
+                  }, 10000);
                 } catch (e) {
 
                 }
               },
               onStateChange: (event: any) => {
                 if (event.data === (window as any).YT.PlayerState.ENDED) {
+                  saveWatchTime();
                   if (progressIntervalRef.current) {
                     clearInterval(progressIntervalRef.current);
                     progressIntervalRef.current = null;
+                  }
+                  if (saveIntervalRef.current) {
+                    clearInterval(saveIntervalRef.current);
+                    saveIntervalRef.current = null;
                   }
                 }
               }
@@ -209,9 +295,16 @@ export const CoursePlayerPage = () => {
       isMountedRef.current = false;
       clearTimeout(timeoutId);
 
+      saveWatchTime();
+
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
         progressIntervalRef.current = null;
+      }
+
+      if (saveIntervalRef.current) {
+        clearInterval(saveIntervalRef.current);
+        saveIntervalRef.current = null;
       }
 
       if (playerRef.current) {
@@ -232,7 +325,7 @@ export const CoursePlayerPage = () => {
         }
       }
     };
-  }, [currentModuleIndex, modules]);
+  }, [currentModuleIndex, modules, user, courseId, watchedTime, completedModules]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -311,13 +404,31 @@ export const CoursePlayerPage = () => {
   const markModuleComplete = async (moduleId: string) => {
     if (!user || completedModules.has(moduleId)) return;
 
+    const currentModule = modules.find(m => m.id === moduleId);
+    if (!currentModule) return;
+
+    const requiredWatchTime = Math.floor(currentModule.duration_minutes * 60 * 0.9);
+    const currentWatchTime = watchTimeRef.current;
+
+    if (currentWatchTime < requiredWatchTime) {
+      const remainingMinutes = Math.ceil((requiredWatchTime - currentWatchTime) / 60);
+      toast.error("❌ Nedostatečný čas sledování", {
+        description: `Musíte sledovat alespoň 90% videa. Zbývá přibližně ${remainingMinutes} min.`
+      });
+      return;
+    }
+
     try {
+      await saveWatchTime();
+
       await supabase.from("user_module_progress").upsert({
         user_id: user.id,
         module_id: moduleId,
         course_id: courseId,
         is_completed: true,
         completed_at: new Date().toISOString(),
+        watch_time_seconds: Math.floor(currentWatchTime),
+        last_watched_position: Math.floor(watchedTime),
       }, {
         onConflict: 'user_id,module_id'
       });
@@ -339,13 +450,17 @@ export const CoursePlayerPage = () => {
       toast.success("✅ Modul dokončen!", {
         description: currentModuleIndex < modules.length - 1
           ? "Přechod na další modul..."
-          : "🎯 Nyní můžete odemknout další kurz!"
+          : "🎉 Gratulujeme! Dokončili jste kurz!"
       });
 
       if (currentModuleIndex < modules.length - 1) {
         setTimeout(() => {
           goToNextModule();
         }, 1500);
+      } else {
+        setTimeout(async () => {
+          await unlockNextCourse();
+        }, 2000);
       }
     } catch (error) {
       console.error("Error marking module complete:", error);
@@ -470,7 +585,6 @@ export const CoursePlayerPage = () => {
   const isCurrentModuleCompleted = completedModules.has(currentModule.id);
   const courseProgress = (completedModules.size / modules.length) * 100;
   const isLastModule = currentModuleIndex === modules.length - 1;
-  const allModulesCompleted = completedModules.size === modules.length;
   const nextModule = !isLastModule ? modules[currentModuleIndex + 1] : null;
 
   const formatTime = (seconds: number) => {
@@ -574,7 +688,7 @@ export const CoursePlayerPage = () => {
                     </div>
                     <div className="flex items-center gap-3 text-sm">
                       <span className="text-muted-foreground">
-                        Sledováno: {formatTime(watchedTime)}
+                        Pozice: {formatTime(watchedTime)}
                       </span>
                       <span className="text-muted-foreground">•</span>
                       <span className="text-muted-foreground">
@@ -582,7 +696,22 @@ export const CoursePlayerPage = () => {
                       </span>
                     </div>
                   </div>
-                  <Progress value={videoProgress} className="h-2" />
+                  <Progress value={videoProgress} className="h-2 mb-3" />
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">
+                      Sledováno: {formatTime(actualWatchTime)} / {formatTime(currentModule.duration_minutes * 60)}
+                    </span>
+                    <span className={`font-medium ${
+                      actualWatchTime >= currentModule.duration_minutes * 60 * 0.9
+                        ? 'text-green-600'
+                        : 'text-amber-600'
+                    }`}>
+                      {actualWatchTime >= currentModule.duration_minutes * 60 * 0.9
+                        ? '✓ Splněno'
+                        : `Požadováno: 90% (${formatTime(Math.floor(currentModule.duration_minutes * 60 * 0.9))})`
+                      }
+                    </span>
+                  </div>
                 </div>
               </Card>
             )}
@@ -677,23 +806,13 @@ export const CoursePlayerPage = () => {
                 <ChevronLeft className="h-4 w-4 mr-2" />
                 Předchozí modul
               </Button>
-              {isLastModule && allModulesCompleted ? (
-                <Button
-                  onClick={unlockNextCourse}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  Odemknout další kurz
-                </Button>
-              ) : (
-                <Button
-                  onClick={goToNextModule}
-                  disabled={currentModuleIndex === modules.length - 1}
-                >
-                  Další modul
-                  <ChevronRight className="h-4 w-4 ml-2" />
-                </Button>
-              )}
+              <Button
+                onClick={goToNextModule}
+                disabled={currentModuleIndex === modules.length - 1}
+              >
+                Další modul
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
             </div>
           </div>
 
