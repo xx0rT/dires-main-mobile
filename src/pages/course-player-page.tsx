@@ -558,7 +558,7 @@ export const CoursePlayerPage = () => {
           <div className="lg:col-span-2 space-y-6">
             {currentModule.video_url && (
               <Card className="overflow-hidden">
-                <div className="relative w-full bg-muted" style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}>
+                <div className="relative aspect-video w-full bg-muted">
                   <div
                     ref={videoRef}
                     className="absolute inset-0 w-full h-full"
