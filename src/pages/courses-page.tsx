@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Progress } from '@/components/ui/progress'
 import { RiBookOpenLine, RiLockLine, RiCheckLine, RiPlayCircleLine, RiTimeLine, RiVideoLine } from '@remixicon/react'
 import { mockCourses, mockModules, mockDatabase } from '@/lib/mock-data'
 import { useEffect, useState, useRef } from 'react'
@@ -234,25 +233,16 @@ export default function CoursesPage() {
           return (
             <div key={course.id} className="relative">
               {index > 0 && (
-                <svg className="absolute left-8 -top-12 w-1 h-12 hidden md:block" style={{ zIndex: 0 }}>
-                  <defs>
-                    <linearGradient id={`progressGradient${index}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#10b981" stopOpacity={previousProgress === 100 ? "1" : "0.3"} />
-                      <stop offset="100%" stopColor="#7033ff" stopOpacity={previousProgress === 100 ? "1" : "0.3"} />
-                    </linearGradient>
-                  </defs>
-                  <motion.line
-                    x1="50%"
-                    y1="0"
-                    x2="50%"
-                    y2="100%"
-                    stroke={`url(#progressGradient${index})`}
-                    strokeWidth="3"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: isInView ? previousProgress / 100 : 0 }}
-                    transition={{ duration: 1.5, delay: index * 0.2, ease: "easeInOut" }}
-                  />
-                </svg>
+                <div className="absolute left-8 -top-12 w-1 h-12 hidden md:block" style={{ zIndex: 0 }}>
+                  <div className="relative w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <motion.div
+                      className="absolute top-0 left-0 w-full bg-gradient-to-b from-green-500 to-primary"
+                      initial={{ height: '0%' }}
+                      animate={{ height: isInView ? `${previousProgress}%` : '0%' }}
+                      transition={{ duration: 1.5, delay: index * 0.2, ease: "easeInOut" }}
+                    />
+                  </div>
+                </div>
               )}
 
               <motion.div
@@ -262,86 +252,97 @@ export default function CoursesPage() {
                 className="relative mb-12"
               >
                 <motion.div
-                  className="absolute left-0 top-8 w-16 h-16 rounded-full bg-background flex items-center justify-center z-20 hidden md:flex shadow-lg"
+                  className="absolute left-0 top-8 w-16 h-16 rounded-full flex items-center justify-center z-20 hidden md:flex shadow-lg"
                   style={{
-                    border: `4px solid ${!isUnlocked ? '#6b7280' : progress === 100 ? '#10b981' : '#7033ff'}`
+                    background: !isUnlocked
+                      ? '#6b7280'
+                      : progress === 100
+                        ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                        : 'linear-gradient(135deg, #7033ff 0%, #a855f7 100%)',
                   }}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.5, delay: index * 0.15 + 0.2, type: "spring" }}
                 >
                   {!isUnlocked ? (
-                    <RiLockLine className="h-6 w-6 text-muted-foreground" />
+                    <RiLockLine className="h-6 w-6 text-white" />
                   ) : progress === 100 ? (
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
                       transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
                     >
-                      <RiCheckLine className="h-6 w-6 text-green-600" />
+                      <RiCheckLine className="h-7 w-7 text-white font-bold" />
                     </motion.div>
                   ) : (
-                    <RiBookOpenLine className="h-6 w-6 text-primary" />
+                    <RiBookOpenLine className="h-6 w-6 text-white" />
                   )}
                 </motion.div>
 
-                <Card className={`md:ml-24 ${!isUnlocked ? 'opacity-60 grayscale' : ''} group relative overflow-hidden transition-all duration-500 border-2 ${progress === 100 ? 'border-green-500/30 hover:border-green-500/50' : isEnrolled ? 'border-primary/30 hover:border-primary/50' : 'hover:border-primary/30'} hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1`}>
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <Card className={`md:ml-24 ${!isUnlocked ? 'opacity-60 grayscale' : ''} group relative overflow-hidden transition-all duration-300 ${progress === 100 ? 'border-2 border-green-500/50 bg-green-50/50 dark:bg-green-950/20' : isEnrolled ? 'border-2 border-primary/50 bg-primary/5' : 'border-2 border-border'} hover:shadow-xl hover:scale-[1.01]`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                  <CardHeader className="relative z-10">
-                    <div className="flex items-start justify-between">
+                  <CardHeader className="relative z-10 pb-3">
+                    <div className="flex items-start justify-between gap-3">
                       <div className="space-y-2 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <CardTitle className="text-2xl group-hover:text-primary transition-colors">{course.title}</CardTitle>
+                          <CardTitle className="text-xl font-bold">{course.title}</CardTitle>
                           {!isUnlocked && (
-                            <Badge variant="secondary" className="gap-1">
+                            <Badge variant="secondary" className="gap-1 text-xs">
                               <RiLockLine className="h-3 w-3" />
                               Zamčeno
                             </Badge>
                           )}
                           {isEnrolled && progress === 100 && (
-                            <Badge variant="default" className="bg-green-600 gap-1">
+                            <Badge className="bg-green-600 hover:bg-green-700 gap-1 text-xs">
                               <RiCheckLine className="h-3 w-3" />
                               Dokončeno
                             </Badge>
                           )}
                           {isEnrolled && progress > 0 && progress < 100 && (
-                            <Badge variant="default" className="gap-1">
+                            <Badge className="gap-1 text-xs">
                               <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
                               V průběhu
                             </Badge>
                           )}
                         </div>
-                        <CardDescription className="text-base leading-relaxed">
+                        <CardDescription className="text-sm leading-relaxed">
                           {course.description}
                         </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
 
-                  <CardContent className="space-y-4 relative z-10">
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2 group-hover:text-primary transition-colors">
-                        <RiVideoLine className="h-4 w-4" />
+                  <CardContent className="space-y-3 relative z-10 pt-0">
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1.5">
+                        <RiVideoLine className="h-3.5 w-3.5" />
                         <span>{modules.length} videí</span>
                       </div>
-                      <div className="flex items-center gap-2 group-hover:text-primary transition-colors">
-                        <RiTimeLine className="h-4 w-4" />
+                      <div className="flex items-center gap-1.5">
+                        <RiTimeLine className="h-3.5 w-3.5" />
                         <span>{totalDuration} minut</span>
                       </div>
                     </div>
 
                     {isEnrolled && (
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Váš pokrok</span>
-                          <span className="font-medium">{Math.round(progress)}%</span>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground font-medium">Váš pokrok</span>
+                          <span className="font-bold text-primary">{Math.round(progress)}%</span>
                         </div>
-                        <Progress value={progress} className="h-2" />
+                        <div className="relative h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <motion.div
+                            className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-purple-500 rounded-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 1, ease: "easeOut" }}
+                          />
+                        </div>
                       </div>
                     )}
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 pt-1">
                       {isUnlocked ? (
                         <>
                           <Dialog>

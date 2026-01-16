@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,10 +14,11 @@ interface ConversationMessage {
   type: 'user' | 'bot'
   content: string
   category?: string
+  isTyping?: boolean
 }
 
 export function PhysioChatbot() {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
   const [showPresetQuestions, setShowPresetQuestions] = useState(true)
   const [messages, setMessages] = useState<ConversationMessage[]>([
     {
@@ -28,12 +29,34 @@ export function PhysioChatbot() {
   ])
   const [input, setInput] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('všechny')
+  const [isTyping, setIsTyping] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const categories = ['všechny', 'páteř', 'sport', 'terapie', 'neurologie', 'obecné', 'akutní péče']
 
   const filteredQuestions = selectedCategory === 'všechny'
     ? mockChatbotQA
     : mockChatbotQA.filter(qa => qa.category === selectedCategory)
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, isTyping])
+
+  const simulateTyping = (content: string, category?: string) => {
+    setIsTyping(true)
+
+    setTimeout(() => {
+      setIsTyping(false)
+      const botMessage: ConversationMessage = {
+        id: Date.now().toString(),
+        type: 'bot',
+        content,
+        category
+      }
+      setMessages(prev => [...prev, botMessage])
+    }, 1000 + Math.random() * 1000)
+  }
 
   const handleQuestionClick = (qa: ChatMessage) => {
     const userMessage: ConversationMessage = {
@@ -42,14 +65,8 @@ export function PhysioChatbot() {
       content: qa.question
     }
 
-    const botMessage: ConversationMessage = {
-      id: (Date.now() + 1).toString(),
-      type: 'bot',
-      content: qa.answer,
-      category: qa.category
-    }
-
-    setMessages(prev => [...prev, userMessage, botMessage])
+    setMessages(prev => [...prev, userMessage])
+    simulateTyping(qa.answer, qa.category)
   }
 
   const handleSendMessage = () => {
@@ -61,21 +78,18 @@ export function PhysioChatbot() {
       content: input
     }
 
+    setMessages(prev => [...prev, userMessage])
+
     const matchedQA = mockChatbotQA.find(qa =>
       qa.question.toLowerCase().includes(input.toLowerCase()) ||
       input.toLowerCase().includes(qa.question.toLowerCase().split(' ').slice(0, 3).join(' '))
     )
 
-    const botMessage: ConversationMessage = {
-      id: (Date.now() + 1).toString(),
-      type: 'bot',
-      content: matchedQA
-        ? matchedQA.answer
-        : 'Omlouvám se, na tuto otázku momentálně nemám odpověď. Zkuste prosím přeformulovat dotaz nebo vyberte některou z připravených otázek níže. Pokud potřebujete konkrétní pomoc, konzultujte s odborníkem.',
-      category: matchedQA?.category
-    }
+    const responseContent = matchedQA
+      ? matchedQA.answer
+      : 'Omlouvám se, na tuto otázku momentálně nemám odpověď. Zkuste prosím přeformulovat dotaz nebo vyberte některou z připravených otázek níže. Pokud potřebujete konkrétní pomoc, konzultujte s odborníkem.'
 
-    setMessages(prev => [...prev, userMessage, botMessage])
+    simulateTyping(responseContent, matchedQA?.category)
     setInput('')
   }
 
@@ -106,8 +120,8 @@ export function PhysioChatbot() {
         </CardHeader>
         <CollapsibleContent>
           <CardContent className="space-y-4">
-        <ScrollArea className="h-[300px] pr-4">
-          <div className="space-y-4">
+        <ScrollArea className="h-[200px] pr-4" ref={scrollRef}>
+          <div className="space-y-3">
             <AnimatePresence>
               {messages.map((message) => (
                 <motion.div
@@ -118,22 +132,51 @@ export function PhysioChatbot() {
                   className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-lg p-3 ${
+                    className={`max-w-[85%] rounded-lg p-2.5 ${
                       message.type === 'user'
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted'
                     }`}
                   >
-                    <p className="text-sm leading-relaxed">{message.content}</p>
+                    <p className="text-xs leading-relaxed">{message.content}</p>
                     {message.category && (
-                      <Badge variant="outline" className="mt-2 text-xs">
+                      <Badge variant="outline" className="mt-1.5 text-xs">
                         {message.category}
                       </Badge>
                     )}
                   </div>
                 </motion.div>
               ))}
+              {isTyping && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex justify-start"
+                >
+                  <div className="max-w-[85%] rounded-lg p-2.5 bg-muted">
+                    <div className="flex gap-1">
+                      <motion.div
+                        className="w-2 h-2 rounded-full bg-primary"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                      />
+                      <motion.div
+                        className="w-2 h-2 rounded-full bg-primary"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                      />
+                      <motion.div
+                        className="w-2 h-2 rounded-full bg-primary"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </AnimatePresence>
+            <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
 
