@@ -425,13 +425,36 @@ export const CoursePlayerPage = () => {
         .eq("user_id", user?.id)
         .eq("course_id", courseId);
 
-      if (progressData) {
+      if (progressData && user) {
         const completed = new Set(
           progressData
             .filter(p => p.is_completed)
             .map(p => p.module_id)
         );
         setCompletedModules(completed);
+
+        if (modulesData && completed.size === modulesData.length && completed.size > 0) {
+          const progressPercentage = 100;
+
+          await supabase
+            .from("user_course_enrollments")
+            .update({
+              progress_percentage: progressPercentage,
+              completed_at: new Date().toISOString(),
+            })
+            .eq("user_id", user.id)
+            .eq("course_id", courseId);
+        } else if (modulesData && modulesData.length > 0) {
+          const progressPercentage = (completed.size / modulesData.length) * 100;
+
+          await supabase
+            .from("user_course_enrollments")
+            .update({
+              progress_percentage: progressPercentage,
+            })
+            .eq("user_id", user.id)
+            .eq("course_id", courseId);
+        }
       }
 
       const { data: nextCourseCheck } = await supabase
