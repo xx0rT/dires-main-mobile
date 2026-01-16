@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { RiBookOpenLine, RiLockLine, RiCheckLine, RiPlayCircleLine, RiTimeLine, RiVideoLine } from '@remixicon/react'
 import { mockCourses, mockModules, mockDatabase } from '@/lib/mock-data'
 import { useEffect, useState, useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import confetti from 'canvas-confetti'
 import { PhysioChatbot } from '@/components/chatbot/physio-chatbot'
@@ -47,7 +47,6 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true)
   const [newlyUnlocked, setNewlyUnlocked] = useState<string[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(containerRef, { once: false, amount: 0.2 })
 
   useEffect(() => {
     loadCoursesData()
@@ -223,8 +222,6 @@ export default function CoursesPage() {
 
         {courses.map((course, index) => {
           const isUnlocked = isCourseUnlocked(index)
-          const previousCourse = index > 0 ? courses[index - 1] : null
-          const previousProgress = previousCourse ? getCourseProgress(previousCourse.id) : 100
           const isEnrolled = isCourseEnrolled(course.id)
           const progress = getCourseProgress(course.id)
           const modules = courseModules[course.id] || []
@@ -232,19 +229,6 @@ export default function CoursesPage() {
 
           return (
             <div key={course.id} className="relative">
-              {index > 0 && (
-                <div className="absolute left-8 -top-20 w-1 h-20 hidden md:block" style={{ zIndex: 0 }}>
-                  <div className="relative w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <motion.div
-                      className="absolute top-0 left-0 w-full bg-gradient-to-b from-green-500 to-primary"
-                      initial={{ height: '0%' }}
-                      animate={{ height: isInView ? `${previousProgress}%` : '0%' }}
-                      transition={{ duration: 1.5, delay: index * 0.2, ease: "easeInOut" }}
-                    />
-                  </div>
-                </div>
-              )}
-
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
