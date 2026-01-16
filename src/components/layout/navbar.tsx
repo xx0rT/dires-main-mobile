@@ -15,22 +15,11 @@ import { Separator } from "../ui/separator"
 import {
     Sheet,
     SheetContent,
-    SheetFooter,
     SheetHeader,
     SheetTitle,
     SheetTrigger
 } from "../ui/sheet"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "../ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "../ui/avatar"
 import { site } from "@/config/site"
-import { useAuth } from "@/lib/auth-context"
 import { ShoppingCartButton } from "../shop/shopping-cart-button"
 
 interface RouteProps {
@@ -148,7 +137,6 @@ const menuContent = {
 export const Navbar = () => {
     const [isOpen, setIsOpen] = React.useState(false)
     const [isScrolled, setIsScrolled] = React.useState(false)
-    const { user, signOut } = useAuth()
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -158,11 +146,6 @@ export const Navbar = () => {
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
-
-    const getUserInitials = () => {
-        if (!user?.email) return "U"
-        return user.email.charAt(0).toUpperCase()
-    }
 
     return (
         <div className={`sticky top-2 z-50 mx-auto px-4 transition-all duration-500 ease-out ${
@@ -376,72 +359,6 @@ export const Navbar = () => {
                     <div className="hidden items-center gap-2 lg:flex">
                         <ShoppingCartButton />
                         <ModeToggle />
-
-                        {user ? (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2">
-                                        <Avatar className="h-9 w-9">
-                                            <AvatarFallback className="bg-primary text-primary-foreground">
-                                                {getUserInitials()}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56" align="end" forceMount>
-                                    <DropdownMenuLabel className="font-normal">
-                                        <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-medium leading-none">Můj účet</p>
-                                            <p className="text-xs leading-none text-muted-foreground">
-                                                {user.email}
-                                            </p>
-                                        </div>
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem asChild>
-                                        <Link to="/courses" className="cursor-pointer">
-                                            Kurzy
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <Link to="/dashboard" className="cursor-pointer">
-                                            Dashboard
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <Link to="/dashboard/settings" className="cursor-pointer">
-                                            Nastavení
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">
-                                        Odhlásit se
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        ) : (
-                            <>
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    variant="outline"
-                                    className="ml-2"
-                                >
-                                    <Link to="/auth/sign-in">
-                                        Přihlásit se
-                                    </Link>
-                                </Button>
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    className="bg-primary hover:bg-primary/90"
-                                >
-                                    <Link to="/auth/sign-up">
-                                        Začít
-                                    </Link>
-                                </Button>
-                            </>
-                        )}
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -514,66 +431,6 @@ export const Navbar = () => {
                                         </div>
                                     </div>
 
-                                    {/* Mobile Actions */}
-                                    <SheetFooter className="flex-col gap-2 border-border/50 border-t pt-4">
-                                        {user ? (
-                                            <>
-                                                <div className="flex items-center gap-3 pb-2">
-                                                    <Avatar className="h-10 w-10">
-                                                        <AvatarFallback className="bg-primary text-primary-foreground">
-                                                            {getUserInitials()}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="flex flex-col">
-                                                        <p className="text-sm font-medium">Můj účet</p>
-                                                        <p className="text-xs text-muted-foreground">{user.email}</p>
-                                                    </div>
-                                                </div>
-                                                <Button
-                                                    asChild
-                                                    variant="outline"
-                                                    className="w-full"
-                                                    onClick={() => setIsOpen(false)}
-                                                >
-                                                    <Link to="/dashboard">
-                                                        Dashboard
-                                                    </Link>
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    className="w-full"
-                                                    onClick={() => {
-                                                        signOut()
-                                                        setIsOpen(false)
-                                                    }}
-                                                >
-                                                    Odhlásit se
-                                                </Button>
-                                            </>
-                                        ) : (
-                                            <div className="flex gap-2 w-full">
-                                                <Button
-                                                    asChild
-                                                    variant="outline"
-                                                    className="w-full"
-                                                    onClick={() => setIsOpen(false)}
-                                                >
-                                                    <Link to="/auth/sign-in">
-                                                        Přihlásit se
-                                                    </Link>
-                                                </Button>
-                                                <Button
-                                                    asChild
-                                                    className="w-full bg-primary hover:bg-primary/90"
-                                                    onClick={() => setIsOpen(false)}
-                                                >
-                                                    <Link to="/auth/sign-up">
-                                                        Začít
-                                                    </Link>
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </SheetFooter>
                                 </div>
                             </SheetContent>
                         </Sheet>
