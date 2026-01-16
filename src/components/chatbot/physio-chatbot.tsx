@@ -120,6 +120,7 @@ export function PhysioChatbot() {
         </CardHeader>
         <CollapsibleContent>
           <CardContent className="space-y-4">
+        <div className="relative" onWheel={(e) => e.stopPropagation()}>
         <ScrollArea className="h-[200px] pr-4" ref={scrollRef}>
           <div className="space-y-3">
             <AnimatePresence>
@@ -179,6 +180,7 @@ export function PhysioChatbot() {
             <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
+        </div>
 
         <div className="space-y-2">
           <div className="flex gap-2">

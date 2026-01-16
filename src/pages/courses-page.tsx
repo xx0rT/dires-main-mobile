@@ -233,7 +233,7 @@ export default function CoursesPage() {
           return (
             <div key={course.id} className="relative">
               {index > 0 && (
-                <div className="absolute left-8 -top-12 w-1 h-12 hidden md:block" style={{ zIndex: 0 }}>
+                <div className="absolute left-8 -top-20 w-1 h-20 hidden md:block" style={{ zIndex: 0 }}>
                   <div className="relative w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                     <motion.div
                       className="absolute top-0 left-0 w-full bg-gradient-to-b from-green-500 to-primary"
