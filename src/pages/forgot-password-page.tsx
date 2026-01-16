@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { supabase } from '@/lib/supabase'
 import { RiArrowLeftLine, RiMailLine } from '@remixicon/react'
 import { site } from '@/config/site'
 
@@ -19,11 +18,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
-      })
-
-      if (error) throw error
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
       setEmailSent(true)
       toast.success('Email pro obnovení hesla byl odeslán!')

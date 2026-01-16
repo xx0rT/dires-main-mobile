@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { RiBillLine, RiCheckLine, RiTimeLine, RiBankCardLine } from '@remixicon/react'
-import { supabase } from '@/lib/supabase'
+import { mockCourses, mockDatabase } from '@/lib/mock-data'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
@@ -35,17 +35,19 @@ export default function BillingPage() {
     if (!user) return
 
     try {
-      const { data: enrollmentsData } = await supabase
-        .from('user_course_enrollments')
-        .select(`
-          *,
-          course:courses(*)
-        `)
-        .eq('user_id', user.id)
-        .order('enrolled_at', { ascending: false })
+      const enrollmentsData = mockDatabase.getEnrollments(user.id)
+        .sort((a, b) => new Date(b.enrolled_at).getTime() - new Date(a.enrolled_at).getTime())
 
-      if (enrollmentsData) {
-        setEnrollments(enrollmentsData as Enrollment[])
+      const enrollmentsWithCourses = enrollmentsData.map(enrollment => {
+        const course = mockCourses.find(c => c.id === enrollment.course_id)
+        return {
+          ...enrollment,
+          course: course || mockCourses[0]
+        }
+      })
+
+      if (enrollmentsWithCourses) {
+        setEnrollments(enrollmentsWithCourses as Enrollment[])
       }
     } catch (error) {
       console.error('Error loading billing data:', error)

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { RiBookOpenLine, RiTimeLine, RiTrophyLine, RiArrowRightLine, RiCheckLine, RiBillLine, RiUserLine } from '@remixicon/react'
-import { supabase } from '@/lib/supabase'
+import { mockCourses, mockDatabase } from '@/lib/mock-data'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
@@ -46,31 +46,30 @@ export default function DashboardPage() {
     if (!user) return
 
     try {
-      const { data: enrollmentsData } = await supabase
-        .from('user_course_enrollments')
-        .select(`
-          *,
-          course:courses(*)
-        `)
-        .eq('user_id', user.id)
-        .order('enrolled_at', { ascending: false })
+      const enrollmentsData = mockDatabase.getEnrollments(user.id)
+        .sort((a, b) => new Date(b.enrolled_at).getTime() - new Date(a.enrolled_at).getTime())
 
-      const { data: progressData } = await supabase
-        .from('user_module_progress')
-        .select('*')
-        .eq('user_id', user.id)
+      const enrollmentsWithCourses = enrollmentsData.map(enrollment => {
+        const course = mockCourses.find(c => c.id === enrollment.course_id)
+        return {
+          ...enrollment,
+          course: course || mockCourses[0]
+        }
+      })
 
-      if (enrollmentsData) {
-        setEnrollments(enrollmentsData as Enrollment[])
+      const progressData = mockDatabase.getModuleProgress(user.id)
+
+      if (enrollmentsWithCourses) {
+        setEnrollments(enrollmentsWithCourses as Enrollment[])
       }
 
       if (progressData) {
-        const completedModulesCount = progressData.filter((p: { is_completed: boolean }) => p.is_completed).length
+        const completedModulesCount = progressData.filter((p) => p.is_completed).length
         const totalMinutes = completedModulesCount * 60
 
         setStats({
-          completedCourses: enrollmentsData?.filter((e: Enrollment) => e.completed_at).length || 0,
-          inProgressCourses: enrollmentsData?.filter((e: Enrollment) => !e.completed_at).length || 0,
+          completedCourses: enrollmentsData?.filter((e) => e.completed_at).length || 0,
+          inProgressCourses: enrollmentsData?.filter((e) => !e.completed_at).length || 0,
           totalHoursSpent: Math.round(totalMinutes / 60),
           completedModules: completedModulesCount
         })

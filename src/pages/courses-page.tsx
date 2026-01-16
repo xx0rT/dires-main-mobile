@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
 import { RiBookOpenLine, RiLockLine, RiCheckLine, RiPlayCircleLine, RiTimeLine, RiVideoLine, RiSparklingLine, RiRefreshLine } from '@remixicon/react'
-import { supabase } from '@/lib/supabase'
+import { mockCourses, mockModules, mockDatabase, mockAiTips } from '@/lib/mock-data'
 import { useEffect, useState, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
@@ -90,21 +90,14 @@ export default function CoursesPage() {
 
   const loadCoursesData = async () => {
     try {
-      const { data: coursesData } = await supabase
-        .from('courses')
-        .select('*')
-        .eq('is_published', true)
-        .order('order_index', { ascending: true })
+      const coursesData = mockCourses.filter(c => c.is_published)
 
       if (coursesData) {
         setCourses(coursesData)
 
         for (const course of coursesData) {
-          const { data: modules } = await supabase
-            .from('course_modules')
-            .select('*')
-            .eq('course_id', course.id)
-            .order('order_index', { ascending: true })
+          const modules = mockModules.filter(m => m.course_id === course.id)
+            .sort((a, b) => a.order_index - b.order_index)
 
           if (modules) {
             setCourseModules(prev => ({ ...prev, [course.id]: modules }))
@@ -113,10 +106,7 @@ export default function CoursesPage() {
       }
 
       if (user) {
-        const { data: enrollmentsData } = await supabase
-          .from('user_course_enrollments')
-          .select('*')
-          .eq('user_id', user.id)
+        const enrollmentsData = mockDatabase.getEnrollments(user.id)
 
         if (enrollmentsData) {
           setEnrollments(enrollmentsData as Enrollment[])
@@ -134,30 +124,8 @@ export default function CoursesPage() {
 
     setLoadingTips(true)
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-
-      if (!session?.access_token) {
-        setLoadingTips(false)
-        return
-      }
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/learning-tips`,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${session?.access_token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-
-      if (response.ok) {
-        const data = await response.json()
-        setAiTips(data.tips || [])
-      } else if (response.status === 401) {
-        console.log('Authentication required for AI tips')
-      }
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setAiTips(mockAiTips)
     } catch (error) {
       console.error('Error fetching AI tips:', error)
     } finally {
@@ -192,27 +160,24 @@ export default function CoursesPage() {
     }
 
     try {
-      const { error } = await supabase
-        .from('user_course_enrollments')
-        .insert({
-          user_id: user.id,
-          course_id: courseId,
-          progress_percentage: 0
-        })
+      mockDatabase.addEnrollment({
+        user_id: user.id,
+        course_id: courseId,
+        progress_percentage: 0,
+        completed_at: null
+      })
 
-      if (!error) {
-        const courseIndex = courses.findIndex(c => c.id === courseId)
-        if (courseIndex > 0) {
-          confetti({
-            particleCount: 150,
-            spread: 100,
-            origin: { y: 0.5 },
-            colors: ['#7033ff', '#4f46e5', '#6366f1', '#a855f7'],
-            ticks: 300
-          })
-        }
-        loadCoursesData()
+      const courseIndex = courses.findIndex(c => c.id === courseId)
+      if (courseIndex > 0) {
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.5 },
+          colors: ['#7033ff', '#4f46e5', '#6366f1', '#a855f7'],
+          ticks: 300
+        })
       }
+      loadCoursesData()
     } catch (error) {
       console.error('Error enrolling in course:', error)
     }

@@ -13,7 +13,7 @@ import {
   Trophy,
   Target
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { mockCourses, mockModules, mockDatabase } from "@/lib/mock-data";
 import { useAuth } from "@/lib/auth-context";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -127,15 +127,14 @@ export const CoursePlayerPage = () => {
       try {
         const currentVideoPosition = Math.floor(playerRef.current.getCurrentTime ? playerRef.current.getCurrentTime() : 0);
 
-        await supabase.from("user_module_progress").upsert({
+        mockDatabase.upsertModuleProgress({
           user_id: user.id,
           module_id: moduleId,
-          course_id: courseId,
+          course_id: courseId || '',
           watch_time_seconds: Math.floor(currentWatchTime),
           last_watched_position: currentVideoPosition,
           is_completed: completedModulesRef.current.has(moduleId),
-        }, {
-          onConflict: 'user_id,module_id'
+          completed_at: completedModulesRef.current.has(moduleId) ? new Date().toISOString() : null
         });
 
         lastSavedTimeRef.current = currentWatchTime;
@@ -151,12 +150,7 @@ export const CoursePlayerPage = () => {
     const moduleId = modules[currentModuleIndex].id;
 
     try {
-      const { data } = await supabase
-        .from("user_module_progress")
-        .select("watch_time_seconds, last_watched_position")
-        .eq("user_id", user.id)
-        .eq("module_id", moduleId)
-        .maybeSingle();
+      const data = mockDatabase.getModuleProgressSingle(user.id, moduleId);
 
       if (data) {
         watchTimeRef.current = data.watch_time_seconds || 0;
@@ -387,13 +381,8 @@ export const CoursePlayerPage = () => {
 
   const loadCourseData = async () => {
     try {
-      const { data: courseData, error: courseError } = await supabase
-        .from("courses")
-        .select("*")
-        .eq("id", courseId)
-        .maybeSingle();
+      const courseData = mockCourses.find(c => c.id === courseId);
 
-      if (courseError) throw courseError;
       if (!courseData) {
         setLoading(false);
         return;
@@ -401,29 +390,17 @@ export const CoursePlayerPage = () => {
 
       setCourse(courseData);
 
-      const { data: modulesData, error: modulesError } = await supabase
-        .from("course_modules")
-        .select("*")
-        .eq("course_id", courseId)
-        .order("order_index", { ascending: true });
+      const modulesData = mockModules
+        .filter(m => m.course_id === courseId)
+        .sort((a, b) => a.order_index - b.order_index);
 
-      if (modulesError) throw modulesError;
       if (modulesData) setModules(modulesData);
 
-      const { data: enrollmentData } = await supabase
-        .from("user_course_enrollments")
-        .select("*")
-        .eq("user_id", user?.id)
-        .eq("course_id", courseId)
-        .maybeSingle();
+      const enrollmentData = mockDatabase.getEnrollments(user?.id || '').find(e => e.course_id === courseId);
 
       setIsEnrolled(!!enrollmentData);
 
-      const { data: progressData } = await supabase
-        .from("user_module_progress")
-        .select("*")
-        .eq("user_id", user?.id)
-        .eq("course_id", courseId);
+      const progressData = mockDatabase.getModuleProgress(user?.id || '', courseId);
 
       if (progressData && user) {
         const completed = new Set(
@@ -436,35 +413,22 @@ export const CoursePlayerPage = () => {
         if (modulesData && completed.size === modulesData.length && completed.size > 0) {
           const progressPercentage = 100;
 
-          await supabase
-            .from("user_course_enrollments")
-            .update({
-              progress_percentage: progressPercentage,
-              completed_at: new Date().toISOString(),
-            })
-            .eq("user_id", user.id)
-            .eq("course_id", courseId);
+          mockDatabase.updateEnrollment(user.id, courseId || '', {
+            progress_percentage: progressPercentage,
+            completed_at: new Date().toISOString(),
+          });
         } else if (modulesData && modulesData.length > 0) {
           const progressPercentage = (completed.size / modulesData.length) * 100;
 
-          await supabase
-            .from("user_course_enrollments")
-            .update({
-              progress_percentage: progressPercentage,
-            })
-            .eq("user_id", user.id)
-            .eq("course_id", courseId);
+          mockDatabase.updateEnrollment(user.id, courseId || '', {
+            progress_percentage: progressPercentage,
+          });
         }
       }
 
-      const { data: nextCourseCheck } = await supabase
-        .from("courses")
-        .select("id")
-        .eq("is_published", true)
-        .gt("order_index", courseData.order_index)
-        .order("order_index", { ascending: true })
-        .limit(1)
-        .maybeSingle();
+      const nextCourseCheck = mockCourses
+        .filter(c => c.is_published && c.order_index > courseData.order_index)
+        .sort((a, b) => a.order_index - b.order_index)[0];
 
       if (nextCourseCheck) {
         setNextCourseId(nextCourseCheck.id);
@@ -487,16 +451,14 @@ export const CoursePlayerPage = () => {
     try {
       await saveWatchTime();
 
-      await supabase.from("user_module_progress").upsert({
+      mockDatabase.upsertModuleProgress({
         user_id: user.id,
         module_id: moduleId,
-        course_id: courseId,
+        course_id: courseId || '',
         is_completed: true,
         completed_at: new Date().toISOString(),
         watch_time_seconds: Math.floor(currentWatchTime),
         last_watched_position: Math.floor(watchedTime),
-      }, {
-        onConflict: 'user_id,module_id'
       });
 
       setCompletedModules(prev => new Set([...prev, moduleId]));
@@ -505,13 +467,9 @@ export const CoursePlayerPage = () => {
       const completedCount = completedModules.size + 1;
       const progressPercentage = (completedCount / totalModules) * 100;
 
-      await supabase
-        .from("user_course_enrollments")
-        .update({
-          progress_percentage: progressPercentage,
-        })
-        .eq("user_id", user.id)
-        .eq("course_id", courseId);
+      mockDatabase.updateEnrollment(user.id, courseId || '', {
+        progress_percentage: progressPercentage,
+      });
 
       toast.success("✅ Modul dokončen!", {
         description: currentModuleIndex < modules.length - 1
@@ -540,43 +498,28 @@ export const CoursePlayerPage = () => {
     if (!user || !course) return;
 
     try {
-      await supabase
-        .from("user_course_enrollments")
-        .update({
-          completed_at: new Date().toISOString(),
-        })
-        .eq("user_id", user.id)
-        .eq("course_id", courseId);
+      mockDatabase.updateEnrollment(user.id, courseId || '', {
+        completed_at: new Date().toISOString(),
+      });
 
-      const { data: nextCourse } = await supabase
-        .from("courses")
-        .select("id, title, order_index")
-        .eq("is_published", true)
-        .gt("order_index", course.order_index)
-        .order("order_index", { ascending: true })
-        .limit(1)
-        .maybeSingle();
+      const nextCourse = mockCourses
+        .filter(c => c.is_published && c.order_index > course.order_index)
+        .sort((a, b) => a.order_index - b.order_index)[0];
 
       if (nextCourse) {
         setNextCourseId(nextCourse.id);
 
-        const { data: existingEnrollment } = await supabase
-          .from("user_course_enrollments")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("course_id", nextCourse.id)
-          .maybeSingle();
+        const existingEnrollment = mockDatabase.getEnrollments(user.id).find(e => e.course_id === nextCourse.id);
 
         const isNewCourse = !existingEnrollment;
 
         if (isNewCourse) {
-          await supabase
-            .from("user_course_enrollments")
-            .insert({
-              user_id: user.id,
-              course_id: nextCourse.id,
-              progress_percentage: 0,
-            });
+          mockDatabase.addEnrollment({
+            user_id: user.id,
+            course_id: nextCourse.id,
+            progress_percentage: 0,
+            completed_at: null
+          });
 
           confetti({
             particleCount: 150,
@@ -635,12 +578,7 @@ export const CoursePlayerPage = () => {
     if (!nextCourseId || !user || !course) return;
 
     try {
-      const { data: nextCourseData } = await supabase
-        .from("courses")
-        .select("id, title")
-        .eq("id", nextCourseId)
-        .eq("is_published", true)
-        .maybeSingle();
+      const nextCourseData = mockCourses.find(c => c.id === nextCourseId && c.is_published);
 
       if (!nextCourseData) {
         toast.error("Další kurz nebyl nalezen");
@@ -648,23 +586,17 @@ export const CoursePlayerPage = () => {
         return;
       }
 
-      const { data: existingEnrollment } = await supabase
-        .from("user_course_enrollments")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("course_id", nextCourseData.id)
-        .maybeSingle();
+      const existingEnrollment = mockDatabase.getEnrollments(user.id).find(e => e.course_id === nextCourseData.id);
 
       const isNewCourse = !existingEnrollment;
 
       if (isNewCourse) {
-        await supabase
-          .from("user_course_enrollments")
-          .insert({
-            user_id: user.id,
-            course_id: nextCourseData.id,
-            progress_percentage: 0,
-          });
+        mockDatabase.addEnrollment({
+          user_id: user.id,
+          course_id: nextCourseData.id,
+          progress_percentage: 0,
+          completed_at: null
+        });
 
         confetti({
           particleCount: 150,

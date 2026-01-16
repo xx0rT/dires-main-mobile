@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Lock, Play, CheckCircle2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { mockCourses, mockDatabase } from "@/lib/mock-data";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,26 +40,23 @@ export const CoursesGrid = () => {
 
   const fetchCoursesWithProgress = async () => {
     try {
-      const { data: coursesData, error: coursesError } = await supabase
-        .from("video_courses")
-        .select("*")
-        .order("order_number", { ascending: true });
+      const coursesData = mockCourses
+        .sort((a, b) => a.order_index - b.order_index)
+        .map((course, index) => ({
+          ...course,
+          order_number: index + 1,
+          prerequisite_course_id: index > 0 ? mockCourses[index - 1].id : null,
+          video_url: ''
+        }));
 
-      if (coursesError) throw coursesError;
-
-      const { data: progressData, error: progressError } = await supabase
-        .from("user_video_progress")
-        .select("*")
-        .eq("user_id", user?.id);
-
-      if (progressError) throw progressError;
+      const enrollments = mockDatabase.getEnrollments(user?.id || '');
 
       const progressMap = new Map<string, UserProgress>();
-      progressData?.forEach((p) => {
-        progressMap.set(p.course_id, {
-          course_id: p.course_id,
-          progress_percentage: Number(p.progress_percentage),
-          is_completed: p.is_completed,
+      enrollments.forEach((e) => {
+        progressMap.set(e.course_id, {
+          course_id: e.course_id,
+          progress_percentage: Number(e.progress_percentage),
+          is_completed: !!e.completed_at,
         });
       });
 
