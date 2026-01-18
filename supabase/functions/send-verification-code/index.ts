@@ -145,10 +145,13 @@ Deno.serve(async (req: Request) => {
       console.log("====================================");
     }
 
+    const isDevelopment = !Deno.env.get("RESEND_API_KEY");
+
     return new Response(
       JSON.stringify({
         success: true,
         message: "Ověřovací kód byl odeslán na váš email",
+        ...(isDevelopment && { code, email }),
       }),
       {
         status: 200,
