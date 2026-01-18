@@ -29,12 +29,29 @@ export function PhysioChatbot() {
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const chatCardRef = useRef<HTMLDivElement>(null)
 
   const filteredQuestions = mockChatbotQA
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (chatCardRef.current && !chatCardRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
 
   const simulateTyping = (content: string, category?: string) => {
     setIsTyping(true)
@@ -63,7 +80,7 @@ export function PhysioChatbot() {
     setShowPresetQuestions(false)
   }
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!input.trim()) return
 
     const userMessage: ConversationMessage = {
@@ -73,18 +90,54 @@ export function PhysioChatbot() {
     }
 
     setMessages(prev => [...prev, userMessage])
-
-    const matchedQA = mockChatbotQA.find(qa =>
-      qa.question.toLowerCase().includes(input.toLowerCase()) ||
-      input.toLowerCase().includes(qa.question.toLowerCase().split(' ').slice(0, 3).join(' '))
-    )
-
-    const responseContent = matchedQA
-      ? matchedQA.answer
-      : 'Omlouvám se, na tuto otázku momentálně nemám odpověď. Zkuste prosím přeformulovat dotaz nebo vyberte některou z připravených otázek níže.'
-
-    simulateTyping(responseContent, matchedQA?.category)
+    const userQuestion = input
     setInput('')
+    setIsTyping(true)
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question: userQuestion })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response')
+      }
+
+      const data = await response.json()
+
+      setIsTyping(false)
+      const botMessage: ConversationMessage = {
+        id: Date.now().toString(),
+        type: 'bot',
+        content: data.answer
+      }
+      setMessages(prev => [...prev, botMessage])
+    } catch (error) {
+      console.error('AI Error:', error)
+      setIsTyping(false)
+
+      const matchedQA = mockChatbotQA.find(qa =>
+        qa.question.toLowerCase().includes(userQuestion.toLowerCase()) ||
+        userQuestion.toLowerCase().includes(qa.question.toLowerCase().split(' ').slice(0, 3).join(' '))
+      )
+
+      const responseContent = matchedQA
+        ? matchedQA.answer
+        : 'Omlouvám se, na tuto otázku momentálně nemám odpověď. Zkuste prosím přeformulovat dotaz nebo vyberte některou z připravených otázek níže.'
+
+      const botMessage: ConversationMessage = {
+        id: Date.now().toString(),
+        type: 'bot',
+        content: responseContent,
+        category: matchedQA?.category
+      }
+      setMessages(prev => [...prev, botMessage])
+    }
   }
 
   return (
@@ -98,9 +151,9 @@ export function PhysioChatbot() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/80 shadow-2xl flex items-center justify-center hover:shadow-primary/50 transition-shadow"
+            className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/80 shadow-2xl flex items-center justify-center hover:shadow-primary/50 transition-shadow"
           >
-            <RiRobotLine className="h-8 w-8 text-white" />
+            <RiRobotLine className="h-7 w-7 text-white" />
           </motion.button>
         )}
       </AnimatePresence>
@@ -108,11 +161,12 @@ export function PhysioChatbot() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            ref={chatCardRef}
             initial={{ scale: 0, opacity: 0, originX: 1, originY: 1 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
-            className="fixed bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)]"
+            className="fixed bottom-6 right-6 z-50 w-[350px] max-w-[calc(100vw-3rem)]"
           >
             <Card className="border-2 border-primary/20 bg-background shadow-2xl">
               <CardHeader className="pb-3 bg-gradient-to-br from-primary/10 to-transparent">
@@ -136,9 +190,9 @@ export function PhysioChatbot() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="p-4 space-y-3">
+              <CardContent className="p-3 space-y-2">
                 <div className="relative" onWheel={(e) => e.stopPropagation()}>
-                  <ScrollArea className="h-[300px] pr-3">
+                  <ScrollArea className="h-[250px] pr-2">
                     <div className="space-y-3">
                       <AnimatePresence>
                         {messages.map((message) => (
