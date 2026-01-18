@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { RiSendPlane2Line, RiQuestionLine, RiRobotLine, RiCloseLine } from '@remixicon/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { mockChatbotQA, type ChatMessage } from '@/lib/mock-data'
+import { useAuth } from '@/lib/auth-context'
 
 interface ConversationMessage {
   id: string
@@ -17,6 +18,7 @@ interface ConversationMessage {
 }
 
 export function PhysioChatbot() {
+  const { session } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [showPresetQuestions, setShowPresetQuestions] = useState(true)
   const [messages, setMessages] = useState<ConversationMessage[]>([
@@ -95,12 +97,18 @@ export function PhysioChatbot() {
     setIsTyping(true)
 
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+      }
+
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ question: userQuestion })
       })
 
