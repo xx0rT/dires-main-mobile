@@ -20,7 +20,6 @@ import SignInPage from './pages/sign-in-page'
 import SignUpPage from './pages/sign-up-page'
 import ForgotPasswordPage from './pages/forgot-password-page'
 import ResetPasswordPage from './pages/reset-password-page'
-import VerifyEmailPage from './pages/verify-email-page'
 import { CoursePlayerPage } from './pages/course-player-page'
 import ScrollToTop from './components/layout/scroll-to-top'
 
@@ -40,7 +39,6 @@ export default function App() {
           <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
           <Route path="/auth/sign-in" element={<SignInPage />} />
           <Route path="/auth/sign-up" element={<SignUpPage />} />
-          <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
           <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
           <Route path="/course/:courseId" element={<CoursePlayerPage />} />
