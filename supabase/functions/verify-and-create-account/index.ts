@@ -6,11 +6,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-interface RequestBody {
-  email: string;
-  code: string;
-}
-
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {
@@ -20,11 +15,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    const { email, code }: RequestBody = await req.json();
+    const { email, code } = await req.json();
 
     if (!email || !code) {
       return new Response(
@@ -36,30 +27,22 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const { data: pending, error: fetchError } = await supabase
-      .from("pending_registrations")
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    await supabaseAdmin.rpc("cleanup_expired_verification_codes");
+
+    const { data: verificationData, error: fetchError } = await supabaseAdmin
+      .from("email_verification_codes")
       .select("*")
       .eq("email", email)
-      .maybeSingle();
+      .single();
 
-    if (fetchError || !pending) {
+    if (fetchError || !verificationData) {
       return new Response(
-        JSON.stringify({ error: "Verification request not found or expired" }),
-        {
-          status: 404,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    if (new Date(pending.expires_at) < new Date()) {
-      await supabase
-        .from("pending_registrations")
-        .delete()
-        .eq("email", email);
-
-      return new Response(
-        JSON.stringify({ error: "Verification code has expired" }),
+        JSON.stringify({ error: "Ověřovací kód nebyl nalezen nebo vypršel" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -67,14 +50,14 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    if (pending.attempts >= 5) {
-      await supabase
-        .from("pending_registrations")
+    if (new Date(verificationData.expires_at) < new Date()) {
+      await supabaseAdmin
+        .from("email_verification_codes")
         .delete()
         .eq("email", email);
 
       return new Response(
-        JSON.stringify({ error: "Too many verification attempts" }),
+        JSON.stringify({ error: "Ověřovací kód vypršel" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -82,16 +65,32 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    if (pending.verification_code !== code) {
-      await supabase
-        .from("pending_registrations")
-        .update({ attempts: pending.attempts + 1 })
+    if (verificationData.attempts >= 5) {
+      await supabaseAdmin
+        .from("email_verification_codes")
+        .delete()
+        .eq("email", email);
+
+      return new Response(
+        JSON.stringify({ error: "Příliš mnoho neúspěšných pokusů" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    if (verificationData.code !== code) {
+      const newAttempts = verificationData.attempts + 1;
+      await supabaseAdmin
+        .from("email_verification_codes")
+        .update({ attempts: newAttempts })
         .eq("email", email);
 
       return new Response(
         JSON.stringify({
-          error: "Invalid verification code",
-          attemptsRemaining: 5 - (pending.attempts + 1),
+          error: "Neplatný ověřovací kód",
+          attemptsRemaining: 5 - newAttempts,
         }),
         {
           status: 400,
@@ -100,18 +99,22 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const decodedPassword = atob(pending.password_hash);
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verificationData.password_hash);
+    const password = Array.from(new Uint8Array(data))
+      .map(b => String.fromCharCode(b))
+      .join("");
 
-    const { data: authData, error: signUpError } = await supabase.auth.admin.createUser({
+    const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
-      password: decodedPassword,
+      password: verificationData.password_hash,
       email_confirm: true,
     });
 
-    if (signUpError) {
-      console.error("Sign up error:", signUpError);
+    if (createError) {
+      console.error("User creation error:", createError);
       return new Response(
-        JSON.stringify({ error: "Failed to create account" }),
+        JSON.stringify({ error: "Nepodařilo se vytvořit účet" }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -119,16 +122,16 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    await supabase
-      .from("pending_registrations")
+    await supabaseAdmin
+      .from("email_verification_codes")
       .delete()
       .eq("email", email);
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Account created successfully",
-        user: authData.user,
+        message: "Účet byl úspěšně vytvořen",
+        user: userData.user,
       }),
       {
         status: 200,

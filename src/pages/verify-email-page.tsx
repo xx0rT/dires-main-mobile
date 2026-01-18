@@ -43,7 +43,7 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     if (!searchParams.get("email")) {
-      navigate("/sign-up")
+      navigate("/auth/sign-up")
     }
   }, [searchParams, navigate])
 

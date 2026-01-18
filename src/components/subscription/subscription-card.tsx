@@ -39,8 +39,8 @@ export function SubscriptionCard({ userId }: SubscriptionCardProps) {
         `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${userId}&select=*`,
         {
           headers: {
-            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
           },
         }
       );

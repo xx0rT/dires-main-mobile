@@ -1,77 +1,10 @@
 import { createClient } from "npm:@supabase/supabase-js@2.90.1";
-import { Resend } from "npm:resend@4.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
-
-interface RequestBody {
-  email: string;
-  password: string;
-}
-
-function generateVerificationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-async function sendVerificationEmail(email: string, code: string): Promise<boolean> {
-  try {
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
-
-    if (!resendApiKey) {
-      console.error("RESEND_API_KEY not configured");
-      return false;
-    }
-
-    const resend = new Resend(resendApiKey);
-
-    await resend.emails.send({
-      from: "noreply@yourdomain.com",
-      to: email,
-      subject: "Ověřovací kód pro registraci",
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="utf-8">
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-              .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-              .code { font-size: 32px; font-weight: bold; letter-spacing: 8px; text-align: center; padding: 20px; background: white; border-radius: 8px; margin: 20px 0; color: #667eea; }
-              .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>Ověřovací kód</h1>
-              </div>
-              <div class="content">
-                <p>Děkujeme za registraci!</p>
-                <p>Váš ověřovací kód je:</p>
-                <div class="code">${code}</div>
-                <p>Tento kód vyprší za 15 minut.</p>
-                <p>Pokud jste nepožádali o tento kód, můžete tento email ignorovat.</p>
-              </div>
-              <div class="footer">
-                <p>Tento email byl odeslán automaticky. Neodpovídejte na něj.</p>
-              </div>
-            </div>
-          </body>
-        </html>
-      `,
-    });
-
-    return true;
-  } catch (error) {
-    console.error("Email send error:", error);
-    return false;
-  }
-}
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -82,11 +15,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    const { email, password }: RequestBody = await req.json();
+    const { email, password } = await req.json();
 
     if (!email || !password) {
       return new Response(
@@ -98,9 +27,17 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    if (password.length < 6) {
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers();
+    const userExists = existingUser?.users?.some(u => u.email === email);
+
+    if (userExists) {
       return new Response(
-        JSON.stringify({ error: "Password must be at least 6 characters" }),
+        JSON.stringify({ error: "Tento email je již zaregistrován" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -108,34 +45,31 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const verificationCode = generateVerificationCode();
-
-    const encoder = new TextEncoder();
-    const passwordData = encoder.encode(password);
-    const encodedPassword = btoa(String.fromCharCode(...new Uint8Array(passwordData)));
-
-    const { error: deleteError } = await supabase
-      .from("pending_registrations")
+    await supabaseAdmin
+      .from("email_verification_codes")
       .delete()
       .eq("email", email);
 
-    if (deleteError && deleteError.code !== "PGRST116") {
-      console.error("Error deleting old registration:", deleteError);
-    }
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-    const { error: insertError } = await supabase
-      .from("pending_registrations")
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const passwordHash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+    const { error: insertError } = await supabaseAdmin
+      .from("email_verification_codes")
       .insert({
         email,
-        password_hash: encodedPassword,
-        verification_code: verificationCode,
-        expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+        code,
+        password_hash: passwordHash,
       });
 
     if (insertError) {
       console.error("Insert error:", insertError);
       return new Response(
-        JSON.stringify({ error: "Failed to create verification request" }),
+        JSON.stringify({ error: "Failed to create verification code" }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -143,27 +77,88 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const emailSent = await sendVerificationEmail(email, verificationCode);
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .code-box { background: #f4f4f4; border: 2px solid #ddd; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0; }
+          .code { font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #000; }
+          .footer { text-align: center; margin-top: 30px; font-size: 14px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Ověřte svůj email</h1>
+          </div>
+          <p>Děkujeme za registraci! Pro dokončení vytvoření účtu prosím zadejte tento ověřovací kód:</p>
+          <div class="code-box">
+            <div class="code">${code}</div>
+          </div>
+          <p>Tento kód vyprší za 15 minut.</p>
+          <p>Pokud jste o tento kód nežádali, můžete tento email ignorovat.</p>
+          <div class="footer">
+            <p>Tento email byl odeslán automaticky, neodpovídejte na něj.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
 
-    if (!emailSent) {
-      console.log(`
-╔════════════════════════════════════════════════════════════╗
-║   EMAIL SERVICE NOT CONFIGURED - VERIFICATION CODE         ║
-╠════════════════════════════════════════════════════════════╣
-║  Email: ${email.padEnd(45)} ║
-║  Code:  ${verificationCode.padEnd(45)} ║
-╠════════════════════════════════════════════════════════════╣
-║  Configure RESEND_API_KEY to enable email sending         ║
-╚════════════════════════════════════════════════════════════╝
-      `);
-    } else {
-      console.log(`Verification email sent to ${email}`);
+    try {
+      const resendApiKey = Deno.env.get("RESEND_API_KEY");
+      const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "onboarding@resend.dev";
+
+      if (resendApiKey) {
+        const resendResponse = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: fromEmail,
+            to: email,
+            subject: "Ověřte svůj email",
+            html: emailHtml,
+          }),
+        });
+
+        if (!resendResponse.ok) {
+          const error = await resendResponse.text();
+          console.error("Resend API error:", error);
+          console.log("=== VERIFICATION CODE (email failed) ===");
+          console.log(`Email: ${email}`);
+          console.log(`Code: ${code}`);
+          console.log("=======================================");
+        } else {
+          console.log(`Verification email sent successfully to ${email}`);
+        }
+      } else {
+        console.log("=== VERIFICATION CODE ===");
+        console.log(`Email: ${email}`);
+        console.log(`Code: ${code}`);
+        console.log("========================");
+      }
+    } catch (e) {
+      console.error("Email sending error:", e);
+      console.log("=== VERIFICATION CODE (fallback) ===");
+      console.log(`Email: ${email}`);
+      console.log(`Code: ${code}`);
+      console.log("====================================");
     }
+
+    const isDevelopment = !Deno.env.get("RESEND_API_KEY");
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Verification code sent to your email",
+        message: "Ověřovací kód byl odeslán na váš email",
+        ...(isDevelopment && { code, email }),
       }),
       {
         status: 200,

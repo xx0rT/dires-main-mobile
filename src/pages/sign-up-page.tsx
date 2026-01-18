@@ -62,7 +62,16 @@ export default function SignUpPage() {
         return
       }
 
-      toast.success('Ověřovací kód byl odeslán na váš email!')
+      if (data.code) {
+        toast.success(`Ověřovací kód: ${data.code}`, { duration: 10000 })
+        console.log('=== VERIFICATION CODE ===')
+        console.log(`Email: ${email}`)
+        console.log(`Code: ${data.code}`)
+        console.log('========================')
+      } else {
+        toast.success('Ověřovací kód byl odeslán na váš email!')
+      }
+
       navigate(`/auth/verify-email?email=${encodeURIComponent(email)}`)
     } catch (error: any) {
       console.error('Error:', error)

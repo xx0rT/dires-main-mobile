@@ -78,9 +78,9 @@ const Pricing20 = ({ className }: Pricing20Props) => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const handleGetStarted = useCallback(async (plan: typeof pricingPlans[0]) => {
-    if (!user || !session) {
+    if (plan.planType === 'free_trial' && (!user || !session)) {
       localStorage.setItem('pending_plan', plan.planType);
-      toast.info("Pro pokračování se prosím přihlaste");
+      toast.info("Pro zkušební verzi se prosím přihlaste");
       navigate("/auth/sign-in");
       return;
     }
@@ -89,28 +89,33 @@ const Pricing20 = ({ className }: Pricing20Props) => {
 
     try {
       const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`;
-      const headers = {
-        'Authorization': `Bearer ${session.access_token}`,
-        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-        'Content-Type': 'application/json',
-      };
+      const authToken = session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
-        headers,
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           planType: plan.planType,
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to create checkout session');
+        if (data.requiresAuth) {
+          localStorage.setItem('pending_plan', plan.planType);
+          toast.info("Pro tento plán se prosím přihlaste");
+          navigate("/auth/sign-in");
+          return;
+        }
+        throw new Error(data.error || 'Failed to create checkout session');
       }
 
-      const { url } = await response.json();
-
-      if (url) {
-        window.location.href = url;
+      if (data.url) {
+        window.location.href = data.url;
       } else {
         navigate('/order-confirmation');
       }

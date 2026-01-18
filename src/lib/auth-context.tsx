@@ -57,17 +57,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+      }
     })
     if (error) throw error
-    setUser(data.user)
-    setSession(data.session)
 
-    const pendingPlan = localStorage.getItem('pending_plan')
-    if (pendingPlan) {
-      localStorage.removeItem('pending_plan')
-      navigate('/', { state: { scrollTo: 'pricing', selectedPlan: pendingPlan } })
-    } else {
-      navigate('/dashboard')
+    if (data.session) {
+      setUser(data.user)
+      setSession(data.session)
+
+      const pendingPlan = localStorage.getItem('pending_plan')
+      if (pendingPlan) {
+        localStorage.removeItem('pending_plan')
+        navigate('/', { state: { scrollTo: 'pricing', selectedPlan: pendingPlan } })
+      } else {
+        navigate('/dashboard')
+      }
     }
   }
 
