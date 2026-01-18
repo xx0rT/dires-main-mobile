@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/lib/auth-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,8 @@ import { RiArrowRightLine, RiArrowLeftLine } from '@remixicon/react'
 import { site } from '@/config/site'
 
 export default function SignUpPage() {
-  const { user, signUp } = useAuth()
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -43,15 +44,29 @@ export default function SignUpPage() {
     setLoading(true)
 
     try {
-      await signUp(email, password)
-      toast.success('Registrace úspěšná! Zkontrolujte svůj email pro ověření účtu.')
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-verification-code`
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        toast.error(data.error || 'Nepodařilo se odeslat ověřovací kód')
+        return
+      }
+
+      toast.success('Ověřovací kód byl odeslán na váš email!')
+      navigate(`/auth/verify-email?email=${encodeURIComponent(email)}`)
     } catch (error: any) {
       console.error('Error:', error)
-      if (error.message?.includes('already registered')) {
-        toast.error('Tento email je již zaregistrován')
-      } else {
-        toast.error(error.message || 'Registrace se nezdařila')
-      }
+      toast.error(error.message || 'Něco se pokazilo')
     } finally {
       setLoading(false)
     }
