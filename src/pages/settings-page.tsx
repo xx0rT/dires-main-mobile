@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 import { RiUserLine, RiLockLine, RiLogoutBoxLine } from '@remixicon/react'
+import { SubscriptionCard } from '@/components/subscription/subscription-card'
 
 export default function SettingsPage() {
   const { user, signOut } = useAuth()
@@ -66,6 +67,7 @@ export default function SettingsPage() {
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList>
           <TabsTrigger value="profile">Profil</TabsTrigger>
+          <TabsTrigger value="subscription">Subscription</TabsTrigger>
           <TabsTrigger value="security">Zabezpečení</TabsTrigger>
           <TabsTrigger value="notifications">Upozornění</TabsTrigger>
         </TabsList>
@@ -142,6 +144,10 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="subscription" className="space-y-6">
+          {user && <SubscriptionCard userId={user.id} />}
         </TabsContent>
 
         <TabsContent value="security" className="space-y-6">

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Lock } from "lucide-react";
+import { useState } from "react";
 import {
   Controller,
   FormProvider,
@@ -7,6 +8,7 @@ import {
   useFormContext,
 } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 import z from "zod";
 
 import { cn } from "@/lib/utils";
@@ -31,6 +33,7 @@ interface OrderItem {
 
 interface OrderSummary {
   companyName: string;
+  planType?: "free_trial" | "monthly" | "lifetime";
   items: OrderItem[];
   currency: string;
 }
@@ -78,11 +81,12 @@ const COUNTRIES = [
 
 const DEFAULT_ORDER: OrderSummary = {
   companyName: "Fyzioterapie Kurzy",
+  planType: "monthly",
   items: [
     {
-      id: "basic-plan",
-      name: "Basic Plan (Monthly)",
-      price: 19.0,
+      id: "monthly",
+      name: "Monthly Plan",
+      price: 30.0,
     },
   ],
   currency: "USD",
@@ -93,6 +97,10 @@ const CheckoutPage = ({ className }: CheckoutPageProps) => {
   const location = useLocation();
   const orderData = (location.state as { order?: OrderSummary })?.order || DEFAULT_ORDER;
 
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [validatedPromo, setValidatedPromo] = useState<{code: string; type: string; value: number} | null>(null);
+
   const form = useForm<CheckoutFormType>({
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
@@ -101,60 +109,97 @@ const CheckoutPage = ({ className }: CheckoutPageProps) => {
       expiryDate: "",
       cvc: "",
       cardholderName: "",
-      country: "CZ",
+      country: "US",
       promoCode: "",
     },
   });
 
-  const onSubmit = (data: CheckoutFormType) => {
-    const orderNumber = `ORD-${new Date().getFullYear()}-${Math.floor(Math.random() * 100000)}`;
-    const orderDate = new Date().toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+  const onSubmit = async (data: CheckoutFormType) => {
+    setIsProcessing(true);
 
-    const confirmationData = {
-      orderNumber,
-      orderDate,
-      status: "confirmed" as const,
-      email: data.email,
-      items: orderData.items.map(item => ({
-        ...item,
-        image: "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=400",
-        quantity: 1,
-        details: [
-          { label: "Plan", value: item.name.includes("Basic") ? "Basic" : item.name.includes("Business") ? "Business" : "Enterprise" },
-          { label: "Billing", value: item.name.includes("Monthly") ? "Monthly" : "Annual" },
-        ],
-      })),
-      subtotal: orderData.items.reduce((sum, item) => sum + item.price, 0),
-      shipping: 0,
-      tax: 0,
-      discount: 0,
-      total: orderData.items.reduce((sum, item) => sum + item.price, 0),
-      shippingAddress: {
-        name: data.cardholderName,
-        street: "1234 Main Street",
-        city: "San Francisco",
-        state: "CA",
-        zipCode: "94102",
-        country: data.country,
-      },
-      shippingMethod: "Digital Delivery",
-      estimatedDelivery: "Instant Access",
-      paymentMethod: {
-        type: "card" as const,
-        lastFour: data.cardNumber.slice(-4),
-        cardBrand: "Visa",
-      },
-    };
+    try {
+      if (orderData.planType === "free_trial") {
+        const orderNumber = `ORD-${new Date().getFullYear()}-${Math.floor(Math.random() * 100000)}`;
+        const orderDate = new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
 
-    navigate("/order-confirmation", { state: { order: confirmationData } });
+        const confirmationData = {
+          orderNumber,
+          orderDate,
+          status: "confirmed" as const,
+          email: data.email,
+          items: orderData.items.map(item => ({
+            ...item,
+            image: "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=400",
+            quantity: 1,
+            details: [
+              { label: "Plan", value: "Free Trial" },
+              { label: "Duration", value: "3 Days" },
+            ],
+          })),
+          subtotal: 0,
+          shipping: 0,
+          tax: 0,
+          discount: 0,
+          total: 0,
+          shippingAddress: {
+            name: data.cardholderName,
+            street: "Digital Delivery",
+            city: "N/A",
+            state: "N/A",
+            zipCode: "00000",
+            country: data.country,
+          },
+          shippingMethod: "Digital Delivery",
+          estimatedDelivery: "Instant Access",
+          paymentMethod: {
+            type: "card" as const,
+            lastFour: "0000",
+            cardBrand: "Free",
+          },
+        };
+
+        navigate("/order-confirmation", { state: { order: confirmationData } });
+        return;
+      }
+
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`;
+      const headers = {
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      };
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          planType: orderData.planType,
+          promoCode: validatedPromo?.code || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      const { url } = await response.json();
+
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error('Failed to process checkout. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const subtotal = orderData.items.reduce((sum, item) => sum + item.price, 0);
-  const total = subtotal;
+  const total = Math.max(0, subtotal - promoDiscount);
 
   const formatPrice = (amount: number, currency: string) => {
     return new Intl.NumberFormat("en-US", {
@@ -162,6 +207,50 @@ const CheckoutPage = ({ className }: CheckoutPageProps) => {
       currency,
       currencyDisplay: "narrowSymbol",
     }).format(amount);
+  };
+
+  const validatePromoCode = async (code: string) => {
+    if (!code || !orderData.planType) return;
+
+    try {
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/validate-promo-code`;
+      const headers = {
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      };
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          code: code.toUpperCase(),
+          planType: orderData.planType,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.valid && data.promo) {
+        const discount = data.promo.discountType === 'percentage'
+          ? Math.floor((subtotal * data.promo.discountValue) / 100)
+          : data.promo.discountValue;
+
+        setPromoDiscount(discount);
+        setValidatedPromo({
+          code: data.promo.code,
+          type: data.promo.discountType,
+          value: data.promo.discountValue,
+        });
+        toast.success(`Promo code applied! $${discount} discount`);
+      } else {
+        setPromoDiscount(0);
+        setValidatedPromo(null);
+        toast.error(data.message || 'Invalid promo code');
+      }
+    } catch (error) {
+      console.error('Promo code validation error:', error);
+      toast.error('Failed to validate promo code');
+    }
   };
 
   return (
@@ -220,8 +309,17 @@ const CheckoutPage = ({ className }: CheckoutPageProps) => {
                 </div>
 
                 <div className="mt-4">
-                  <PromoCodeField />
+                  <PromoCodeField onValidate={validatePromoCode} />
                 </div>
+
+                {promoDiscount > 0 && (
+                  <div className="flex items-center justify-between text-emerald-600">
+                    <span className="text-sm">Discount ({validatedPromo?.code})</span>
+                    <span className="text-sm">
+                      -{formatPrice(promoDiscount, orderData.currency)}
+                    </span>
+                  </div>
+                )}
 
                 <Separator className="my-4" />
 
@@ -271,8 +369,9 @@ const CheckoutPage = ({ className }: CheckoutPageProps) => {
                     type="submit"
                     size="lg"
                     className="h-12 w-full bg-blue-600 text-base text-white hover:bg-blue-700"
+                    disabled={isProcessing}
                   >
-                    Complete payment
+                    {isProcessing ? "Processing..." : "Complete payment"}
                   </Button>
 
                   <p className="text-center text-xs text-muted-foreground">
@@ -309,7 +408,7 @@ const CheckoutPage = ({ className }: CheckoutPageProps) => {
   );
 };
 
-const PromoCodeField = () => {
+const PromoCodeField = ({ onValidate }: { onValidate: (code: string) => void }) => {
   const form = useFormContext<CheckoutFormType>();
 
   return (
@@ -321,9 +420,16 @@ const PromoCodeField = () => {
           <Input
             {...field}
             placeholder="Coupon code"
-            className="h-9 flex-1 text-sm"
+            className="h-9 flex-1 text-sm uppercase"
+            onChange={(e) => field.onChange(e.target.value.toUpperCase())}
           />
-          <Button type="button" variant="outline" size="sm" className="h-9">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-9"
+            onClick={() => onValidate(field.value || '')}
+          >
             Apply
           </Button>
         </div>

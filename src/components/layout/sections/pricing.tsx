@@ -7,7 +7,6 @@ import {
   Building,
   Rocket,
 } from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
@@ -18,44 +17,44 @@ import { Button } from "@/components/ui/button";
 const pricingPlans = [
   {
     icon: Rocket,
-    name: "Basic plan",
-    price: {
-      monthly: 19,
-      yearly: 199,
-    },
+    name: "Free Trial",
+    planType: "free_trial" as const,
+    price: 0,
+    duration: "3 days",
     features: [
+      "3-day free trial",
+      "Full access to all features",
       "Basic task management tools",
       "Calendar sync with limited integrations",
       "Access to 1 dashboard for tracking tasks",
-      "Limited AI suggestions and insights",
       "Basic support and community access",
     ],
   },
   {
     icon: Briefcase,
-    name: "Business plan",
-    price: {
-      monthly: 29,
-      yearly: 299,
-    },
+    name: "Monthly Plan",
+    planType: "monthly" as const,
+    price: 30,
+    duration: "per month",
     features: [
-      "All Free Plan features, plus:",
+      "All trial features, plus:",
       "Unlimited task lists",
       "Advanced calendar sync",
       "AI-driven insights",
       "Access to custom dashboards",
       "Priority email support",
+      "Cancel anytime",
     ],
   },
   {
     icon: Building,
-    name: "Enterprise plan",
-    price: {
-      monthly: 49,
-      yearly: 499,
-    },
+    name: "Lifetime Access",
+    planType: "lifetime" as const,
+    price: 200,
+    duration: "one-time",
     features: [
-      "All Pro Plan features, plus:",
+      "All monthly features, plus:",
+      "Lifetime access - pay once",
       "Dedicated account manager",
       "Custom integrations",
       "Real-time collaboration",
@@ -70,17 +69,17 @@ interface Pricing20Props {
 }
 
 const Pricing20 = ({ className }: Pricing20Props) => {
-  const [isMonthly] = useState(true);
   const navigate = useNavigate();
 
   const handleGetStarted = (plan: typeof pricingPlans[0]) => {
     const orderData = {
       companyName: "Fyzioterapie Kurzy",
+      planType: plan.planType,
       items: [
         {
-          id: plan.name.toLowerCase().replace(/\s+/g, "-"),
-          name: `${plan.name} (${isMonthly ? "Monthly" : "Yearly"})`,
-          price: isMonthly ? plan.price.monthly : plan.price.yearly,
+          id: plan.planType,
+          name: plan.name,
+          price: plan.price,
         },
       ],
       currency: "USD",
@@ -129,21 +128,17 @@ const Pricing20 = ({ className }: Pricing20Props) => {
                   <h3 className="text-xl tracking-[-0.8px]">{plan.name}</h3>
                 </div>
 
-                <>
-                  <div className="flex items-baseline font-medium">
-                    <span className="text-[3.5rem] leading-[120%] tracking-[-3.92px]">
-                      ${isMonthly ? plan.price.monthly : plan.price.yearly}
-                    </span>
-                    <span className="text-muted-foreground-subtle text-2xl tracking-[-0.96px]">
-                      {isMonthly ? "/mo" : "/yr"}
-                    </span>
-                  </div>
-                  <p className="text-muted-foreground">
-                    {isMonthly
-                      ? `or $${plan.price.yearly} yearly`
-                      : `or $${plan.price.monthly}/mo monthly`}
-                  </p>
-                </>
+                <div className="flex items-baseline font-medium">
+                  <span className="text-[3.5rem] leading-[120%] tracking-[-3.92px]">
+                    ${plan.price}
+                  </span>
+                  <span className="text-muted-foreground-subtle text-2xl tracking-[-0.96px]">
+                    {plan.planType === "free_trial" ? "" : plan.planType === "monthly" ? "/mo" : ""}
+                  </span>
+                </div>
+                <p className="text-muted-foreground">
+                  {plan.duration}
+                </p>
               </div>
 
               <div className="pt-6">
