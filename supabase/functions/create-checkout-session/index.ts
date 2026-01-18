@@ -33,6 +33,20 @@ Deno.serve(async (req: Request) => {
       throw new Error("No authorization header");
     }
 
+    const token = authHeader.replace("Bearer ", "");
+    const userResponse = await fetch(`${Deno.env.get("SUPABASE_URL")}/auth/v1/user`, {
+      headers: {
+        Authorization: authHeader,
+        apikey: Deno.env.get("SUPABASE_ANON_KEY") || "",
+      },
+    });
+
+    if (!userResponse.ok) {
+      throw new Error("Failed to get user");
+    }
+
+    const user = await userResponse.json();
+
     const plans = {
       free_trial: {
         name: "3-Day Free Trial",
@@ -89,6 +103,48 @@ Deno.serve(async (req: Request) => {
     const finalPrice = Math.max(0, selectedPlan.price - discountAmount);
 
     if (planType === "free_trial") {
+      const supabaseClient = await import("npm:@supabase/supabase-js@2");
+      const supabase = supabaseClient.createClient(
+        Deno.env.get("SUPABASE_URL") || "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
+      );
+
+      const periodEnd = new Date();
+      periodEnd.setDate(periodEnd.getDate() + 3);
+
+      const { error: subError } = await supabase
+        .from("subscriptions")
+        .insert({
+          user_id: user.id,
+          plan_type: "free_trial",
+          status: "trialing",
+          current_period_start: new Date().toISOString(),
+          current_period_end: periodEnd.toISOString(),
+        });
+
+      if (subError) {
+        console.error("Error creating trial subscription:", subError);
+        throw subError;
+      }
+
+      await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/send-invoice-email`, {
+        method: "POST",
+        headers: {
+          Authorization: authHeader,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customerEmail: user.email,
+          customerName: user.email.split('@')[0],
+          planType: "free_trial",
+          planName: "Zkušební verze zdarma",
+          amount: 0,
+          currency: "usd",
+          orderNumber: `TRIAL-${Date.now()}`,
+          orderDate: new Date().toLocaleDateString('cs-CZ'),
+        }),
+      });
+
       const sessionData = {
         sessionId: `trial_${Date.now()}`,
         planType: "free_trial",
@@ -119,7 +175,10 @@ Deno.serve(async (req: Request) => {
     formData.append("mode", selectedPlan.recurring ? "subscription" : "payment");
     formData.append("success_url", `${req.headers.get("origin")}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`);
     formData.append("cancel_url", `${req.headers.get("origin")}/checkout`);
+    formData.append("client_reference_id", user.id);
     formData.append("metadata[planType]", planType);
+    formData.append("metadata[userEmail]", user.email);
+    formData.append("metadata[userName]", user.email.split('@')[0]);
 
     if (promoCode) {
       formData.append("metadata[promoCode]", promoCode);
