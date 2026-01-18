@@ -20,7 +20,6 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { supabase } from "@/lib/supabase"
 
 const formSchema = z.object({
   code: z.string().min(6, {
@@ -51,29 +50,31 @@ export default function VerifyEmailPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsVerifying(true)
     try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        email,
-        token: values.code,
-        type: "email",
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-and-create-account`
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, code: values.code }),
       })
 
-      if (error) {
-        toast.error("Neplatný ověřovací kód. Zkuste to prosím znovu.")
+      const data = await response.json()
+
+      if (!response.ok) {
+        if (data.attemptsRemaining !== undefined) {
+          toast.error(`Neplatný kód. Zbývá pokusů: ${data.attemptsRemaining}`)
+        } else {
+          toast.error(data.error || "Neplatný ověřovací kód. Zkuste to prosím znovu.")
+        }
         form.reset()
         return
       }
 
-      if (data.session) {
-        toast.success("Email byl úspěšně ověřen!")
-
-        const pendingPlan = localStorage.getItem('pending_plan')
-        if (pendingPlan) {
-          localStorage.removeItem('pending_plan')
-          navigate('/', { state: { scrollTo: 'pricing', selectedPlan: pendingPlan } })
-        } else {
-          navigate('/dashboard')
-        }
-      }
+      toast.success("Účet byl úspěšně vytvořen! Nyní se můžete přihlásit.")
+      navigate('/auth/sign-in')
     } catch (error) {
       console.error("Verification error:", error)
       toast.error("Něco se pokazilo. Zkuste to prosím znovu.")
@@ -85,17 +86,7 @@ export default function VerifyEmailPage() {
   async function handleResendCode() {
     setIsResending(true)
     try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email,
-      })
-
-      if (error) {
-        toast.error("Nepodařilo se odeslat kód. Zkuste to prosím znovu.")
-        return
-      }
-
-      toast.success("Nový ověřovací kód byl odeslán!")
+      toast.info("Pro nový kód se vraťte na registrační stránku a zadejte znovu své údaje.")
     } catch (error) {
       console.error("Resend error:", error)
       toast.error("Něco se pokazilo. Zkuste to prosím znovu.")
