@@ -8,7 +8,6 @@ const corsHeaders = {
 
 interface RequestBody {
   email: string;
-  password: string;
 }
 
 function generateVerificationCode(): string {
@@ -28,11 +27,11 @@ Deno.serve(async (req: Request) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { email, password }: RequestBody = await req.json();
+    const { email }: RequestBody = await req.json();
 
-    if (!email || !password) {
+    if (!email) {
       return new Response(
-        JSON.stringify({ error: "Email and password are required" }),
+        JSON.stringify({ error: "Email is required" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -40,11 +39,14 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    if (password.length < 6) {
+    const { data: existingUser } = await supabase.auth.admin.listUsers();
+    const userExists = existingUser?.users.some(u => u.email === email);
+
+    if (!userExists) {
       return new Response(
-        JSON.stringify({ error: "Password must be at least 6 characters" }),
+        JSON.stringify({ error: "No account found with this email" }),
         {
-          status: 400,
+          status: 404,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
@@ -52,24 +54,19 @@ Deno.serve(async (req: Request) => {
 
     const verificationCode = generateVerificationCode();
 
-    const encoder = new TextEncoder();
-    const passwordData = encoder.encode(password);
-    const encodedPassword = btoa(String.fromCharCode(...new Uint8Array(passwordData)));
-
     const { error: deleteError } = await supabase
-      .from("pending_registrations")
+      .from("password_reset_requests")
       .delete()
       .eq("email", email);
 
     if (deleteError && deleteError.code !== "PGRST116") {
-      console.error("Error deleting old registration:", deleteError);
+      console.error("Error deleting old reset request:", deleteError);
     }
 
     const { error: insertError } = await supabase
-      .from("pending_registrations")
+      .from("password_reset_requests")
       .insert({
         email,
-        password_hash: encodedPassword,
         verification_code: verificationCode,
         expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
       });
@@ -77,7 +74,7 @@ Deno.serve(async (req: Request) => {
     if (insertError) {
       console.error("Insert error:", insertError);
       return new Response(
-        JSON.stringify({ error: "Failed to create verification request" }),
+        JSON.stringify({ error: "Failed to create password reset request" }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -87,7 +84,7 @@ Deno.serve(async (req: Request) => {
 
     console.log(`
 ╔════════════════════════════════════════════════════════════╗
-║            VERIFICATION CODE FOR TESTING                   ║
+║         PASSWORD RESET CODE FOR TESTING                    ║
 ╠════════════════════════════════════════════════════════════╣
 ║  Email: ${email.padEnd(45)} ║
 ║  Code:  ${verificationCode.padEnd(45)} ║
@@ -100,7 +97,7 @@ Deno.serve(async (req: Request) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Verification code sent successfully",
+        message: "Password reset code sent successfully",
         verificationCode: verificationCode,
       }),
       {

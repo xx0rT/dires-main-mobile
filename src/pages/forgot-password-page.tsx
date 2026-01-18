@@ -1,29 +1,50 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { RiArrowLeftLine, RiMailLine } from '@remixicon/react'
+import { RiArrowLeftLine } from '@remixicon/react'
 import { site } from '@/config/site'
 
 export default function ForgotPasswordPage() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
-  const [emailSent, setEmailSent] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-password-reset-code`
 
-      setEmailSent(true)
-      toast.success('Email pro obnovení hesla byl odeslán!')
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        toast.error(data.error || 'Nepodařilo se odeslat ověřovací kód')
+        return
+      }
+
+      if (data.verificationCode) {
+        toast.success(`Váš ověřovací kód: ${data.verificationCode}`, { duration: 10000 })
+      } else {
+        toast.success('Ověřovací kód byl odeslán na váš email!')
+      }
+      navigate(`/auth/reset-password?email=${encodeURIComponent(email)}`)
     } catch (error: any) {
-      toast.error(error.message || 'Odeslání emailu se nezdařilo')
+      console.error('Error:', error)
+      toast.error(error.message || 'Něco se pokazilo')
     } finally {
       setLoading(false)
     }
@@ -41,60 +62,29 @@ export default function ForgotPasswordPage() {
 
         <Card>
           <CardHeader className="space-y-1">
-            {!emailSent ? (
-              <>
-                <CardTitle className="text-2xl">Obnovení hesla</CardTitle>
-                <CardDescription>
-                  Zadejte svůj email a my vám pošleme odkaz pro obnovení hesla
-                </CardDescription>
-              </>
-            ) : (
-              <>
-                <div className="flex justify-center mb-4">
-                  <div className="rounded-full bg-primary/20 p-3">
-                    <RiMailLine className="h-6 w-6 text-primary" />
-                  </div>
-                </div>
-                <CardTitle className="text-2xl text-center">Zkontrolujte svůj email</CardTitle>
-                <CardDescription className="text-center">
-                  Poslali jsme odkaz pro obnovení hesla na {email}
-                </CardDescription>
-              </>
-            )}
+            <CardTitle className="text-2xl">Obnovení hesla</CardTitle>
+            <CardDescription>
+              Zadejte svůj email a dostanete ověřovací kód
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {!emailSent ? (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="jmeno@priklad.cz"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    autoComplete="email"
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Odesílání...' : 'Odeslat odkaz pro obnovení'}
-                </Button>
-              </form>
-            ) : (
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground text-center">
-                  Nedostali jste email? Zkontrolujte složku spam nebo to zkuste znovu.
-                </p>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setEmailSent(false)}
-                >
-                  Zkusit jiný email
-                </Button>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="jmeno@priklad.cz"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                />
               </div>
-            )}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Odesílání...' : 'Odeslat ověřovací kód'}
+              </Button>
+            </form>
 
             <div className="mt-6">
               <Link
