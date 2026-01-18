@@ -22,34 +22,38 @@ Deno.serve(async (req: Request) => {
 
   try {
     const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!STRIPE_SECRET_KEY) {
+      console.error("STRIPE_SECRET_KEY is not configured");
       throw new Error("STRIPE_SECRET_KEY is not configured");
     }
 
-    const { planType, promoCode }: PaymentIntentRequest = await req.json();
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+      console.error("Supabase environment variables not configured");
+      throw new Error("Supabase configuration missing");
+    }
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
+      console.error("No authorization header");
       throw new Error("No authorization header");
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") || "",
-      Deno.env.get("SUPABASE_ANON_KEY") || "",
-      {
-        global: {
-          headers: {
-            Authorization: authHeader,
-          },
-        },
-      }
-    );
+    const supabaseAuth = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser(token);
     if (userError || !user) {
+      console.error("Auth error:", userError);
       throw new Error("Unauthorized");
+    }
+
+    const { planType, promoCode }: PaymentIntentRequest = await req.json();
+
+    if (!planType) {
+      throw new Error("Plan type is required");
     }
 
     const plans = {
@@ -79,7 +83,9 @@ Deno.serve(async (req: Request) => {
       const periodEnd = new Date();
       periodEnd.setDate(periodEnd.getDate() + 3);
 
-      const { error: subError } = await supabase
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+      const { error: subError } = await supabaseClient
         .from("subscriptions")
         .insert({
           user_id: user.id,
@@ -90,6 +96,7 @@ Deno.serve(async (req: Request) => {
         });
 
       if (subError) {
+        console.error("Subscription insert error:", subError);
         throw subError;
       }
 
@@ -111,7 +118,9 @@ Deno.serve(async (req: Request) => {
     let promoId = null;
 
     if (promoCode) {
-      const { data: promo } = await supabase
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+      const { data: promo } = await supabaseClient
         .from("promo_codes")
         .select("*")
         .eq("code", promoCode.toUpperCase())
@@ -139,6 +148,9 @@ Deno.serve(async (req: Request) => {
       formData.append("items[0][price_data][product_data][name]", selectedPlan.name);
       formData.append("items[0][price_data][unit_amount]", finalPrice.toString());
       formData.append("items[0][price_data][recurring][interval]", "month");
+      formData.append("payment_behavior", "default_incomplete");
+      formData.append("payment_settings[payment_method_types][]", "card");
+      formData.append("expand[]", "latest_invoice.payment_intent");
       formData.append("metadata[user_id]", user.id);
       formData.append("metadata[plan_type]", planType);
       if (promoCode) {
@@ -162,6 +174,7 @@ Deno.serve(async (req: Request) => {
 
       if (!subscriptionResponse.ok) {
         const error = await subscriptionResponse.text();
+        console.error("Stripe subscription error:", error);
         throw new Error(`Stripe subscription error: ${error}`);
       }
 
@@ -185,6 +198,7 @@ Deno.serve(async (req: Request) => {
     const formData = new URLSearchParams();
     formData.append("amount", finalPrice.toString());
     formData.append("currency", "usd");
+    formData.append("automatic_payment_methods[enabled]", "true");
     formData.append("metadata[user_id]", user.id);
     formData.append("metadata[plan_type]", planType);
     if (promoCode) {
@@ -208,6 +222,7 @@ Deno.serve(async (req: Request) => {
 
     if (!paymentIntentResponse.ok) {
       const error = await paymentIntentResponse.text();
+      console.error("Stripe API error:", error);
       throw new Error(`Stripe API error: ${error}`);
     }
 
