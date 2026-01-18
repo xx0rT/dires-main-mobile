@@ -52,18 +52,12 @@ Deno.serve(async (req: Request) => {
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const passwordHash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-
     const { error: insertError } = await supabaseAdmin
       .from("email_verification_codes")
       .insert({
         email,
         code,
-        password_hash: passwordHash,
+        password_hash: password,
       });
 
     if (insertError) {

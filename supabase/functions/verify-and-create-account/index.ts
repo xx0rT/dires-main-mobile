@@ -99,12 +99,6 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const encoder = new TextEncoder();
-    const data = encoder.encode(verificationData.password_hash);
-    const password = Array.from(new Uint8Array(data))
-      .map(b => String.fromCharCode(b))
-      .join("");
-
     const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password: verificationData.password_hash,
