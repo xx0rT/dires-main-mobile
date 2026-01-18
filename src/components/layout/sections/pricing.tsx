@@ -7,8 +7,8 @@ import {
   Building,
   Rocket,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
@@ -73,12 +73,14 @@ interface Pricing20Props {
 
 const Pricing20 = ({ className }: Pricing20Props) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, session } = useAuth();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
-  const handleGetStarted = async (plan: typeof pricingPlans[0]) => {
+  const handleGetStarted = useCallback(async (plan: typeof pricingPlans[0]) => {
     if (!user || !session) {
-      toast.error("Pro pokračování se prosím přihlaste");
+      localStorage.setItem('pending_plan', plan.planType);
+      toast.info("Pro pokračování se prosím přihlaste");
       navigate("/auth/sign-in");
       return;
     }
@@ -108,6 +110,8 @@ const Pricing20 = ({ className }: Pricing20Props) => {
 
       if (url) {
         window.location.href = url;
+      } else {
+        navigate('/order-confirmation');
       }
     } catch (error) {
       console.error('Checkout error:', error);
@@ -115,7 +119,17 @@ const Pricing20 = ({ className }: Pricing20Props) => {
     } finally {
       setLoadingPlan(null);
     }
-  };
+  }, [user, session, navigate]);
+
+  useEffect(() => {
+    const state = location.state as { selectedPlan?: string } | null;
+    if (state?.selectedPlan && user && session) {
+      const plan = pricingPlans.find(p => p.planType === state.selectedPlan);
+      if (plan) {
+        handleGetStarted(plan);
+      }
+    }
+  }, [location.state, user, session, handleGetStarted]);
 
   return (
     <section className={cn("py-32", className)}>

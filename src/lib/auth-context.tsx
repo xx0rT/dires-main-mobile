@@ -43,7 +43,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error
     setUser(data.user)
     setSession(data.session)
-    navigate('/dashboard')
+
+    const pendingPlan = localStorage.getItem('pending_plan')
+    if (pendingPlan) {
+      localStorage.removeItem('pending_plan')
+      navigate('/', { state: { scrollTo: 'pricing', selectedPlan: pendingPlan } })
+    } else {
+      navigate('/dashboard')
+    }
   }
 
   const signUp = async (email: string, password: string) => {
@@ -54,7 +61,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error
     setUser(data.user)
     setSession(data.session)
-    navigate('/dashboard')
+
+    const pendingPlan = localStorage.getItem('pending_plan')
+    if (pendingPlan) {
+      localStorage.removeItem('pending_plan')
+      navigate('/', { state: { scrollTo: 'pricing', selectedPlan: pendingPlan } })
+    } else {
+      navigate('/dashboard')
+    }
   }
 
   const signOut = async () => {
