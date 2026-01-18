@@ -8,8 +8,11 @@ import {
   Rocket,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -70,22 +73,48 @@ interface Pricing20Props {
 
 const Pricing20 = ({ className }: Pricing20Props) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
-  const handleGetStarted = (plan: typeof pricingPlans[0]) => {
-    const orderData = {
-      companyName: "Fyzioterapie Kurzy",
-      planType: plan.planType,
-      items: [
-        {
-          id: plan.planType,
-          name: plan.name,
-          price: plan.price,
-        },
-      ],
-      currency: "USD",
-    };
+  const handleGetStarted = async (plan: typeof pricingPlans[0]) => {
+    if (!user) {
+      toast.error("Please sign in to continue");
+      navigate("/auth/sign-in");
+      return;
+    }
 
-    navigate("/checkout", { state: { order: orderData } });
+    setLoadingPlan(plan.planType);
+
+    try {
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`;
+      const headers = {
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      };
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          planType: plan.planType,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      const { url } = await response.json();
+
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error('Failed to start checkout. Please try again.');
+    } finally {
+      setLoadingPlan(null);
+    }
   };
 
   return (
@@ -161,8 +190,9 @@ const Pricing20 = ({ className }: Pricing20Props) => {
                 variant={index === 1 ? "default" : "secondary"}
                 className="mt-12"
                 onClick={() => handleGetStarted(plan)}
+                disabled={loadingPlan === plan.planType}
               >
-                Get started
+                {loadingPlan === plan.planType ? "Loading..." : "Get started"}
               </Button>
             </div>
           ))}

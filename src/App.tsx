@@ -9,7 +9,6 @@ import CoursesPage from './pages/courses-page'
 import ShopPage from './pages/shop-page'
 import CartPage from './pages/cart-page'
 import ProductDetailPage from './pages/product-detail-page'
-import CheckoutPage from './pages/checkout-page'
 import OrderConfirmationPage from './pages/order-confirmation-page'
 import DashboardPage from './pages/dashboard-page'
 import AnalyticsPage from './pages/analytics-page'
@@ -36,7 +35,6 @@ export default function App() {
             <Route path="product/:productId" element={<ProductDetailPage />} />
             <Route path="cart" element={<CartPage />} />
           </Route>
-          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
           <Route path="/auth/sign-in" element={<SignInPage />} />
           <Route path="/auth/sign-up" element={<SignUpPage />} />
