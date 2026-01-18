@@ -67,7 +67,7 @@ export default function SettingsPage() {
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList>
           <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="subscription">Subscription</TabsTrigger>
+          <TabsTrigger value="subscription">Předplatné</TabsTrigger>
           <TabsTrigger value="security">Zabezpečení</TabsTrigger>
           <TabsTrigger value="notifications">Upozornění</TabsTrigger>
         </TabsList>
@@ -147,7 +147,17 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="subscription" className="space-y-6">
-          {user && <SubscriptionCard userId={user.id} />}
+          <Card>
+            <CardHeader>
+              <CardTitle>Informace o předplatném</CardTitle>
+              <CardDescription>
+                Spravujte své předplatné a licenci
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {user && <SubscriptionCard userId={user.id} />}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="security" className="space-y-6">

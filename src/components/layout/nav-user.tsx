@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
+import { Star } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,10 +28,12 @@ import {
 } from '@remixicon/react'
 
 import { useAuth } from '@/lib/auth-context'
+import { useSubscription } from '@/lib/use-subscription'
 
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { user, signOut, loading } = useAuth()
+  const { hasActiveSubscription } = useSubscription()
 
   if (loading) {
     return (
@@ -68,7 +72,15 @@ export function NavUser() {
                 <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>
               <div className="ms-1 grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="truncate font-medium">{displayName}</span>
+                <div className="flex items-center gap-2">
+                  <span className="truncate font-medium">{displayName}</span>
+                  {hasActiveSubscription && (
+                    <Badge variant="outline" className="h-4 px-1">
+                      <Star className="mr-0.5 size-2.5 fill-current" />
+                      <span className="text-[10px]">Premium</span>
+                    </Badge>
+                  )}
+                </div>
                 <span className="truncate text-muted-foreground text-xs">{user.email}</span>
               </div>
               <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-accent/50 in-[[data-slot=dropdown-menu-trigger]:hover]:bg-transparent group-data-[collapsible=icon]:hidden">

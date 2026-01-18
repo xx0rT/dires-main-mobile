@@ -1,8 +1,9 @@
-import { Menu, X } from "lucide-react"
+import { Menu, X, Star } from "lucide-react"
 import { Link } from "react-router-dom"
 import React from "react"
 import { ModeToggle } from "./mode-toggle"
 import { Button } from "../ui/button"
+import { Badge } from "../ui/badge"
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -32,6 +33,7 @@ import { Avatar, AvatarFallback } from "../ui/avatar"
 import { site } from "@/config/site"
 import { useAuth } from "@/lib/auth-context"
 import { ShoppingCartButton } from "../shop/shopping-cart-button"
+import { useSubscription } from "@/lib/use-subscription"
 
 interface RouteProps {
     href: string
@@ -149,6 +151,7 @@ export const Navbar = () => {
     const [isOpen, setIsOpen] = React.useState(false)
     const [isScrolled, setIsScrolled] = React.useState(false)
     const { user, signOut } = useAuth()
+    const { hasActiveSubscription } = useSubscription()
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -391,7 +394,15 @@ export const Navbar = () => {
                                 <DropdownMenuContent className="w-56" align="end" forceMount>
                                     <DropdownMenuLabel className="font-normal">
                                         <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-medium leading-none">Můj účet</p>
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-sm font-medium leading-none">Můj účet</p>
+                                                {hasActiveSubscription && (
+                                                    <Badge variant="outline" className="h-5 px-1.5">
+                                                        <Star className="mr-1 size-3 fill-current" />
+                                                        <span className="text-xs">Premium</span>
+                                                    </Badge>
+                                                )}
+                                            </div>
                                             <p className="text-xs leading-none text-muted-foreground">
                                                 {user.email}
                                             </p>
@@ -524,8 +535,16 @@ export const Navbar = () => {
                                                             {getUserInitials()}
                                                         </AvatarFallback>
                                                     </Avatar>
-                                                    <div className="flex flex-col">
-                                                        <p className="text-sm font-medium">Můj účet</p>
+                                                    <div className="flex flex-col flex-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <p className="text-sm font-medium">Můj účet</p>
+                                                            {hasActiveSubscription && (
+                                                                <Badge variant="outline" className="h-5 px-1.5">
+                                                                    <Star className="mr-1 size-3 fill-current" />
+                                                                    <span className="text-xs">Premium</span>
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                         <p className="text-xs text-muted-foreground">{user.email}</p>
                                                     </div>
                                                 </div>
