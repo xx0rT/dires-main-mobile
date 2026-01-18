@@ -29,23 +29,24 @@ Deno.serve(async (req: Request) => {
     const { planType, promoCode }: CheckoutRequest = await req.json();
 
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      throw new Error("No authorization header");
+    let user = null;
+
+    if (authHeader) {
+      try {
+        const userResponse = await fetch(`${Deno.env.get("SUPABASE_URL")}/auth/v1/user`, {
+          headers: {
+            Authorization: authHeader,
+            apikey: Deno.env.get("SUPABASE_ANON_KEY") || "",
+          },
+        });
+
+        if (userResponse.ok) {
+          user = await userResponse.json();
+        }
+      } catch (error) {
+        console.log("Could not get authenticated user, proceeding as guest");
+      }
     }
-
-    const token = authHeader.replace("Bearer ", "");
-    const userResponse = await fetch(`${Deno.env.get("SUPABASE_URL")}/auth/v1/user`, {
-      headers: {
-        Authorization: authHeader,
-        apikey: Deno.env.get("SUPABASE_ANON_KEY") || "",
-      },
-    });
-
-    if (!userResponse.ok) {
-      throw new Error("Failed to get user");
-    }
-
-    const user = await userResponse.json();
 
     const plans = {
       free_trial: {
@@ -103,6 +104,22 @@ Deno.serve(async (req: Request) => {
     const finalPrice = Math.max(0, selectedPlan.price - discountAmount);
 
     if (planType === "free_trial") {
+      if (!user) {
+        return new Response(
+          JSON.stringify({
+            error: "Authentication required for free trial",
+            requiresAuth: true,
+          }),
+          {
+            status: 401,
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
+
       const supabaseClient = await import("npm:@supabase/supabase-js@2");
       const supabase = supabaseClient.createClient(
         Deno.env.get("SUPABASE_URL") || "",
@@ -175,10 +192,14 @@ Deno.serve(async (req: Request) => {
     formData.append("mode", selectedPlan.recurring ? "subscription" : "payment");
     formData.append("success_url", `${req.headers.get("origin")}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`);
     formData.append("cancel_url", `${req.headers.get("origin")}/checkout`);
-    formData.append("client_reference_id", user.id);
+
+    if (user) {
+      formData.append("client_reference_id", user.id);
+      formData.append("metadata[userEmail]", user.email);
+      formData.append("metadata[userName]", user.email.split('@')[0]);
+    }
+
     formData.append("metadata[planType]", planType);
-    formData.append("metadata[userEmail]", user.email);
-    formData.append("metadata[userName]", user.email.split('@')[0]);
 
     if (promoCode) {
       formData.append("metadata[promoCode]", promoCode);
