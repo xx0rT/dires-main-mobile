@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Lock } from "lucide-react";
-import React from "react";
 import {
   Controller,
   FormProvider,
@@ -139,16 +138,15 @@ const CheckoutPage = ({ className }: CheckoutPageProps) => {
                   >
                     <ArrowLeft className="size-4" />
                   </button>
-                  <div className="flex items-center gap-2">
-                    <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
-                      <span className="text-lg font-bold text-primary">F</span>
-                    </div>
-                    <span className="font-semibold">{orderData.companyName}</span>
-                  </div>
+                  <img
+                    src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/shadcnblockscom-icon.svg"
+                    alt={orderData.companyName}
+                    className="size-8"
+                  />
                 </div>
 
                 <div className="mb-8">
-                  <p className="text-muted-foreground">Total amount</p>
+                  <p className="text-sm text-muted-foreground">{orderData.companyName}</p>
                   <p className="text-4xl font-semibold tracking-tight">
                     {formatPrice(total, orderData.currency)}
                   </p>
@@ -198,10 +196,21 @@ const CheckoutPage = ({ className }: CheckoutPageProps) => {
 
             <div className="p-8 pt-32 lg:p-12 lg:pt-40 xl:p-16 xl:pt-48">
               <div className="mx-auto w-full max-w-md">
+                <Button
+                  type="button"
+                  className="h-auto w-full bg-foreground py-1 text-background hover:bg-foreground/90"
+                >
+                  <img
+                    src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/apple-pay-white.svg"
+                    alt="Apple Pay"
+                    className="h-12"
+                  />
+                </Button>
+
                 <div className="my-6 flex items-center gap-4">
                   <Separator className="flex-1" />
                   <span className="text-sm text-muted-foreground">
-                    Pay with card
+                    or pay with card
                   </span>
                   <Separator className="flex-1" />
                 </div>
@@ -219,7 +228,7 @@ const CheckoutPage = ({ className }: CheckoutPageProps) => {
                   <Button
                     type="submit"
                     size="lg"
-                    className="h-12 w-full text-base"
+                    className="h-12 w-full bg-blue-600 text-base text-white hover:bg-blue-700"
                   >
                     Complete payment
                   </Button>
@@ -260,21 +269,6 @@ const CheckoutPage = ({ className }: CheckoutPageProps) => {
 
 const PromoCodeField = () => {
   const form = useFormContext<CheckoutFormType>();
-  const [showInput, setShowInput] = React.useState(false);
-
-  if (!showInput) {
-    return (
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="h-9 text-sm"
-        onClick={() => setShowInput(true)}
-      >
-        Add coupon code
-      </Button>
-    );
-  }
 
   return (
     <Controller
