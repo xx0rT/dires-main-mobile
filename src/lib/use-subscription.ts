@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './auth-context';
+import { supabase } from './supabase';
 
 interface Subscription {
   id: string;
@@ -15,33 +16,28 @@ interface Subscription {
 }
 
 export function useSubscription() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchSubscription() {
-      if (!user) {
+      if (!user || !session) {
         setLoading(false);
         return;
       }
 
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${user.id}&select=*`,
-          {
-            headers: {
-              apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-            },
-          }
-        );
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.length > 0) {
-            setSubscription(data[0]);
-          }
+        if (error) {
+          console.error('Error fetching subscription:', error);
+        } else if (data) {
+          setSubscription(data);
         }
       } catch (error) {
         console.error('Error fetching subscription:', error);
@@ -51,7 +47,7 @@ export function useSubscription() {
     }
 
     fetchSubscription();
-  }, [user]);
+  }, [user, session]);
 
   const hasActiveSubscription = subscription?.status === 'active' || subscription?.status === 'trialing';
 

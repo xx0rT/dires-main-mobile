@@ -73,11 +73,11 @@ interface Pricing20Props {
 
 const Pricing20 = ({ className }: Pricing20Props) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const handleGetStarted = async (plan: typeof pricingPlans[0]) => {
-    if (!user) {
+    if (!user || !session) {
       toast.error("Pro pokračování se prosím přihlaste");
       navigate("/auth/sign-in");
       return;
@@ -88,7 +88,7 @@ const Pricing20 = ({ className }: Pricing20Props) => {
     try {
       const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`;
       const headers = {
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        'Authorization': `Bearer ${session.access_token}`,
         'Content-Type': 'application/json',
       };
 
