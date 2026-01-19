@@ -133,7 +133,7 @@ Deno.serve(async (req: Request) => {
         .from("subscriptions")
         .insert({
           user_id: user.id,
-          plan_type: "free_trial",
+          plan: "free_trial",
           status: "trialing",
           current_period_start: new Date().toISOString(),
           current_period_end: periodEnd.toISOString(),

@@ -65,7 +65,7 @@ Deno.serve(async (req: Request) => {
           const { data, error } = await supabase
             .from("subscriptions")
             .update({
-              plan_type: planType,
+              plan: planType,
               status: planType === "free_trial" ? "trialing" : "active",
               stripe_customer_id: customerId,
               stripe_subscription_id: subscriptionId,
@@ -87,7 +87,7 @@ Deno.serve(async (req: Request) => {
             .from("subscriptions")
             .insert({
               user_id: userId,
-              plan_type: planType,
+              plan: planType,
               status: planType === "free_trial" ? "trialing" : "active",
               stripe_customer_id: customerId,
               stripe_subscription_id: subscriptionId,
