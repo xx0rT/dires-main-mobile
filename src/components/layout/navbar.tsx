@@ -395,10 +395,12 @@ export const Navbar = () => {
                                     <DropdownMenuLabel className="font-normal">
                                         <div className="flex flex-col space-y-1">
                                             <div className="flex items-center gap-2">
-                                                <p className="text-sm font-medium leading-none">Můj účet</p>
+                                                <p className={`text-sm font-medium leading-none ${hasActiveSubscription ? 'text-yellow-600 dark:text-yellow-400' : ''}`}>
+                                                    Můj účet
+                                                </p>
                                                 {hasActiveSubscription && (
-                                                    <Badge variant="outline" className="h-5 px-1.5">
-                                                        <Star className="mr-1 size-3 fill-current" />
+                                                    <Badge variant="outline" className="h-5 px-1.5 bg-yellow-500/10 border-yellow-500/50 text-yellow-700 dark:text-yellow-400">
+                                                        <Star className="mr-1 size-3 fill-yellow-500 text-yellow-500" />
                                                         <span className="text-xs">Premium</span>
                                                     </Badge>
                                                 )}
@@ -537,10 +539,12 @@ export const Navbar = () => {
                                                     </Avatar>
                                                     <div className="flex flex-col flex-1">
                                                         <div className="flex items-center gap-2">
-                                                            <p className="text-sm font-medium">Můj účet</p>
+                                                            <p className={`text-sm font-medium ${hasActiveSubscription ? 'text-yellow-600 dark:text-yellow-400' : ''}`}>
+                                                                Můj účet
+                                                            </p>
                                                             {hasActiveSubscription && (
-                                                                <Badge variant="outline" className="h-5 px-1.5">
-                                                                    <Star className="mr-1 size-3 fill-current" />
+                                                                <Badge variant="outline" className="h-5 px-1.5 bg-yellow-500/10 border-yellow-500/50 text-yellow-700 dark:text-yellow-400">
+                                                                    <Star className="mr-1 size-3 fill-yellow-500 text-yellow-500" />
                                                                     <span className="text-xs">Premium</span>
                                                                 </Badge>
                                                             )}

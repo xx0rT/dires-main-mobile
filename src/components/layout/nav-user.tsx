@@ -73,10 +73,12 @@ export function NavUser() {
               </Avatar>
               <div className="ms-1 grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                 <div className="flex items-center gap-2">
-                  <span className="truncate font-medium">{displayName}</span>
+                  <span className={`truncate font-medium ${hasActiveSubscription ? 'text-yellow-600 dark:text-yellow-400' : ''}`}>
+                    {displayName}
+                  </span>
                   {hasActiveSubscription && (
-                    <Badge variant="outline" className="h-4 px-1">
-                      <Star className="mr-0.5 size-2.5 fill-current" />
+                    <Badge variant="outline" className="h-4 px-1 bg-yellow-500/10 border-yellow-500/50 text-yellow-700 dark:text-yellow-400">
+                      <Star className="mr-0.5 size-2.5 fill-yellow-500 text-yellow-500" />
                       <span className="text-[10px]">Premium</span>
                     </Badge>
                   )}

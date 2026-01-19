@@ -5,8 +5,8 @@ import { supabase } from './supabase';
 interface Subscription {
   id: string;
   user_id: string;
-  plan_type: 'free_trial' | 'monthly' | 'lifetime';
-  status: 'active' | 'cancelled' | 'expired' | 'trialing';
+  plan: string;
+  status: string;
   stripe_customer_id?: string;
   stripe_subscription_id?: string;
   current_period_start?: string;
@@ -49,7 +49,10 @@ export function useSubscription() {
     fetchSubscription();
   }, [user, session]);
 
-  const hasActiveSubscription = subscription?.status === 'active' || subscription?.status === 'trialing';
+  const hasActiveSubscription =
+    (subscription?.status === 'active' || subscription?.status === 'trialing') &&
+    subscription?.plan !== 'free' &&
+    subscription?.stripe_subscription_id != null;
 
   return { subscription, loading, hasActiveSubscription };
 }
