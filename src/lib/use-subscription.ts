@@ -20,39 +20,66 @@ export function useSubscription() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchSubscription() {
-      if (!user || !session) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (error) {
-          console.error('Error fetching subscription:', error);
-        } else if (data) {
-          setSubscription(data);
-        }
-      } catch (error) {
-        console.error('Error fetching subscription:', error);
-      } finally {
-        setLoading(false);
-      }
+  const fetchSubscription = async () => {
+    if (!user || !session) {
+      setLoading(false);
+      return;
     }
 
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching subscription:', error);
+      } else if (data) {
+        setSubscription(data);
+      }
+    } catch (error) {
+      console.error('Error fetching subscription:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchSubscription();
   }, [user, session]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('subscription_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'subscriptions',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('Subscription updated:', payload);
+          fetchSubscription();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
 
   const hasActiveSubscription =
     (subscription?.status === 'active' || subscription?.status === 'trialing') &&
     subscription?.plan !== 'free' &&
     subscription?.stripe_subscription_id != null;
 
-  return { subscription, loading, hasActiveSubscription };
+  const refetch = fetchSubscription;
+
+  return { subscription, loading, hasActiveSubscription, refetch };
 }

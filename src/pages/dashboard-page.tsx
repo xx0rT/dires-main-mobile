@@ -3,11 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { RiBookOpenLine, RiTimeLine, RiTrophyLine, RiArrowRightLine, RiCheckLine, RiBillLine, RiUserLine } from '@remixicon/react'
+import { RiBookOpenLine, RiTimeLine, RiTrophyLine, RiArrowRightLine, RiCheckLine, RiBillLine, RiUserLine, RiRefreshLine } from '@remixicon/react'
 import { mockCourses, mockDatabase } from '@/lib/mock-data'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { useSubscription } from '@/lib/use-subscription'
+import { toast } from 'sonner'
 
 interface Course {
   id: string
@@ -29,14 +31,28 @@ interface Enrollment {
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const { subscription, hasActiveSubscription, refetch } = useSubscription()
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [stats, setStats] = useState({
     completedCourses: 0,
     inProgressCourses: 0,
     totalHoursSpent: 0,
     completedModules: 0
   })
+
+  const handleRefreshSubscription = async () => {
+    setRefreshing(true)
+    try {
+      await refetch()
+      toast.success('Předplatné aktualizováno')
+    } catch (error) {
+      toast.error('Nepodařilo se aktualizovat předplatné')
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   useEffect(() => {
     loadDashboardData()
@@ -127,13 +143,47 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
+        className="flex items-start justify-between"
       >
-        <h1 className="text-3xl font-bold">
-          {getGreeting()}, {user?.email?.split('@')[0] || 'Studente'}
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Vítejte zpět na vaší vzdělávací platformě. Pokračujte ve svém učení.
-        </p>
+        <div>
+          <h1 className="text-3xl font-bold">
+            {getGreeting()}, {user?.email?.split('@')[0] || 'Studente'}
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Vítejte zpět na vaší vzdělávací platformě. Pokračujte ve svém učení.
+          </p>
+        </div>
+        {subscription && (
+          <Card className="px-4 py-3 min-w-[240px]">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground mb-1">Status předplatného</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold capitalize">{subscription.plan}</p>
+                  {hasActiveSubscription ? (
+                    <Badge className="bg-yellow-500/10 border-yellow-500/50 text-yellow-700 dark:text-yellow-400">
+                      Premium
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline">Free</Badge>
+                  )}
+                </div>
+                {subscription.stripe_subscription_id && (
+                  <p className="text-xs text-muted-foreground mt-1">ID: {subscription.stripe_subscription_id.slice(-8)}</p>
+                )}
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleRefreshSubscription}
+                disabled={refreshing}
+                title="Aktualizovat předplatné"
+              >
+                <RiRefreshLine className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
+          </Card>
+        )}
       </motion.div>
 
       <motion.div

@@ -8,8 +8,10 @@ import {
   Truck,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 import { cn } from "@/lib/utils";
+import { useSubscription } from "@/lib/use-subscription";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
@@ -107,6 +109,44 @@ const OrderConfirmationPage = ({ className }: OrderConfirmationPageProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const orderData = (location.state as { order?: OrderSummaryData })?.order || DEFAULT_ORDER;
+  const { refetch } = useSubscription();
+
+  useEffect(() => {
+    const refreshSubscription = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get('session_id');
+
+      if (sessionId) {
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        const pollSubscription = async () => {
+          if (attempts >= maxAttempts) {
+            console.log('Max polling attempts reached');
+            return;
+          }
+
+          attempts++;
+          console.log(`Checking subscription update (attempt ${attempts}/${maxAttempts})...`);
+
+          if (refetch) {
+            await refetch();
+          }
+
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          pollSubscription();
+        };
+
+        pollSubscription();
+      } else {
+        if (refetch) {
+          await refetch();
+        }
+      }
+    };
+
+    refreshSubscription();
+  }, [refetch]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
