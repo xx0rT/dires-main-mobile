@@ -112,40 +112,48 @@ const OrderConfirmationPage = ({ className }: OrderConfirmationPageProps) => {
   const { refetch } = useSubscription();
 
   useEffect(() => {
-    const refreshSubscription = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const sessionId = urlParams.get('session_id');
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
 
-      if (sessionId) {
-        let attempts = 0;
-        const maxAttempts = 10;
+    if (!sessionId) {
+      if (refetch) {
+        refetch();
+      }
+      return;
+    }
 
-        const pollSubscription = async () => {
-          if (attempts >= maxAttempts) {
-            console.log('Max polling attempts reached');
-            return;
-          }
+    let attempts = 0;
+    const maxAttempts = 5;
+    const intervalTime = 3000;
+    let intervalId: NodeJS.Timeout;
 
-          attempts++;
-          console.log(`Checking subscription update (attempt ${attempts}/${maxAttempts})...`);
+    const pollSubscription = async () => {
+      if (attempts >= maxAttempts) {
+        console.log('Max polling attempts reached');
+        clearInterval(intervalId);
+        return;
+      }
 
-          if (refetch) {
-            await refetch();
-          }
+      attempts++;
+      console.log(`Checking subscription update (attempt ${attempts}/${maxAttempts})...`);
 
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          pollSubscription();
-        };
-
-        pollSubscription();
-      } else {
+      try {
         if (refetch) {
           await refetch();
         }
+      } catch (error) {
+        console.error('Error refetching subscription:', error);
       }
     };
 
-    refreshSubscription();
+    pollSubscription();
+    intervalId = setInterval(pollSubscription, intervalTime);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, [refetch]);
 
   const formatPrice = (price: number) => {
