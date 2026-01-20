@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './auth-context';
 import { supabase } from './supabase';
 
@@ -20,7 +20,7 @@ export function useSubscription() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchSubscription = async () => {
+  const fetchSubscription = useCallback(async () => {
     if (!user || !session) {
       setLoading(false);
       return;
@@ -43,11 +43,11 @@ export function useSubscription() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, session]);
 
   useEffect(() => {
     fetchSubscription();
-  }, [user, session]);
+  }, [fetchSubscription]);
 
   useEffect(() => {
     if (!user) return;
@@ -72,14 +72,12 @@ export function useSubscription() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, fetchSubscription]);
 
   const hasActiveSubscription =
     (subscription?.status === 'active' || subscription?.status === 'trialing') &&
     subscription?.plan !== 'free' &&
     subscription?.stripe_subscription_id != null;
 
-  const refetch = fetchSubscription;
-
-  return { subscription, loading, hasActiveSubscription, refetch };
+  return { subscription, loading, hasActiveSubscription, refetch: fetchSubscription };
 }
