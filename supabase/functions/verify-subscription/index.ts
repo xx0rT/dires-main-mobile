@@ -38,6 +38,106 @@ Deno.serve(async (req: Request) => {
     }
 
     const user = await userResponse.json();
+    const body = await req.json().catch(() => ({}));
+    const sessionId = body.sessionId;
+
+    if (sessionId && sessionId !== 'undefined') {
+      console.log("🔍 Verifying Stripe session:", sessionId);
+
+      const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY");
+      if (!STRIPE_SECRET_KEY) {
+        throw new Error("STRIPE_SECRET_KEY not configured");
+      }
+
+      const stripeResponse = await fetch(
+        `https://api.stripe.com/v1/checkout/sessions/${sessionId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+          },
+        }
+      );
+
+      if (stripeResponse.ok) {
+        const session = await stripeResponse.json();
+        console.log("✅ Retrieved Stripe session:", {
+          id: session.id,
+          payment_status: session.payment_status,
+          customer: session.customer,
+          subscription: session.subscription,
+          metadata: session.metadata
+        });
+
+        if (session.payment_status === "paid" || session.payment_status === "no_payment_required") {
+          const { planType } = session.metadata;
+          const customerId = session.customer;
+          const subscriptionId = session.subscription;
+
+          const periodStart = new Date();
+          const periodEnd = new Date();
+          if (planType === "free_trial") {
+            periodEnd.setDate(periodEnd.getDate() + 3);
+          } else if (planType === "monthly") {
+            periodEnd.setMonth(periodEnd.getMonth() + 1);
+          } else if (planType === "lifetime") {
+            periodEnd.setFullYear(periodEnd.getFullYear() + 100);
+          }
+
+          const planMapping: Record<string, string> = {
+            "free_trial": "free_trial",
+            "monthly": "pro",
+            "lifetime": "premium"
+          };
+
+          const mappedPlan = planMapping[planType] || planType;
+          const subscriptionStatus = planType === "free_trial" ? "trialing" : "active";
+
+          const { data: existingSub } = await supabaseClient
+            .from("subscriptions")
+            .select("id")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          const subscriptionData = {
+            plan: mappedPlan,
+            status: subscriptionStatus,
+            stripe_customer_id: customerId,
+            stripe_subscription_id: subscriptionId || `one_time_${Date.now()}`,
+            current_period_start: periodStart.toISOString(),
+            current_period_end: periodEnd.toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+
+          if (existingSub) {
+            console.log("🔄 Updating existing subscription for user:", user.id);
+            const { error } = await supabaseClient
+              .from("subscriptions")
+              .update(subscriptionData)
+              .eq("user_id", user.id);
+
+            if (error) {
+              console.error("❌ Error updating subscription:", error);
+              throw error;
+            }
+            console.log("✅ Subscription updated successfully");
+          } else {
+            console.log("➕ Creating new subscription for user:", user.id);
+            const { error } = await supabaseClient
+              .from("subscriptions")
+              .insert({
+                user_id: user.id,
+                ...subscriptionData,
+              });
+
+            if (error) {
+              console.error("❌ Error creating subscription:", error);
+              throw error;
+            }
+            console.log("✅ Subscription created successfully");
+          }
+        }
+      }
+    }
 
     const { data: subscription } = await supabaseClient
       .from("subscriptions")

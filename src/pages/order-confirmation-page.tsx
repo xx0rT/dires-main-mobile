@@ -12,6 +12,7 @@ import { useEffect } from "react";
 
 import { cn } from "@/lib/utils";
 import { useSubscription } from "@/lib/use-subscription";
+import { useAuth } from "@/lib/auth-context";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
@@ -110,6 +111,7 @@ const OrderConfirmationPage = ({ className }: OrderConfirmationPageProps) => {
   const navigate = useNavigate();
   const orderData = (location.state as { order?: OrderSummaryData })?.order || DEFAULT_ORDER;
   const { refetch } = useSubscription();
+  const { session } = useAuth();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -122,39 +124,42 @@ const OrderConfirmationPage = ({ className }: OrderConfirmationPageProps) => {
       return;
     }
 
-    let attempts = 0;
-    const maxAttempts = 5;
-    const intervalTime = 3000;
-    let intervalId: NodeJS.Timeout;
-
-    const pollSubscription = async () => {
-      if (attempts >= maxAttempts) {
-        console.log('Max polling attempts reached');
-        clearInterval(intervalId);
-        return;
-      }
-
-      attempts++;
-      console.log(`Checking subscription update (attempt ${attempts}/${maxAttempts})...`);
+    const verifyPayment = async () => {
+      console.log('🔍 Verifying payment with session ID:', sessionId);
 
       try {
-        if (refetch) {
-          await refetch();
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-subscription`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ sessionId }),
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log('✅ Payment verification result:', result);
+
+          if (result.subscription) {
+            console.log('✅ Subscription confirmed, refreshing data...');
+            if (refetch) {
+              await refetch();
+            }
+          }
+        } else {
+          console.error('❌ Payment verification failed:', await response.text());
         }
       } catch (error) {
-        console.error('Error refetching subscription:', error);
+        console.error('❌ Error verifying payment:', error);
       }
     };
 
-    pollSubscription();
-    intervalId = setInterval(pollSubscription, intervalTime);
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [refetch]);
+    verifyPayment();
+  }, [refetch, session]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
