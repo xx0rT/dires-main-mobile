@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { mockCourses, mockModules, mockDatabase } from "@/lib/mock-data";
 import { useAuth } from "@/lib/auth-context";
+import { useSubscription } from "@/lib/use-subscription";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,7 @@ interface CourseModule {
 export const CoursePlayerPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const { user } = useAuth();
+  const { hasActiveSubscription, loading: subscriptionLoading } = useSubscription();
   const navigate = useNavigate();
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<CourseModule[]>([]);
@@ -622,7 +624,11 @@ export const CoursePlayerPage = () => {
     return <Navigate to="/auth/sign-in" replace />;
   }
 
-  if (loading) {
+  if (!hasActiveSubscription && !subscriptionLoading) {
+    return <Navigate to="/courses" replace />;
+  }
+
+  if (loading || subscriptionLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

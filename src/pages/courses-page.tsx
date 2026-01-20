@@ -1,9 +1,10 @@
 import { useAuth } from '@/lib/auth-context'
+import { useSubscription } from '@/lib/use-subscription'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { RiBookOpenLine, RiLockLine, RiCheckLine, RiPlayCircleLine, RiTimeLine, RiVideoLine } from '@remixicon/react'
+import { RiBookOpenLine, RiLockLine, RiCheckLine, RiPlayCircleLine, RiTimeLine, RiVideoLine, RiShieldCheckLine } from '@remixicon/react'
 import { mockCourses, mockModules, mockDatabase } from '@/lib/mock-data'
 import { useEffect, useState, useRef } from 'react'
 import { motion } from 'framer-motion'
@@ -39,6 +40,7 @@ interface Enrollment {
 export default function CoursesPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { subscription, loading: subscriptionLoading, hasActiveSubscription } = useSubscription()
   const [courses, setCourses] = useState<Course[]>([])
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [courseModules, setCourseModules] = useState<Record<string, CourseModule[]>>({})
@@ -179,10 +181,100 @@ export default function CoursesPage() {
     setSelectedCourse(course)
   }
 
-  if (loading) {
+  if (loading || subscriptionLoading) {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      </div>
+    )
+  }
+
+  if (user && !hasActiveSubscription) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-2xl mx-auto"
+        >
+          <Card className="border-2 border-primary/20 shadow-lg">
+            <CardHeader className="text-center space-y-4 pb-6">
+              <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
+                <RiShieldCheckLine className="h-10 w-10 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-3xl mb-3">
+                  Premium přístup vyžadován
+                </CardTitle>
+                <CardDescription className="text-base">
+                  Pro přístup ke kurzům potřebujete aktivní předplatné
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <RiCheckLine className="h-5 w-5 text-primary" />
+                  Co získáte s premium přístupem:
+                </h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <RiCheckLine className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Neomezený přístup ke všem kurzům</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <RiCheckLine className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>AI asistent pro dotazy k obsahu kurzů</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <RiCheckLine className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Certifikáty po dokončení jednotlivých kurzů</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <RiCheckLine className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Doplňkové studijní materiály ke stažení</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <RiCheckLine className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Aktualizace obsahu zdarma</span>
+                  </li>
+                </ul>
+              </div>
+
+              {subscription && (
+                <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <p className="text-sm text-muted-foreground">
+                    <strong className="text-foreground">Aktuální stav:</strong>{' '}
+                    {subscription.status === 'cancelled' && 'Vaše předplatné bylo zrušeno'}
+                    {subscription.status === 'inactive' && 'Vaše předplatné není aktivní'}
+                    {subscription.status === 'expired' && 'Vaše předplatné vypršelo'}
+                    {!['cancelled', 'inactive', 'expired'].includes(subscription.status) &&
+                      `Status: ${subscription.status}`}
+                  </p>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <Button
+                  onClick={() => navigate('/#pricing')}
+                  className="flex-1"
+                  size="lg"
+                >
+                  Zobrazit cenové plány
+                </Button>
+                <Button
+                  onClick={() => navigate('/dashboard')}
+                  variant="outline"
+                  className="flex-1"
+                  size="lg"
+                >
+                  Zpět na dashboard
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     )
   }
