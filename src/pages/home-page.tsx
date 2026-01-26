@@ -1,4 +1,4 @@
-import { Feature249 } from '@/components/ui/feature-249'
+import { BenefitsSection } from '@/components/layout/sections/benefits'
 import { CommunitySection } from '@/components/layout/sections/community'
 import { ContactSection } from '@/components/layout/sections/contact'
 import { Feature283 } from '@/components/layout/sections/contributors'
@@ -22,8 +22,8 @@ export default function HomePage() {
         <LogoCloud />
       </div>
 
-      <div className="bg-background transition-colors duration-700">
-        <Feature249 />
+      <div className="bg-muted/70 transition-colors duration-700">
+        <BenefitsSection />
       </div>
 
       <div className="bg-background transition-colors duration-700">
