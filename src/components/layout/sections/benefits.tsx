@@ -7,15 +7,17 @@ import { cn } from "@/lib/utils";
 
 export const BenefitsSection = () => {
   return (
-    <section id="benefits" className="bg-white py-32">
+    <section id="benefits" className="py-32">
       <div className="container flex flex-col items-center justify-center">
-        <TextReveal className="font-medium xl:text-3xl" maxWidth="86rem">
-          And the coolest part? This is just the beginning — there&apos;s so
-          much more coming your way. From exciting features to game-changing
-          updates, we&apos;re just getting started. Stay tuned — the best is yet
-          to come. Big ideas are turning into reality, and you&apos;re at the
-          heart of it all. Get ready to experience what&apos;s next.
-        </TextReveal>
+        <div className="flex max-w-4xl">
+          <TextReveal
+            title=" { Shadcn Blocks }"
+            className="items-center justify-center text-center"
+          >
+            And the coolest part? This is just the beginning—there&apos;s so
+            much more coming your way
+          </TextReveal>
+        </div>
       </div>
     </section>
   );
