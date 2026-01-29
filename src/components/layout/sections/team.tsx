@@ -113,9 +113,9 @@ const Team11 = ({
 
   return (
     <section id="team" className={cn("py-32", className)}>
-      <div className="container">
-        <div className="flex flex-col gap-14 items-center">
-          <div className="flex flex-col gap-4 border-b-2 pb-6 text-center max-w-3xl">
+      <div className="container mx-auto">
+        <div className="flex flex-col gap-14 items-center justify-center">
+          <div className="flex flex-col gap-4 border-b-2 pb-6 text-center max-w-3xl mx-auto">
             <h3 className="text-3xl font-light tracking-tight lg:text-6xl">
               {heading}
             </h3>
@@ -125,7 +125,7 @@ const Team11 = ({
           </div>
           <ul
             onMouseLeave={() => setHoveredMember(null)}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center"
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center mx-auto max-w-6xl w-full"
           >
             {members.map((member, index) => {
               return (
