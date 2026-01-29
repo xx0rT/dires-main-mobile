@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 export const BenefitsSection = () => {
   return (
     <section id="benefits" className="py-32">
-      <div className="container flex flex-col items-center justify-center">
-        <div className="flex max-w-4xl">
+      <div className="container flex flex-col items-center justify-center mx-auto">
+        <div className="flex max-w-4xl mx-auto w-full justify-center">
           <TextReveal
             title=" { Dires Fyzio }"
             className="items-center justify-center text-center"
@@ -49,17 +49,17 @@ const TextReveal: FC<TextRevealProps> = ({
   return (
     <div
       ref={targetRef}
-      className={cn("relative z-0 h-[200vh]", className)}
+      className={cn("relative z-0 h-[200vh] mx-auto", className)}
       style={{ maxWidth: maxWidth || "56rem" }}
     >
-      <div className="sticky top-0 mx-auto flex h-[50%] items-center bg-transparent px-[1rem] py-[5rem]">
-        <div ref={targetRef} className="flex flex-col justify-center">
+      <div className="sticky top-0 mx-auto flex h-[50%] items-center justify-center bg-transparent px-[1rem] py-[5rem]">
+        <div ref={targetRef} className="flex flex-col justify-center items-center w-full">
           <span className="text-center text-lg font-medium tracking-tight text-foreground">
             {title}
           </span>
           <span
             className={cn(
-              "flex flex-wrap p-5 text-2xl font-semibold text-black/20 md:p-8 md:text-3xl lg:p-10 lg:text-4xl xl:text-5xl dark:text-white/20",
+              "flex flex-wrap justify-center p-5 text-2xl font-semibold text-black/20 md:p-8 md:text-3xl lg:p-10 lg:text-4xl xl:text-5xl dark:text-white/20",
               className,
             )}
           >
