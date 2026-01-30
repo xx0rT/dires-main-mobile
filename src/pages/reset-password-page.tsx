@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { Link, useNavigate, useSearchParams } from "react-router-dom"
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -14,20 +14,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@/components/ui/input-otp"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { site } from "@/config/site"
+import { supabase } from "@/lib/supabase"
 
 const formSchema = z.object({
-  code: z.string().min(6, {
-    message: "Ověřovací kód musí mít 6 znaků.",
-  }),
   newPassword: z.string().min(6, {
     message: "Heslo musí mít alespoň 6 znaků.",
   }),
@@ -41,76 +33,35 @@ const formSchema = z.object({
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const email = searchParams.get("email") || ""
-  const [isVerifying, setIsVerifying] = useState(false)
-  const [isResending, setIsResending] = useState(false)
+  const [isResetting, setIsResetting] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      code: "",
       newPassword: "",
       confirmPassword: "",
     },
   })
 
-  useEffect(() => {
-    if (!email) {
-      toast.error("Email chybí. Vraťte se na stránku pro obnovení hesla.")
-      navigate("/auth/forgot-password")
-    }
-  }, [email, navigate])
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsVerifying(true)
+    setIsResetting(true)
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-and-reset-password`
-
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          code: values.code,
-          newPassword: values.newPassword
-        }),
+      const { error } = await supabase.auth.updateUser({
+        password: values.newPassword
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        if (data.attemptsRemaining !== undefined) {
-          toast.error(`Neplatný kód. Zbývá pokusů: ${data.attemptsRemaining}`)
-        } else {
-          toast.error(data.error || "Neplatný ověřovací kód. Zkuste to prosím znovu.")
-        }
-        form.reset({ code: "", newPassword: values.newPassword, confirmPassword: values.confirmPassword })
+      if (error) {
+        toast.error(error.message)
         return
       }
 
       toast.success("Heslo bylo úspěšně změněno! Nyní se můžete přihlásit.")
       navigate('/auth/sign-in')
-    } catch (error) {
-      console.error("Verification error:", error)
-      toast.error("Něco se pokazilo. Zkuste to prosím znovu.")
+    } catch (error: any) {
+      console.error("Password reset error:", error)
+      toast.error(error.message || "Něco se pokazilo. Zkuste to prosím znovu.")
     } finally {
-      setIsVerifying(false)
-    }
-  }
-
-  async function handleResendCode() {
-    setIsResending(true)
-    try {
-      toast.info("Pro nový kód se vraťte na stránku obnovení hesla a zadejte znovu svůj email.")
-    } catch (error) {
-      console.error("Resend error:", error)
-      toast.error("Něco se pokazilo. Zkuste to prosím znovu.")
-    } finally {
-      setIsResending(false)
+      setIsResetting(false)
     }
   }
 
@@ -133,40 +84,12 @@ export default function ResetPasswordPage() {
             </div>
             <CardTitle className="text-2xl text-center">Resetovat heslo</CardTitle>
             <CardDescription className="text-center">
-              Poslali jsme ověřovací kód na{" "}
-              <span className="font-medium">{email}</span>
+              Zadejte své nové heslo
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
               <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-                <FormField
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ověřovací kód</FormLabel>
-                      <FormControl>
-                        <div className="flex justify-center">
-                          <InputOTP maxLength={6} {...field}>
-                            <InputOTPGroup>
-                              <InputOTPSlot className="bg-background" index={0} />
-                              <InputOTPSlot className="bg-background" index={1} />
-                              <InputOTPSlot className="bg-background" index={2} />
-                            </InputOTPGroup>
-                            <InputOTPSeparator />
-                            <InputOTPGroup>
-                              <InputOTPSlot className="bg-background" index={3} />
-                              <InputOTPSlot className="bg-background" index={4} />
-                              <InputOTPSlot className="bg-background" index={5} />
-                            </InputOTPGroup>
-                          </InputOTP>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <FormField
                   control={form.control}
                   name="newPassword"
@@ -201,23 +124,11 @@ export default function ResetPasswordPage() {
                     </FormItem>
                   )}
                 />
-                <Button className="w-full" disabled={isVerifying} type="submit">
-                  {isVerifying ? "Resetování hesla..." : "Resetovat heslo"}
+                <Button className="w-full" disabled={isResetting} type="submit">
+                  {isResetting ? "Resetování hesla..." : "Resetovat heslo"}
                 </Button>
               </form>
             </Form>
-            <div className="mt-4 text-center text-sm text-muted-foreground">
-              Nedostali jste kód?{" "}
-              <Button
-                className="h-auto p-0 font-normal"
-                type="button"
-                variant="link"
-                disabled={isResending}
-                onClick={handleResendCode}
-              >
-                Poslat znovu
-              </Button>
-            </div>
             <div className="mt-6">
               <Link
                 to="/auth/sign-in"

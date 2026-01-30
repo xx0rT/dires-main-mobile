@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import { RiArrowRightLine, RiArrowLeftLine } from '@remixicon/react'
 import { site } from '@/config/site'
+import { supabase } from '@/lib/supabase'
 
 export default function SignUpPage() {
   const { user } = useAuth()
@@ -44,35 +45,20 @@ export default function SignUpPage() {
     setLoading(true)
 
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-verification-code`
-
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        toast.error(data.error || 'Nepodařilo se odeslat ověřovací kód')
+      if (error) {
+        toast.error(error.message)
         return
       }
 
-      if (data.code) {
-        toast.success(`Ověřovací kód: ${data.code}`, { duration: 10000 })
-        console.log('=== VERIFICATION CODE ===')
-        console.log(`Email: ${email}`)
-        console.log(`Code: ${data.code}`)
-        console.log('========================')
-      } else {
-        toast.success('Ověřovací kód byl odeslán na váš email!')
+      if (data.user) {
+        toast.success('Účet byl úspěšně vytvořen! Přihlašuji...')
+        navigate('/dashboard')
       }
-
-      navigate(`/auth/verify-email?email=${encodeURIComponent(email)}`)
     } catch (error: any) {
       console.error('Error:', error)
       toast.error(error.message || 'Něco se pokazilo')
