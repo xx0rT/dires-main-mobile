@@ -104,42 +104,45 @@ Deno.serve(async (req: Request) => {
     `;
 
     try {
-      const resendApiKey = Deno.env.get("RESEND_API_KEY");
-      let fromEmail = (Deno.env.get("RESEND_FROM_EMAIL") || "onboarding@resend.dev").trim();
+      const smtpHost = Deno.env.get("SMTP_HOST") || "smtp.gmail.com";
+      const smtpPort = Deno.env.get("SMTP_PORT") || "587";
+      const smtpUser = Deno.env.get("SMTP_USER");
+      const smtpPassword = Deno.env.get("SMTP_PASSWORD");
+      const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || smtpUser;
 
-      // Validate and clean email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const namedEmailRegex = /^.+\s*<[^\s@]+@[^\s@]+\.[^\s@]+>$/;
+      if (smtpUser && smtpPassword && fromEmail) {
+        // Use SMTP to send email
+        const SMTPClient = (await import("https://deno.land/x/denomailer@1.6.0/mod.ts")).default;
 
-      if (!emailRegex.test(fromEmail) && !namedEmailRegex.test(fromEmail)) {
-        console.error("Invalid from email format:", fromEmail);
-        fromEmail = "onboarding@resend.dev";
-      }
-
-      if (resendApiKey) {
-        const resendResponse = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${resendApiKey}`,
-            "Content-Type": "application/json",
+        const client = new SMTPClient({
+          connection: {
+            hostname: smtpHost,
+            port: Number(smtpPort),
+            tls: true,
+            auth: {
+              username: smtpUser,
+              password: smtpPassword,
+            },
           },
-          body: JSON.stringify({
+        });
+
+        try {
+          await client.send({
             from: fromEmail,
             to: email,
             subject: "Ověřte svůj email",
             html: emailHtml,
-          }),
-        });
+          });
 
-        if (!resendResponse.ok) {
-          const error = await resendResponse.text();
-          console.error("Resend API error:", error);
+          await client.close();
+          console.log(`Verification email sent successfully to ${email}`);
+        } catch (emailError) {
+          console.error("SMTP send error:", emailError);
+          await client.close();
           console.log("=== VERIFICATION CODE (email failed) ===");
           console.log(`Email: ${email}`);
           console.log(`Code: ${code}`);
           console.log("=======================================");
-        } else {
-          console.log(`Verification email sent successfully to ${email}`);
         }
       } else {
         console.log("=== VERIFICATION CODE ===");
@@ -155,7 +158,7 @@ Deno.serve(async (req: Request) => {
       console.log("====================================");
     }
 
-    const isDevelopment = !Deno.env.get("RESEND_API_KEY");
+    const isDevelopment = !Deno.env.get("SMTP_USER");
 
     return new Response(
       JSON.stringify({

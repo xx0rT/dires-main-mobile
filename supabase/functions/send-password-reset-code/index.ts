@@ -1,5 +1,4 @@
 import { createClient } from "npm:@supabase/supabase-js@2.90.1";
-import { Resend } from "npm:resend@4.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,27 +16,32 @@ function generateVerificationCode(): string {
 
 async function sendPasswordResetEmail(email: string, code: string): Promise<boolean> {
   try {
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const smtpHost = Deno.env.get("SMTP_HOST") || "smtp.gmail.com";
+    const smtpPort = Deno.env.get("SMTP_PORT") || "587";
+    const smtpUser = Deno.env.get("SMTP_USER");
+    const smtpPassword = Deno.env.get("SMTP_PASSWORD");
+    const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || smtpUser;
 
-    if (!resendApiKey) {
-      console.error("RESEND_API_KEY not configured");
+    if (!smtpUser || !smtpPassword || !fromEmail) {
+      console.error("SMTP credentials not configured");
       return false;
     }
 
-    let fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "onboarding@resend.dev";
+    const SMTPClient = (await import("https://deno.land/x/denomailer@1.6.0/mod.ts")).default;
 
-    // Ensure proper email format: "Name <email@domain.com>"
-    if (!fromEmail.includes("<")) {
-      fromEmail = `Resetování hesla <${fromEmail}>`;
-    }
+    const client = new SMTPClient({
+      connection: {
+        hostname: smtpHost,
+        port: Number(smtpPort),
+        tls: true,
+        auth: {
+          username: smtpUser,
+          password: smtpPassword,
+        },
+      },
+    });
 
-    const resend = new Resend(resendApiKey);
-
-    await resend.emails.send({
-      from: fromEmail,
-      to: email,
-      subject: "Resetování hesla - Ověřovací kód",
-      html: `
+    const emailHtml = `
         <!DOCTYPE html>
         <html>
           <head>
@@ -73,9 +77,16 @@ async function sendPasswordResetEmail(email: string, code: string): Promise<bool
             </div>
           </body>
         </html>
-      `,
+      `;
+
+    await client.send({
+      from: fromEmail,
+      to: email,
+      subject: "Resetování hesla - Ověřovací kód",
+      html: emailHtml,
     });
 
+    await client.close();
     return true;
   } catch (error) {
     console.error("Email send error:", error);
@@ -161,7 +172,7 @@ Deno.serve(async (req: Request) => {
 ║  Email: ${email.padEnd(45)} ║
 ║  Code:  ${verificationCode.padEnd(45)} ║
 ╠════════════════════════════════════════════════════════════╣
-║  Configure RESEND_API_KEY to enable email sending         ║
+║  Configure SMTP credentials to enable email sending       ║
 ╚════════════════════════════════════════════════════════════╝
       `);
     } else {

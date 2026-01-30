@@ -26,11 +26,15 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+    const smtpHost = Deno.env.get("SMTP_HOST") || "smtp.gmail.com";
+    const smtpPort = Deno.env.get("SMTP_PORT") || "587";
+    const smtpUser = Deno.env.get("SMTP_USER");
+    const smtpPassword = Deno.env.get("SMTP_PASSWORD");
+    const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || smtpUser;
     const OWNER_EMAIL = "txrxo.troxx@gmail.com";
 
-    if (!RESEND_API_KEY) {
-      throw new Error("RESEND_API_KEY is not configured");
+    if (!smtpUser || !smtpPassword || !fromEmail) {
+      throw new Error("SMTP credentials are not configured");
     }
 
     const {
@@ -148,43 +152,39 @@ Deno.serve(async (req: Request) => {
 </html>
     `;
 
-    const resendPromises = [
-      fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Fyzioterapie Kurzy <onboarding@resend.dev>",
-          to: [customerEmail],
-          subject: `Faktura za váš nákup - ${orderNumber}`,
-          html: customerEmailHtml,
-        }),
-      }),
-      fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Fyzioterapie Kurzy <onboarding@resend.dev>",
-          to: [OWNER_EMAIL],
-          subject: `Nový nákup: ${planName} - ${formatPrice(amount, currency)}`,
-          html: ownerEmailHtml,
-        }),
-      }),
-    ];
+    const SMTPClient = (await import("https://deno.land/x/denomailer@1.6.0/mod.ts")).default;
 
-    const responses = await Promise.all(resendPromises);
+    const client = new SMTPClient({
+      connection: {
+        hostname: smtpHost,
+        port: Number(smtpPort),
+        tls: true,
+        auth: {
+          username: smtpUser,
+          password: smtpPassword,
+        },
+      },
+    });
 
-    for (const response of responses) {
-      if (!response.ok) {
-        const error = await response.text();
-        console.error("Resend API error:", error);
-        throw new Error(`Failed to send email: ${error}`);
-      }
+    try {
+      await client.send({
+        from: fromEmail,
+        to: customerEmail,
+        subject: `Faktura za váš nákup - ${orderNumber}`,
+        html: customerEmailHtml,
+      });
+
+      await client.send({
+        from: fromEmail,
+        to: OWNER_EMAIL,
+        subject: `Nový nákup: ${planName} - ${formatPrice(amount, currency)}`,
+        html: ownerEmailHtml,
+      });
+
+      await client.close();
+    } catch (emailError) {
+      await client.close();
+      throw emailError;
     }
 
     return new Response(
