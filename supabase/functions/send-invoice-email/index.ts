@@ -152,7 +152,7 @@ Deno.serve(async (req: Request) => {
 </html>
     `;
 
-    const SMTPClient = (await import("https://deno.land/x/denomailer@1.6.0/mod.ts")).default;
+    const { SMTPClient } = await import("https://deno.land/x/denomailer@1.6.0/mod.ts");
 
     const client = new SMTPClient({
       connection: {

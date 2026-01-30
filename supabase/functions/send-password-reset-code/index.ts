@@ -27,7 +27,7 @@ async function sendPasswordResetEmail(email: string, code: string): Promise<bool
       return false;
     }
 
-    const SMTPClient = (await import("https://deno.land/x/denomailer@1.6.0/mod.ts")).default;
+    const { SMTPClient } = await import("https://deno.land/x/denomailer@1.6.0/mod.ts");
 
     const client = new SMTPClient({
       connection: {
