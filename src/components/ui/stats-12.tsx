@@ -53,29 +53,29 @@ const Stats12 = ({ className }: Stats12Props) => {
 
   return (
     <section className={cn("py-32", className)}>
-      <div className="container mx-auto flex justify-center">
-        <div className="flex w-full flex-col justify-between gap-4 lg:flex-row">
-          <div className="w-full lg:w-1/3">
-            <h1 className="w-full font-bold text-6xl">
+      <div className="container mx-auto flex justify-center px-4">
+        <div className="flex w-full max-w-6xl flex-col justify-between gap-8 lg:flex-row lg:gap-12">
+          <div className="w-full lg:w-[45%]">
+            <h1 className="w-full font-bold text-4xl lg:text-5xl">
               Nejsme Jen Slova, Předvádíme Výsledky
             </h1>
-            <p className="my-4 text-lg tracking-tight text-muted-foreground">
+            <p className="my-4 text-base tracking-tight text-muted-foreground lg:text-lg">
               Naše fyzioterapeutické kurzy transformují zdravotní péči v České republice.
               Důvěřuje nám přes tisíc certifikovaných terapeutů.
             </p>
             <Button
               variant="secondary"
-              className="text-md group mt-10 flex w-fit items-center justify-center gap-2 rounded-full px-6 py-1 tracking-tight shadow-none"
+              className="text-md group mt-8 flex w-fit items-center justify-center gap-2 rounded-full px-6 py-1 tracking-tight shadow-none"
             >
               <span>Začněte S Námi</span>
               <ArrowRight className="size-4 -rotate-45 transition-all ease-out group-hover:ml-3 group-hover:rotate-0" />
             </Button>
-            <div className="mt-10 lg:w-[115%]">
+            <div className="mt-10 w-full">
               <Graph />
             </div>
           </div>
-          <div ref={ref} className="flex w-full flex-col items-end lg:w-1/2">
-            <h1 className="font-bold text-8xl leading-none lg:text-[10rem]">
+          <div ref={ref} className="flex w-full flex-col items-center lg:w-[55%] lg:items-end">
+            <h1 className="font-bold text-7xl leading-none lg:text-8xl">
               <NumberFlow
                 value={
                   showMonthlyStats
@@ -86,20 +86,20 @@ const Stats12 = ({ className }: Stats12Props) => {
                 className="font-bold"
               />
             </h1>
-            <div className="mb-6 flex flex-col items-center justify-center gap-6 lg:flex-row lg:gap-17">
-              <p>Absolventů za poslední rok</p>
+            <div className="mb-6 flex flex-col items-center justify-center gap-4 lg:flex-row lg:gap-6">
+              <p className="text-sm lg:text-base">Absolventů za poslední rok</p>
               <Button
                 variant="secondary"
-                className="text-md group flex w-fit items-center justify-center gap-2 rounded-full px-6 py-1 tracking-tight shadow-none transition-all duration-300 ease-out active:scale-95"
+                className="text-sm group flex w-fit items-center justify-center gap-2 rounded-full px-4 py-1 tracking-tight shadow-none transition-all duration-300 ease-out active:scale-95"
                 onClick={() => setShowMonthlyStats(!showMonthlyStats)}
               >
                 <span>Měsíční Statistiky</span>
                 <RefreshCcw className="size-4 -rotate-45 transition-all ease-out group-hover:ml-3 group-hover:rotate-0" />
               </Button>
             </div>
-            <div className="mt-auto mb-10 grid w-full grid-cols-2 gap-14">
+            <div className="mt-auto mb-10 grid w-full max-w-lg grid-cols-2 gap-8 lg:gap-10">
               <div className="text-left">
-                <h2 className="text-4xl font-medium lg:text-6xl">
+                <h2 className="text-3xl font-medium lg:text-5xl">
                   <NumberFlow
                     value={
                       showMonthlyStats
@@ -109,10 +109,10 @@ const Stats12 = ({ className }: Stats12Props) => {
                     suffix="+"
                   />
                 </h2>
-                <p className="text-muted-foreground/70"> Aktivních Terapeutů </p>
+                <p className="text-sm text-muted-foreground/70"> Aktivních Terapeutů </p>
               </div>
               <div className="text-right">
-                <h2 className="text-4xl font-medium lg:text-6xl">
+                <h2 className="text-3xl font-medium lg:text-5xl">
                   <NumberFlow
                     value={
                       showMonthlyStats
@@ -122,10 +122,10 @@ const Stats12 = ({ className }: Stats12Props) => {
                     suffix="%"
                   />
                 </h2>
-                <p className="text-muted-foreground/70"> Růst Absolventů </p>
+                <p className="text-sm text-muted-foreground/70"> Růst Absolventů </p>
               </div>
               <div className="text-left">
-                <h2 className="text-4xl font-medium lg:text-6xl">
+                <h2 className="text-3xl font-medium lg:text-5xl">
                   <NumberFlow
                     value={
                       showMonthlyStats
@@ -135,10 +135,10 @@ const Stats12 = ({ className }: Stats12Props) => {
                     suffix="+"
                   />
                 </h2>
-                <p className="text-muted-foreground/70"> Nových Studentů </p>
+                <p className="text-sm text-muted-foreground/70"> Nových Studentů </p>
               </div>
               <div className="text-right">
-                <h2 className="text-4xl font-medium lg:text-6xl">
+                <h2 className="text-3xl font-medium lg:text-5xl">
                   <NumberFlow
                     value={
                       showMonthlyStats
@@ -148,7 +148,7 @@ const Stats12 = ({ className }: Stats12Props) => {
                     suffix="%"
                   />
                 </h2>
-                <p className="text-muted-foreground/70"> Úspěšnost Kurzů </p>
+                <p className="text-sm text-muted-foreground/70"> Úspěšnost Kurzů </p>
               </div>
             </div>
           </div>
