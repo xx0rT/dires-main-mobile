@@ -9,17 +9,12 @@ import { PricingSection } from '@/components/layout/sections/pricing'
 import { ServicesSection } from '@/components/layout/sections/services'
 import { TeamSection } from '@/components/layout/sections/team'
 import { TestimonialSection } from '@/components/layout/sections/testimonial'
-import LogoCloud from '@/components/logo-cloud'
 
 export default function HomePage() {
   return (
     <>
       <div className="bg-background transition-colors duration-700">
         <HeroSection />
-      </div>
-
-      <div className="bg-background transition-colors duration-700">
-        <LogoCloud />
       </div>
 
       <div className="bg-muted/70 transition-colors duration-700">
