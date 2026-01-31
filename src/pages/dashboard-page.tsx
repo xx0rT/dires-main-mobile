@@ -10,6 +10,8 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useSubscription } from '@/lib/use-subscription'
 import { toast } from 'sonner'
+import { PhysioAnalyticsChart } from '@/components/dashboard/physio-analytics-chart'
+import { PhysioTodoList } from '@/components/dashboard/physio-todo-list'
 
 interface Course {
   id: string
@@ -134,7 +136,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8 relative">
+    <div className="space-y-8 relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/3 left-1/2 h-[40%] w-[60%] animate-pulse bg-gradient-to-r from-primary/15 via-purple-500/15 to-primary/15 blur-3xl" />
       </div>
@@ -217,11 +219,27 @@ export default function DashboardPage() {
         })}
       </motion.div>
 
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <PhysioAnalyticsChart />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <PhysioTodoList />
+      </motion.div>
+
       {enrollments.length > 0 ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Card>
             <CardHeader>
@@ -280,7 +298,7 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Card>
             <CardHeader>
@@ -310,7 +328,7 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
         >
           <Card>
             <CardHeader>
@@ -345,7 +363,7 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
         >
           <Card>
             <CardHeader>
