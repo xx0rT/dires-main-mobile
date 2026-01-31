@@ -23,7 +23,7 @@ export const HeroSection = () => {
     }
 
     return (
-        <section className="relative min-h-screen w-full pb-0">
+        <section className="relative w-full pb-0">
             <PatternPlaceholder />
             <div
                 className="absolute inset-0 z-0"
@@ -33,9 +33,9 @@ export const HeroSection = () => {
                 }}
             />
             <div className="container relative z-10 mx-auto w-full px-4">
-                <div className="grid gap-12 py-24 md:grid-cols-2 md:items-center md:gap-14 lg:grid-cols-[0.8fr,1.2fr] lg:gap-20 xl:gap-24 xl:py-32">
+                <div className="grid gap-8 py-16 md:grid-cols-2 md:items-center md:gap-10 lg:grid-cols-[0.8fr,1.2fr] lg:gap-16 xl:gap-20 xl:py-20">
                 {/* Left side - Copy */}
-                <div className="space-y-8 text-center md:space-y-10" data-aos="fade-right">
+                <div className="space-y-6 text-center md:space-y-7" data-aos="fade-right">
                     <Badge
                         variant="outline"
                         className="rounded-2xl py-2 text-sm"
