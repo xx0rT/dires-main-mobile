@@ -199,7 +199,7 @@ export function PhysioChatbot() {
                   <ScrollArea className="h-[250px] pr-2">
                     <div className="space-y-3">
                       <AnimatePresence>
-                        {messages.map((message) => (
+                        {messages.map((message, index) => (
                           <motion.div
                             key={message.id}
                             initial={{ opacity: 0, y: 10 }}
@@ -208,15 +208,35 @@ export function PhysioChatbot() {
                             className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                           >
                             <div
-                              className={`max-w-[85%] rounded-2xl px-3 py-2 ${
+                              className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 relative overflow-hidden ${
                                 message.type === 'user'
                                   ? 'bg-primary text-primary-foreground rounded-br-sm'
-                                  : 'bg-muted rounded-bl-sm'
+                                  : index === 0
+                                    ? 'bg-gradient-to-br from-primary/10 via-primary/5 to-background/50 border border-primary/20 rounded-bl-sm shadow-sm'
+                                    : 'bg-muted rounded-bl-sm'
                               }`}
                             >
-                              <p className="text-xs leading-relaxed">{message.content}</p>
+                              {message.type === 'bot' && index === 0 && (
+                                <>
+                                  <div
+                                    className="absolute inset-0 opacity-30"
+                                    style={{
+                                      backgroundImage: `repeating-linear-gradient(
+                                        45deg,
+                                        transparent,
+                                        transparent 10px,
+                                        hsl(var(--primary) / 0.08) 10px,
+                                        hsl(var(--primary) / 0.08) 20px
+                                      )`
+                                    }}
+                                  />
+                                  <div className="absolute -top-6 -right-6 w-32 h-32 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent rounded-full blur-3xl" />
+                                  <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-gradient-to-tr from-primary/10 to-transparent rounded-full blur-2xl" />
+                                </>
+                              )}
+                              <p className="text-xs leading-relaxed relative z-10">{message.content}</p>
                               {message.category && (
-                                <Badge variant="outline" className="mt-1.5 text-xs">
+                                <Badge variant="outline" className="mt-1.5 text-xs relative z-10">
                                   {message.category}
                                 </Badge>
                               )}
