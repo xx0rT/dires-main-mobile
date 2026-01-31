@@ -25,7 +25,7 @@ export const HeroSection = () => {
     }
 
     return (
-        <section className="relative w-full pb-0">
+        <section className="relative min-h-screen w-full pb-0 flex flex-col -mt-20 pt-20">
             <PatternPlaceholder />
             <div
                 className="absolute inset-0 z-0"
@@ -34,8 +34,8 @@ export const HeroSection = () => {
                         "radial-gradient(125% 125% at 50% 90%, var(--background) 40%, var(--primary) 100%)",
                 }}
             />
-            <div className="container relative z-10 mx-auto w-full px-4">
-                <div className="grid gap-8 py-16 md:grid-cols-2 md:items-center md:gap-10 lg:grid-cols-[0.8fr,1.2fr] lg:gap-16 xl:gap-20 xl:py-20">
+            <div className="container relative z-10 mx-auto w-full px-4 flex-1 flex flex-col pt-4">
+                <div className="grid gap-8 py-16 md:grid-cols-2 md:items-center md:gap-10 lg:grid-cols-[0.8fr,1.2fr] lg:gap-16 xl:gap-20 xl:py-20 flex-1">
                 {/* Left side - Copy */}
                 <div className="space-y-6 text-center md:space-y-7" data-aos="fade-right">
                     <Badge
@@ -153,7 +153,7 @@ export const HeroSection = () => {
             </div>
 
             {/* Trusted by section - positioned at bottom */}
-            <div className="relative w-full pb-12 pt-8">
+            <div className="relative w-full pb-8 pt-4 mt-auto">
                 <div className="group relative m-auto max-w-7xl px-6" data-aos="fade-up">
                     <div className="flex flex-col items-center md:flex-row gap-4">
                         <div className="md:max-w-44 md:border-r md:pr-6">
