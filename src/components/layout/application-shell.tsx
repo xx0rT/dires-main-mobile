@@ -15,9 +15,7 @@ import {
   Settings,
   Users,
   BarChart3,
-  Code2,
   CreditCard,
-  Puzzle,
 } from "lucide-react";
 import * as React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -179,7 +177,7 @@ const SidebarTrigger = React.forwardRef<
         onClick?.(event);
         togglePanel();
       }}
-      aria-label={isPanelOpen ? "Collapse sidebar" : "Expand sidebar"}
+      aria-label={isPanelOpen ? "Sbalit postranní panel" : "Rozbalit postranní panel"}
       aria-expanded={isPanelOpen}
       {...props}
     >
@@ -199,7 +197,7 @@ const SidebarTrigger = React.forwardRef<
     <Tooltip>
       <TooltipTrigger asChild>{button}</TooltipTrigger>
       <TooltipContent side="right" sideOffset={8}>
-        <span>{isPanelOpen ? "Collapse" : "Expand"}</span>
+        <span>{isPanelOpen ? "Sbalit" : "Rozbalit"}</span>
         <kbd className="ml-2 rounded bg-neutral-200 px-1.5 py-0.5 text-[10px] font-medium text-neutral-600">
           {"\u2318"}B
         </kbd>
@@ -278,7 +276,7 @@ function SidebarRail({
             </div>
           </TooltipTrigger>
           <TooltipContent side="right" sideOffset={8}>
-            Account
+            Účet
           </TooltipContent>
         </Tooltip>
       </div>
@@ -295,7 +293,7 @@ function UserMenu() {
       <DropdownMenuTrigger asChild>
         <button
           className="flex size-11 items-center justify-center rounded-lg hover:bg-black/5 active:bg-black/10 focus-visible:ring-2 focus-visible:ring-black/50 dark:hover:bg-white/5 dark:active:bg-white/10 dark:focus-visible:ring-white/50"
-          aria-label="Account"
+          aria-label="Účet"
         >
           <Avatar className="size-7">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email || ""} />
@@ -308,15 +306,15 @@ function UserMenu() {
       <DropdownMenuContent align="end" side="right" className="w-56">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">{user?.email?.split('@')[0] || "User"}</p>
+            <p className="text-sm font-medium">{user?.email?.split('@')[0] || "Uživatel"}</p>
             <p className="text-xs text-muted-foreground">{user?.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/dashboard/settings')}>Settings</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/dashboard/billing')}>Billing</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/dashboard/settings')}>Nastavení</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/dashboard/billing')}>Fakturace</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/auth/sign-in')}>Log out</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/auth/sign-in')}>Odhlásit se</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -330,39 +328,39 @@ function OrganizationSwitcher() {
           <div className="flex size-6 items-center justify-center rounded bg-neutral-200 dark:bg-neutral-800">
             <img
               src="/logo.svg"
-              alt="Organization"
+              alt="Moje Kurzy"
               width={16}
               height={16}
               className="size-4"
             />
           </div>
           <span className="flex-1 truncate text-sm font-medium text-neutral-900 dark:text-neutral-100">
-            My Workspace
+            Moje Kurzy
           </span>
           <ChevronDown className="size-4 text-neutral-500 dark:text-neutral-500" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+        <DropdownMenuLabel>Kurzy Fyzioterapie</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <div className="flex items-center gap-2">
             <div className="flex size-6 items-center justify-center rounded bg-neutral-200 dark:bg-neutral-800">
               <img
                 src="/logo.svg"
-                alt="Organization"
+                alt="Moje Kurzy"
                 width={16}
                 height={16}
                 className="size-4"
               />
             </div>
-            <span>My Workspace</span>
+            <span>Moje Kurzy</span>
           </div>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <Plus className="mr-2 size-4" />
-          Create workspace
+          Zapsat se na kurz
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -375,7 +373,7 @@ function NotificationBell() {
       variant="ghost"
       size="icon"
       className="ml-auto size-8 text-neutral-600 hover:bg-black/5 dark:text-neutral-400 dark:hover:bg-white/5"
-      aria-label="Notifications"
+      aria-label="Oznámení"
     >
       <Bell className="size-4" />
     </Button>
@@ -388,13 +386,13 @@ function NewActionButton() {
       <DropdownMenuTrigger asChild>
         <Button className="w-full justify-start gap-2 bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-neutral-100 dark:text-black dark:hover:bg-neutral-200">
           <Plus className="size-4" />
-          New
+          Nový
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-48">
-        <DropdownMenuItem>New Document</DropdownMenuItem>
-        <DropdownMenuItem>New Project</DropdownMenuItem>
-        <DropdownMenuItem>New Event</DropdownMenuItem>
+        <DropdownMenuItem>Nová Lekce</DropdownMenuItem>
+        <DropdownMenuItem>Nová Poznámka</DropdownMenuItem>
+        <DropdownMenuItem>Nový Dotaz</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -497,7 +495,7 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
                         isSetupActive ? "text-blue-600 dark:text-blue-400" : "text-neutral-500 dark:text-neutral-500"
                       )}
                     />
-                    <span className="font-medium">Configuration</span>
+                    <span className="font-medium">Konfigurace</span>
                     <ChevronRight
                       className={cn(
                         "ml-auto size-4",
@@ -536,7 +534,7 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
                       >
                         <CollapsibleTrigger
                           className="absolute right-0 top-0 p-1 text-neutral-400 transition-colors hover:text-neutral-600 dark:text-neutral-600 dark:hover:text-neutral-400"
-                          aria-label="Collapse configuration"
+                          aria-label="Sbalit konfiguraci"
                         >
                           <ChevronDown className="size-4" />
                         </CollapsibleTrigger>
@@ -685,7 +683,7 @@ function ContentArea({ children }: ContentAreaProps) {
             showCornerFills ? "opacity-100" : "opacity-0"
           )}
         />
-        <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-white md:pb-0 dark:md:bg-black">
+        <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-white md:pb-0 dark:md:bg-neutral-900">
           <div className="flex-1 overflow-auto p-6 pb-24 md:pb-6">
             {children}
           </div>
@@ -784,7 +782,7 @@ function MobileNavigation({
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent className="md:hidden">
           <DrawerHeader>
-            <DrawerTitle>{activeModule?.label ?? "Navigation"}</DrawerTitle>
+            <DrawerTitle>{activeModule?.label ?? "Navigace"}</DrawerTitle>
           </DrawerHeader>
           <ScrollArea className="max-h-[70vh] px-4 pb-6">
             {activeModule ? (
@@ -814,7 +812,7 @@ function MobileNavigation({
                 {utilities.length > 0 && (
                   <div className="mt-6 border-t border-neutral-200 pt-3 dark:border-neutral-800">
                     <div className="mb-2 pl-2 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-500">
-                      Utilities
+                      Nástroje
                     </div>
                     <nav className="flex flex-col gap-0.5">
                       {utilities.map((item) => (
@@ -925,77 +923,77 @@ function MobileNavItem({
 
 const navigationData = {
   railIcons: [
-    { moduleId: "home", label: "Home", icon: Home, defaultPath: "/dashboard" },
-    { moduleId: "analytics", label: "Analytics", icon: BarChart3, defaultPath: "/dashboard/analytics" },
-    { moduleId: "integrations", label: "Courses", icon: Puzzle, defaultPath: "/dashboard/integrations" },
-    { moduleId: "billing", label: "Billing", icon: CreditCard, defaultPath: "/dashboard/billing" },
+    { moduleId: "home", label: "Domů", icon: Home, defaultPath: "/dashboard" },
+    { moduleId: "analytics", label: "Statistiky", icon: BarChart3, defaultPath: "/dashboard/analytics" },
+    { moduleId: "integrations", label: "Kurzy", icon: BookOpen, defaultPath: "/dashboard/integrations" },
+    { moduleId: "billing", label: "Platby", icon: CreditCard, defaultPath: "/dashboard/billing" },
   ] as RailIconConfig[],
   modules: [
     {
       id: "home",
-      label: "Home",
+      label: "Domů",
       icon: Home,
       defaultPath: "/dashboard",
       sections: [
         {
           id: "main",
           items: [
-            { id: "overview", label: "Overview", icon: Home, path: "/dashboard" },
-            { id: "analytics", label: "Analytics", icon: BarChart3, path: "/dashboard/analytics" },
-            { id: "api", label: "API", icon: Code2, path: "/dashboard/api" },
+            { id: "overview", label: "Přehled", icon: Home, path: "/dashboard" },
+            { id: "analytics", label: "Pokrok", icon: BarChart3, path: "/dashboard/analytics" },
+            { id: "api", label: "Moje Lekce", icon: BookOpen, path: "/dashboard/api" },
           ],
         },
       ],
     },
     {
       id: "analytics",
-      label: "Analytics",
+      label: "Statistiky",
       icon: BarChart3,
       defaultPath: "/dashboard/analytics",
       sections: [
         {
           id: "main",
           items: [
-            { id: "overview", label: "Overview", icon: BarChart3, path: "/dashboard/analytics" },
-            { id: "reports", label: "Reports", icon: FileText, path: "/dashboard/analytics" },
+            { id: "overview", label: "Celkový Pokrok", icon: BarChart3, path: "/dashboard/analytics" },
+            { id: "reports", label: "Výsledky Testů", icon: FileText, path: "/dashboard/analytics" },
           ],
         },
       ],
     },
     {
       id: "integrations",
-      label: "Courses",
-      icon: Puzzle,
+      label: "Kurzy",
+      icon: BookOpen,
       defaultPath: "/dashboard/integrations",
       sections: [
         {
           id: "main",
           items: [
-            { id: "all-courses", label: "All Courses", icon: BookOpen, path: "/dashboard/integrations" },
-            { id: "my-courses", label: "My Courses", icon: Users, path: "/dashboard/integrations" },
+            { id: "all-courses", label: "Všechny Kurzy", icon: BookOpen, path: "/dashboard/integrations" },
+            { id: "my-courses", label: "Moje Kurzy", icon: Users, path: "/dashboard/integrations" },
           ],
         },
       ],
     },
     {
       id: "billing",
-      label: "Billing",
+      label: "Platby",
       icon: CreditCard,
       defaultPath: "/dashboard/billing",
       sections: [
         {
           id: "main",
           items: [
-            { id: "overview", label: "Overview", icon: CreditCard, path: "/dashboard/billing" },
-            { id: "invoices", label: "Invoices", icon: FileText, path: "/dashboard/billing" },
+            { id: "overview", label: "Předplatné", icon: CreditCard, path: "/dashboard/billing" },
+            { id: "invoices", label: "Faktury", icon: FileText, path: "/dashboard/billing" },
           ],
         },
       ],
     },
   ] as NavModuleConfig[],
   utilities: [
-    { id: "settings", label: "Settings", icon: Settings, path: "/dashboard/settings" },
-    { id: "help", label: "Help & Support", icon: HelpCircle, path: "#" },
+    { id: "settings", label: "Nastavení", icon: Settings, path: "/dashboard/settings" },
+    { id: "help", label: "Pomoc & Podpora", icon: HelpCircle, path: "#" },
   ] as NavItemConfig[],
 };
 
