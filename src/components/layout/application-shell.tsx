@@ -225,7 +225,7 @@ function SidebarRail({
         <div className="pb-1 pt-2">
           <a
             href="/dashboard"
-            className="block rounded-lg px-1 py-4 outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-blue-500/50"
+            className="block rounded-lg px-1 py-4 outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-purple-500/50"
           >
             <img
               src="/logo.svg"
@@ -249,9 +249,9 @@ function SidebarRail({
                     onClick={() => onModuleChange(item.moduleId)}
                     aria-label={item.label}
                     className={cn(
-                      "relative flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50",
+                      "relative flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-purple-500/50",
                       isActive
-                        ? "bg-blue-600 dark:bg-blue-600 text-white shadow-sm"
+                        ? "bg-purple-600 dark:bg-purple-600 text-white shadow-sm"
                         : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 active:bg-neutral-300 dark:active:bg-neutral-700"
                     )}
                   >
@@ -293,12 +293,12 @@ function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex size-11 items-center justify-center rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 active:bg-neutral-300 dark:active:bg-neutral-700 focus-visible:ring-2 focus-visible:ring-blue-500/50"
+          className="flex size-11 items-center justify-center rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 active:bg-neutral-300 dark:active:bg-neutral-700 focus-visible:ring-2 focus-visible:ring-purple-500/50"
           aria-label="Účet"
         >
           <Avatar className="size-7">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email || ""} />
-            <AvatarFallback className="text-xs bg-blue-600 text-white">
+            <AvatarFallback className="text-xs bg-purple-600 text-white">
               {getInitials(user?.email?.split('@')[0] || "User")}
             </AvatarFallback>
           </Avatar>
@@ -337,7 +337,7 @@ function OrganizationSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-          <div className="flex size-6 items-center justify-center rounded bg-blue-600 dark:bg-blue-600">
+          <div className="flex size-6 items-center justify-center rounded bg-purple-600 dark:bg-purple-600">
             <BookOpen className="size-3.5 text-white" />
           </div>
           <span className="flex-1 truncate text-sm font-medium text-neutral-900 dark:text-neutral-100">
@@ -402,7 +402,7 @@ function NewActionButton() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate('/dashboard/integrations')}>
-          <BookOpen className="mr-2 size-4 text-blue-600 dark:text-blue-400" />
+          <BookOpen className="mr-2 size-4 text-purple-600 dark:text-purple-400" />
           <div className="flex flex-col">
             <span className="font-medium">Procházet Kurzy</span>
             <span className="text-xs text-muted-foreground">Objevte nové znalosti</span>
@@ -458,7 +458,7 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
 
   return (
     <div
-      className="relative flex h-screen flex-col overflow-hidden rounded-l-xl bg-white dark:bg-[#1f1f1f] border-r border-neutral-200 dark:border-neutral-800"
+      className="relative flex h-screen flex-col overflow-hidden rounded-l-xl bg-neutral-50 dark:bg-[#1f1f1f] border-r border-neutral-200 dark:border-neutral-800"
       style={{ width: `${SIDEBAR_PANEL_WIDTH}px` }}
     >
       <div
@@ -514,21 +514,21 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
                       "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
                       setupOpen && "hidden",
                       isSetupActive
-                        ? "bg-blue-50 dark:bg-blue-950/50 font-medium text-blue-600 dark:text-blue-400"
+                        ? "bg-purple-50 dark:bg-purple-950/50 font-medium text-purple-600 dark:text-purple-400"
                         : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     )}
                   >
                     <Settings
                       className={cn(
                         "size-4",
-                        isSetupActive ? "text-blue-600 dark:text-blue-400" : "text-neutral-500 dark:text-neutral-400"
+                        isSetupActive ? "text-purple-600 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
                       )}
                     />
                     <span className="font-medium">Konfigurace</span>
                     <ChevronRight
                       className={cn(
                         "ml-auto size-4",
-                        isSetupActive ? "text-blue-400" : "text-neutral-400 dark:text-neutral-500"
+                        isSetupActive ? "text-purple-400" : "text-neutral-400 dark:text-neutral-500"
                       )}
                     />
                   </CollapsibleTrigger>
@@ -641,7 +641,7 @@ function NavItem({ item, isActive }: { item: NavItemConfig; isActive: boolean })
       className={cn(
         "group flex h-8 items-center justify-between rounded-lg px-2 py-1.5 text-sm leading-none transition-colors duration-75",
         isActive
-          ? "bg-blue-50 dark:bg-blue-950/50 font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950/70"
+          ? "bg-purple-50 dark:bg-purple-950/50 font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-950/70"
           : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
       )}
     >
@@ -649,7 +649,7 @@ function NavItem({ item, isActive }: { item: NavItemConfig; isActive: boolean })
         <Icon
           className={cn(
             "size-4 shrink-0",
-            isActive ? "text-blue-600 dark:text-blue-400" : "text-neutral-500 dark:text-neutral-400"
+            isActive ? "text-purple-600 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
           )}
         />
         <span className="truncate">{item.label}</span>
@@ -702,13 +702,13 @@ function ContentArea({ children }: ContentAreaProps) {
       <div className="relative flex min-h-0 flex-1 flex-col">
         <div
           className={cn(
-            "absolute -left-2 top-0 z-0 hidden h-3 w-5 bg-white dark:bg-[#1f1f1f] transition-opacity duration-300 md:block",
+            "absolute -left-2 top-0 z-0 hidden h-3 w-5 bg-neutral-50 dark:bg-[#1f1f1f] transition-opacity duration-300 md:block",
             showCornerFills ? "opacity-100" : "opacity-0"
           )}
         />
         <div
           className={cn(
-            "absolute -left-2 bottom-0 z-0 hidden h-3 w-5 bg-white dark:bg-[#1f1f1f] transition-opacity duration-300 md:block",
+            "absolute -left-2 bottom-0 z-0 hidden h-3 w-5 bg-neutral-50 dark:bg-[#1f1f1f] transition-opacity duration-300 md:block",
             showCornerFills ? "opacity-100" : "opacity-0"
           )}
         />
@@ -861,7 +861,7 @@ function MobileNavigation({
         </DrawerContent>
       </Drawer>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#1a1a1a] backdrop-blur-lg md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-[#1a1a1a] backdrop-blur-lg md:hidden">
         <div
           className="grid"
           style={{
@@ -882,7 +882,7 @@ function MobileNavigation({
                 className={cn(
                   "flex flex-col items-center gap-1 py-3 text-xs transition-colors",
                   isActive
-                    ? "text-blue-600 dark:text-blue-400 font-medium"
+                    ? "text-purple-600 dark:text-purple-400 font-medium"
                     : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
                 )}
                 aria-label={module.label}
@@ -930,7 +930,7 @@ function MobileNavItem({
       className={cn(
         "group flex h-8 items-center justify-between rounded-lg px-2 py-1.5 text-sm leading-none transition-colors duration-75",
         isActive
-          ? "bg-blue-50 dark:bg-blue-950/50 font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950/70"
+          ? "bg-purple-50 dark:bg-purple-950/50 font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-950/70"
           : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
       )}
     >
@@ -938,7 +938,7 @@ function MobileNavItem({
         <Icon
           className={cn(
             "size-4 shrink-0",
-            isActive ? "text-blue-600 dark:text-blue-400" : "text-neutral-500 dark:text-neutral-400"
+            isActive ? "text-purple-600 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
           )}
         />
         <span className="truncate">{item.label}</span>
