@@ -167,7 +167,7 @@ export default function DashboardPage() {
                       Premium
                     </Badge>
                   ) : (
-                    <Badge variant="outline">Free</Badge>
+                    <Badge variant="outline" className="border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300">Free</Badge>
                   )}
                 </div>
                 {subscription.stripe_subscription_id && (

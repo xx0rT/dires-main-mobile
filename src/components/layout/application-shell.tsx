@@ -458,7 +458,7 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
 
   return (
     <div
-      className="relative flex h-screen flex-col overflow-hidden rounded-l-xl bg-neutral-50 dark:bg-[#1f1f1f] border-r border-neutral-200 dark:border-neutral-800"
+      className="relative flex h-screen flex-col overflow-hidden rounded-l-xl bg-[rgb(245,245,245)] dark:bg-[#1f1f1f] border-r border-neutral-200 dark:border-neutral-800"
       style={{ width: `${SIDEBAR_PANEL_WIDTH}px` }}
     >
       <div
@@ -514,14 +514,14 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
                       "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
                       setupOpen && "hidden",
                       isSetupActive
-                        ? "bg-purple-50 dark:bg-purple-950/50 font-medium text-purple-600 dark:text-purple-400"
+                        ? "bg-purple-500/15 dark:bg-purple-500/15 font-medium text-purple-700 dark:text-purple-400"
                         : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     )}
                   >
                     <Settings
                       className={cn(
                         "size-4",
-                        isSetupActive ? "text-purple-600 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
+                        isSetupActive ? "text-purple-700 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
                       )}
                     />
                     <span className="font-medium">Konfigurace</span>
@@ -641,7 +641,7 @@ function NavItem({ item, isActive }: { item: NavItemConfig; isActive: boolean })
       className={cn(
         "group flex h-8 items-center justify-between rounded-lg px-2 py-1.5 text-sm leading-none transition-colors duration-75",
         isActive
-          ? "bg-purple-50 dark:bg-purple-950/50 font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-950/70"
+          ? "bg-purple-500/15 dark:bg-purple-500/15 font-medium text-purple-700 dark:text-purple-400 hover:bg-purple-500/20 dark:hover:bg-purple-500/20"
           : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
       )}
     >
@@ -649,7 +649,7 @@ function NavItem({ item, isActive }: { item: NavItemConfig; isActive: boolean })
         <Icon
           className={cn(
             "size-4 shrink-0",
-            isActive ? "text-purple-600 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
+            isActive ? "text-purple-700 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
           )}
         />
         <span className="truncate">{item.label}</span>
@@ -698,21 +698,21 @@ function ContentArea({ children }: ContentAreaProps) {
   const showCornerFills = isPanelOpen;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-neutral-100 dark:bg-[#141414] md:py-2 md:pr-2">
+    <div className="flex min-h-0 flex-1 flex-col bg-[rgb(245,245,245)] dark:bg-[rgb(26,26,26)] md:py-2 md:pr-2">
       <div className="relative flex min-h-0 flex-1 flex-col">
         <div
           className={cn(
-            "absolute -left-2 top-0 z-0 hidden h-3 w-5 bg-neutral-50 dark:bg-[#1f1f1f] transition-opacity duration-300 md:block",
+            "absolute -left-2 top-0 z-0 hidden h-3 w-5 bg-[rgb(245,245,245)] dark:bg-[#1f1f1f] transition-opacity duration-300 md:block",
             showCornerFills ? "opacity-100" : "opacity-0"
           )}
         />
         <div
           className={cn(
-            "absolute -left-2 bottom-0 z-0 hidden h-3 w-5 bg-neutral-50 dark:bg-[#1f1f1f] transition-opacity duration-300 md:block",
+            "absolute -left-2 bottom-0 z-0 hidden h-3 w-5 bg-[rgb(245,245,245)] dark:bg-[#1f1f1f] transition-opacity duration-300 md:block",
             showCornerFills ? "opacity-100" : "opacity-0"
           )}
         />
-        <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-neutral-50 dark:md:bg-[#1a1a1a] md:pb-0">
+        <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-[rgb(245,245,245)] dark:md:bg-[rgb(26,26,26)] md:pb-0">
           <div className="flex-1 overflow-auto p-6 pb-24 md:pb-6">
             {children}
           </div>
@@ -861,7 +861,7 @@ function MobileNavigation({
         </DrawerContent>
       </Drawer>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-[#1a1a1a] backdrop-blur-lg md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 dark:border-neutral-800 bg-[rgb(245,245,245)] dark:bg-[#1a1a1a] backdrop-blur-lg md:hidden">
         <div
           className="grid"
           style={{
@@ -930,7 +930,7 @@ function MobileNavItem({
       className={cn(
         "group flex h-8 items-center justify-between rounded-lg px-2 py-1.5 text-sm leading-none transition-colors duration-75",
         isActive
-          ? "bg-purple-50 dark:bg-purple-950/50 font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-950/70"
+          ? "bg-purple-500/15 dark:bg-purple-500/15 font-medium text-purple-700 dark:text-purple-400 hover:bg-purple-500/20 dark:hover:bg-purple-500/20"
           : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
       )}
     >
@@ -938,7 +938,7 @@ function MobileNavItem({
         <Icon
           className={cn(
             "size-4 shrink-0",
-            isActive ? "text-purple-600 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
+            isActive ? "text-purple-700 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
           )}
         />
         <span className="truncate">{item.label}</span>
