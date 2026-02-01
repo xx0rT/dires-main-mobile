@@ -226,7 +226,7 @@ function SidebarRail({
         <div className="pb-1 pt-2">
           <a
             href="/dashboard"
-            className="block rounded-lg px-1 py-4 outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-black/50"
+            className="block rounded-lg px-1 py-4 outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-black/50 dark:focus-visible:ring-white/50"
           >
             <img
               src="/logo.svg"
@@ -250,10 +250,10 @@ function SidebarRail({
                     onClick={() => onModuleChange(item.moduleId)}
                     aria-label={item.label}
                     className={cn(
-                      "relative flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-black/50",
+                      "relative flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-black/50 dark:focus-visible:ring-white/50",
                       isActive
-                        ? "bg-white text-neutral-900"
-                        : "text-neutral-600 hover:bg-black/5 active:bg-black/10"
+                        ? "bg-white text-neutral-900 dark:bg-black dark:text-neutral-100"
+                        : "text-neutral-600 hover:bg-black/5 active:bg-black/10 dark:text-neutral-400 dark:hover:bg-white/5 dark:active:bg-white/10"
                     )}
                   >
                     <Icon className="size-5" />
@@ -269,7 +269,7 @@ function SidebarRail({
       </div>
 
       <div className="flex flex-col items-center gap-3 py-3">
-        <SidebarTrigger className="size-11 text-neutral-600 hover:bg-black/5 active:bg-black/10" />
+        <SidebarTrigger className="size-11 text-neutral-600 hover:bg-black/5 active:bg-black/10 dark:text-neutral-400 dark:hover:bg-white/5 dark:active:bg-white/10" />
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -294,7 +294,7 @@ function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex size-11 items-center justify-center rounded-lg hover:bg-black/5 active:bg-black/10 focus-visible:ring-2 focus-visible:ring-black/50"
+          className="flex size-11 items-center justify-center rounded-lg hover:bg-black/5 active:bg-black/10 focus-visible:ring-2 focus-visible:ring-black/50 dark:hover:bg-white/5 dark:active:bg-white/10 dark:focus-visible:ring-white/50"
           aria-label="Account"
         >
           <Avatar className="size-7">
@@ -326,8 +326,8 @@ function OrganizationSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-black/5">
-          <div className="flex size-6 items-center justify-center rounded bg-neutral-200">
+        <button className="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-black/5 dark:hover:bg-white/5">
+          <div className="flex size-6 items-center justify-center rounded bg-neutral-200 dark:bg-neutral-800">
             <img
               src="/logo.svg"
               alt="Organization"
@@ -336,10 +336,10 @@ function OrganizationSwitcher() {
               className="size-4"
             />
           </div>
-          <span className="flex-1 truncate text-sm font-medium text-neutral-900">
+          <span className="flex-1 truncate text-sm font-medium text-neutral-900 dark:text-neutral-100">
             My Workspace
           </span>
-          <ChevronDown className="size-4 text-neutral-500" />
+          <ChevronDown className="size-4 text-neutral-500 dark:text-neutral-500" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
@@ -347,7 +347,7 @@ function OrganizationSwitcher() {
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <div className="flex items-center gap-2">
-            <div className="flex size-6 items-center justify-center rounded bg-neutral-200">
+            <div className="flex size-6 items-center justify-center rounded bg-neutral-200 dark:bg-neutral-800">
               <img
                 src="/logo.svg"
                 alt="Organization"
@@ -374,7 +374,7 @@ function NotificationBell() {
     <Button
       variant="ghost"
       size="icon"
-      className="ml-auto size-8 text-neutral-600 hover:bg-black/5"
+      className="ml-auto size-8 text-neutral-600 hover:bg-black/5 dark:text-neutral-400 dark:hover:bg-white/5"
       aria-label="Notifications"
     >
       <Bell className="size-4" />
@@ -386,7 +386,7 @@ function NewActionButton() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="w-full justify-start gap-2 bg-neutral-900 text-white hover:bg-neutral-800">
+        <Button className="w-full justify-start gap-2 bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-neutral-100 dark:text-black dark:hover:bg-neutral-200">
           <Plus className="size-4" />
           New
         </Button>
@@ -431,12 +431,12 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
 
   return (
     <div
-      className="relative flex h-screen flex-col overflow-hidden rounded-l-xl bg-neutral-100"
+      className="relative flex h-screen flex-col overflow-hidden rounded-l-xl bg-neutral-100 dark:bg-neutral-900"
       style={{ width: `${SIDEBAR_PANEL_WIDTH}px` }}
     >
       <div
         key={module.id}
-        className="relative flex min-h-0 flex-1 animate-in fade-in slide-in-from-right-2 flex-col text-neutral-500 duration-200"
+        className="relative flex min-h-0 flex-1 animate-in fade-in slide-in-from-right-2 flex-col text-neutral-500 dark:text-neutral-500 duration-200"
       >
         <div className="shrink-0 p-3">
           <div className="mb-2 flex items-center gap-2">
@@ -453,7 +453,7 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
           {primarySections.map((section) => (
             <div key={section.id}>
               {section.label && (
-                <div className="mb-2 pl-3 text-sm text-neutral-500">
+                <div className="mb-2 pl-3 text-sm text-neutral-500 dark:text-neutral-500">
                   {section.label}
                 </div>
               )}
@@ -480,28 +480,28 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
                 className="group/setup"
               >
                 <div
-                  className={cn("rounded-lg p-2", setupOpen && "bg-neutral-200/50")}
+                  className={cn("rounded-lg p-2", setupOpen && "bg-neutral-200/50 dark:bg-neutral-800/50")}
                 >
                   <CollapsibleTrigger
                     className={cn(
                       "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
                       setupOpen && "hidden",
                       isSetupActive
-                        ? "bg-blue-100/50 font-medium text-blue-600"
-                        : "text-neutral-600 hover:bg-neutral-200/50"
+                        ? "bg-blue-100/50 font-medium text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                        : "text-neutral-600 hover:bg-neutral-200/50 dark:text-neutral-400 dark:hover:bg-neutral-800/50"
                     )}
                   >
                     <Settings
                       className={cn(
                         "size-4",
-                        isSetupActive ? "text-blue-600" : "text-neutral-500"
+                        isSetupActive ? "text-blue-600 dark:text-blue-400" : "text-neutral-500 dark:text-neutral-500"
                       )}
                     />
                     <span className="font-medium">Configuration</span>
                     <ChevronRight
                       className={cn(
                         "ml-auto size-4",
-                        isSetupActive ? "text-blue-400" : "text-neutral-400"
+                        isSetupActive ? "text-blue-400" : "text-neutral-400 dark:text-neutral-600"
                       )}
                     />
                   </CollapsibleTrigger>
@@ -535,7 +535,7 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
                         className="scrollbar-hide relative flex max-h-[40vh] flex-col gap-0.5 overflow-y-auto pr-6"
                       >
                         <CollapsibleTrigger
-                          className="absolute right-0 top-0 p-1 text-neutral-400 transition-colors hover:text-neutral-600"
+                          className="absolute right-0 top-0 p-1 text-neutral-400 transition-colors hover:text-neutral-600 dark:text-neutral-600 dark:hover:text-neutral-400"
                           aria-label="Collapse configuration"
                         >
                           <ChevronDown className="size-4" />
@@ -572,7 +572,7 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
             )}
 
             {utilities.length > 0 && (
-              <div className="mt-3 border-t border-neutral-200 pt-3">
+              <div className="mt-3 border-t border-neutral-200 pt-3 dark:border-neutral-800">
                 <nav className="flex flex-col gap-0.5">
                   {utilities.map((item) => (
                     <NavItem
@@ -614,21 +614,21 @@ function NavItem({ item, isActive }: { item: NavItemConfig; isActive: boolean })
       className={cn(
         "group flex h-8 items-center justify-between rounded-lg p-2 text-sm leading-none transition-[background-color,color,font-weight] duration-75",
         isActive
-          ? "bg-blue-100/50 font-medium text-blue-600 hover:bg-blue-100/80 active:bg-blue-100"
-          : "text-neutral-700 hover:bg-black/5 active:bg-black/10"
+          ? "bg-blue-100/50 font-medium text-blue-600 hover:bg-blue-100/80 active:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-400 dark:hover:bg-blue-900/80 dark:active:bg-blue-900"
+          : "text-neutral-700 hover:bg-black/5 active:bg-black/10 dark:text-neutral-300 dark:hover:bg-white/5 dark:active:bg-white/10"
       )}
     >
       <span className="flex min-w-0 items-center gap-2.5">
         <Icon
           className={cn(
             "size-4 shrink-0",
-            isActive ? "text-blue-600" : "text-neutral-600"
+            isActive ? "text-blue-600 dark:text-blue-400" : "text-neutral-600 dark:text-neutral-400"
           )}
         />
         <span className="truncate">{item.label}</span>
       </span>
       {isExternal && (
-        <ExternalLink className="size-3.5 text-neutral-500 transition-transform duration-75 group-hover:-translate-y-px group-hover:translate-x-px" />
+        <ExternalLink className="size-3.5 text-neutral-500 transition-transform duration-75 group-hover:-translate-y-px group-hover:translate-x-px dark:text-neutral-500" />
       )}
     </a>
   );
@@ -671,21 +671,21 @@ function ContentArea({ children }: ContentAreaProps) {
   const showCornerFills = isPanelOpen;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-neutral-200 md:py-2 md:pr-2">
+    <div className="flex min-h-0 flex-1 flex-col bg-neutral-200 md:py-2 md:pr-2 dark:bg-neutral-800">
       <div className="relative flex min-h-0 flex-1 flex-col">
         <div
           className={cn(
-            "absolute -left-2 top-0 z-0 hidden h-3 w-5 bg-neutral-100 transition-opacity duration-300 md:block",
+            "absolute -left-2 top-0 z-0 hidden h-3 w-5 bg-neutral-100 transition-opacity duration-300 md:block dark:bg-neutral-900",
             showCornerFills ? "opacity-100" : "opacity-0"
           )}
         />
         <div
           className={cn(
-            "absolute -left-2 bottom-0 z-0 hidden h-3 w-5 bg-neutral-100 transition-opacity duration-300 md:block",
+            "absolute -left-2 bottom-0 z-0 hidden h-3 w-5 bg-neutral-100 transition-opacity duration-300 md:block dark:bg-neutral-900",
             showCornerFills ? "opacity-100" : "opacity-0"
           )}
         />
-        <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-white md:pb-0">
+        <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-white md:pb-0 dark:md:bg-black">
           <div className="flex-1 overflow-auto p-6 pb-24 md:pb-6">
             {children}
           </div>
@@ -793,7 +793,7 @@ function MobileNavigation({
                   {activeModule.sections.map((section) => (
                     <div key={section.id}>
                       {section.label && (
-                        <div className="mb-2 pl-2 text-xs font-medium uppercase tracking-wide text-neutral-500">
+                        <div className="mb-2 pl-2 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-500">
                           {section.label}
                         </div>
                       )}
@@ -812,8 +812,8 @@ function MobileNavigation({
                 </div>
 
                 {utilities.length > 0 && (
-                  <div className="mt-6 border-t border-neutral-200 pt-3">
-                    <div className="mb-2 pl-2 text-xs font-medium uppercase tracking-wide text-neutral-500">
+                  <div className="mt-6 border-t border-neutral-200 pt-3 dark:border-neutral-800">
+                    <div className="mb-2 pl-2 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-500">
                       Utilities
                     </div>
                     <nav className="flex flex-col gap-0.5">
@@ -903,21 +903,21 @@ function MobileNavItem({
       className={cn(
         "group flex h-8 items-center justify-between rounded-lg p-2 text-sm leading-none transition-[background-color,color,font-weight] duration-75",
         isActive
-          ? "bg-blue-100/50 font-medium text-blue-600 hover:bg-blue-100/80 active:bg-blue-100"
-          : "text-neutral-700 hover:bg-black/5 active:bg-black/10"
+          ? "bg-blue-100/50 font-medium text-blue-600 hover:bg-blue-100/80 active:bg-blue-100 dark:bg-blue-900/50 dark:text-blue-400 dark:hover:bg-blue-900/80 dark:active:bg-blue-900"
+          : "text-neutral-700 hover:bg-black/5 active:bg-black/10 dark:text-neutral-300 dark:hover:bg-white/5 dark:active:bg-white/10"
       )}
     >
       <span className="flex min-w-0 items-center gap-2.5">
         <Icon
           className={cn(
             "size-4 shrink-0",
-            isActive ? "text-blue-600" : "text-neutral-600"
+            isActive ? "text-blue-600 dark:text-blue-400" : "text-neutral-600 dark:text-neutral-400"
           )}
         />
         <span className="truncate">{item.label}</span>
       </span>
       {isExternal && (
-        <ExternalLink className="size-3.5 text-neutral-500 transition-transform duration-75 group-hover:-translate-y-px group-hover:translate-x-px" />
+        <ExternalLink className="size-3.5 text-neutral-500 transition-transform duration-75 group-hover:-translate-y-px group-hover:translate-x-px dark:text-neutral-500" />
       )}
     </a>
   );
@@ -1034,7 +1034,7 @@ export function ApplicationShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen flex-col overflow-hidden bg-neutral-200">
+      <div className="flex h-screen flex-col overflow-hidden bg-neutral-200 dark:bg-neutral-800">
         <div className="flex min-h-0 flex-1 md:grid md:grid-cols-[min-content_minmax(0,1fr)]">
           <DubSidebar
             railIcons={navigationData.railIcons}
