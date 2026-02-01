@@ -168,14 +168,10 @@ export const Navbar = () => {
     }
 
     return (
-        <div className={`sticky z-50 transition-all duration-500 ease-out ${
-            isScrolled
-                ? 'top-2 lg:mx-auto lg:px-4 lg:w-[70%] lg:max-w-5xl'
-                : 'top-0 w-full'
+        <div className={`sticky top-0 z-50 transition-all duration-500 ease-out lg:top-2 lg:mx-auto lg:px-4 ${
+            isScrolled ? 'lg:w-[70%] lg:max-w-5xl' : 'lg:w-[98%] lg:max-w-7xl'
         }`}>
-            <nav className={`border-b border-border bg-card/50 shadow-black/2 shadow-sm backdrop-blur-sm transition-all duration-500 ease-out ${
-                isScrolled ? 'lg:rounded-xl lg:border' : 'lg:border-b'
-            }`}>
+            <nav className="border-b border-border bg-card/50 shadow-black/2 shadow-sm backdrop-blur-sm transition-all duration-500 ease-out lg:rounded-xl lg:border">
                 <div className={`flex items-center justify-between px-4 lg:px-6 transition-all duration-500 ease-out ${
                     isScrolled ? 'py-2' : 'py-3'
                 }`}>

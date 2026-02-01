@@ -25,7 +25,7 @@ export const HeroSection = () => {
     }
 
     return (
-        <section className="relative min-h-screen w-full pb-0 flex flex-col">
+        <section className="relative min-h-screen w-full pb-0 flex flex-col -mt-20 pt-20">
             <PatternPlaceholder />
             <div
                 className="absolute inset-0 z-0"
