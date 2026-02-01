@@ -17,6 +17,7 @@ import {
   BarChart3,
   Code2,
   CreditCard,
+  Puzzle,
 } from "lucide-react";
 import * as React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -220,19 +221,19 @@ function SidebarRail({
   onModuleChange,
 }: SidebarRailProps) {
   return (
-    <div className="flex h-full w-16 flex-col items-center justify-between bg-neutral-100 dark:bg-[#1a1a1a] border-r border-neutral-200 dark:border-neutral-800">
+    <div className="flex h-full w-16 flex-col items-center justify-between">
       <div className="flex flex-col items-center gap-3 p-2">
         <div className="pb-1 pt-2">
           <a
             href="/dashboard"
-            className="block rounded-lg px-1 py-4 outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-purple-500/50"
+            className="block rounded-lg px-1 py-4 outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-black/50"
           >
             <img
               src="/logo.svg"
               alt="Logo"
               width={80}
               height={20}
-              className="h-5 dark:invert"
+              className="h-5"
             />
           </a>
         </div>
@@ -249,10 +250,10 @@ function SidebarRail({
                     onClick={() => onModuleChange(item.moduleId)}
                     aria-label={item.label}
                     className={cn(
-                      "relative flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-purple-500/50",
+                      "relative flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-black/50",
                       isActive
-                        ? "bg-purple-600 dark:bg-purple-600 text-white shadow-sm"
-                        : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 active:bg-neutral-300 dark:active:bg-neutral-700"
+                        ? "bg-white text-neutral-900"
+                        : "text-neutral-600 hover:bg-black/5 active:bg-black/10"
                     )}
                   >
                     <Icon className="size-5" />
@@ -268,7 +269,7 @@ function SidebarRail({
       </div>
 
       <div className="flex flex-col items-center gap-3 py-3">
-        <SidebarTrigger className="size-11 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 active:bg-neutral-300 dark:active:bg-neutral-700" />
+        <SidebarTrigger className="size-11 text-neutral-600 hover:bg-black/5 active:bg-black/10" />
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -277,7 +278,7 @@ function SidebarRail({
             </div>
           </TooltipTrigger>
           <TooltipContent side="right" sideOffset={8}>
-            Účet
+            Account
           </TooltipContent>
         </Tooltip>
       </div>
@@ -293,12 +294,12 @@ function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex size-11 items-center justify-center rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 active:bg-neutral-300 dark:active:bg-neutral-700 focus-visible:ring-2 focus-visible:ring-purple-500/50"
-          aria-label="Účet"
+          className="flex size-11 items-center justify-center rounded-lg hover:bg-black/5 active:bg-black/10 focus-visible:ring-2 focus-visible:ring-black/50"
+          aria-label="Account"
         >
           <Avatar className="size-7">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email || ""} />
-            <AvatarFallback className="text-xs bg-purple-600 text-white">
+            <AvatarFallback className="text-xs">
               {getInitials(user?.email?.split('@')[0] || "User")}
             </AvatarFallback>
           </Avatar>
@@ -307,65 +308,61 @@ function UserMenu() {
       <DropdownMenuContent align="end" side="right" className="w-56">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">{user?.email?.split('@')[0] || "Student"}</p>
+            <p className="text-sm font-medium">{user?.email?.split('@')[0] || "User"}</p>
             <p className="text-xs text-muted-foreground">{user?.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/dashboard/settings')}>
-          <Settings className="mr-2 size-4" />
-          Nastavení
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/dashboard/billing')}>
-          <CreditCard className="mr-2 size-4" />
-          Platby
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/dashboard/settings')}>Settings</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/dashboard/billing')}>Billing</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/auth/sign-in')} className="text-red-600 dark:text-red-400">
-          Odhlásit se
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/auth/sign-in')}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
 function OrganizationSwitcher() {
-  const { user } = useAuth();
-  const userName = user?.email?.split('@')[0] || "Student";
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-          <div className="flex size-6 items-center justify-center rounded bg-purple-600 dark:bg-purple-600">
-            <BookOpen className="size-3.5 text-white" />
+        <button className="flex min-w-0 flex-1 items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-black/5">
+          <div className="flex size-6 items-center justify-center rounded bg-neutral-200">
+            <img
+              src="/logo.svg"
+              alt="Organization"
+              width={16}
+              height={16}
+              className="size-4"
+            />
           </div>
-          <span className="flex-1 truncate text-sm font-medium text-neutral-900 dark:text-neutral-100">
-            Moje Vzdělávání
+          <span className="flex-1 truncate text-sm font-medium text-neutral-900">
+            My Workspace
           </span>
-          <ChevronDown className="size-4 text-neutral-500 dark:text-neutral-400" />
+          <ChevronDown className="size-4 text-neutral-500" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel>
-          <div className="flex flex-col gap-1">
-            <span className="font-medium">Vítejte, {userName}</span>
-            <span className="text-xs text-muted-foreground">Platforma pro fyzioterapeuty</span>
+        <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <div className="flex items-center gap-2">
+            <div className="flex size-6 items-center justify-center rounded bg-neutral-200">
+              <img
+                src="/logo.svg"
+                alt="Organization"
+                width={16}
+                height={16}
+                className="size-4"
+              />
+            </div>
+            <span>My Workspace</span>
           </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <BookOpen className="mr-2 size-4" />
-          Moje Kurzy
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Users className="mr-2 size-4" />
-          Studijní Skupina
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Settings className="mr-2 size-4" />
-          Nastavení Profilu
+          <Plus className="mr-2 size-4" />
+          Create workspace
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -377,8 +374,8 @@ function NotificationBell() {
     <Button
       variant="ghost"
       size="icon"
-      className="ml-auto size-8 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-      aria-label="Oznámení"
+      className="ml-auto size-8 text-neutral-600 hover:bg-black/5"
+      aria-label="Notifications"
     >
       <Bell className="size-4" />
     </Button>
@@ -386,42 +383,18 @@ function NotificationBell() {
 }
 
 function NewActionButton() {
-  const navigate = useNavigate();
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="w-full justify-start gap-2 bg-neutral-900 dark:bg-neutral-800 text-white hover:bg-neutral-800 dark:hover:bg-neutral-700 shadow-sm">
+        <Button className="w-full justify-start gap-2 bg-neutral-900 text-white hover:bg-neutral-800">
           <Plus className="size-4" />
-          Začít Studium
+          New
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel className="text-xs text-muted-foreground">
-          RYCHLÉ AKCE
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/dashboard/integrations')}>
-          <BookOpen className="mr-2 size-4 text-purple-600 dark:text-purple-400" />
-          <div className="flex flex-col">
-            <span className="font-medium">Procházet Kurzy</span>
-            <span className="text-xs text-muted-foreground">Objevte nové znalosti</span>
-          </div>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/dashboard/integrations')}>
-          <Users className="mr-2 size-4 text-green-600 dark:text-green-400" />
-          <div className="flex flex-col">
-            <span className="font-medium">Pokračovat ve Studiu</span>
-            <span className="text-xs text-muted-foreground">Tam, kde jste přestali</span>
-          </div>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/dashboard/analytics')}>
-          <BarChart3 className="mr-2 size-4 text-purple-600 dark:text-purple-400" />
-          <div className="flex flex-col">
-            <span className="font-medium">Můj Pokrok</span>
-            <span className="text-xs text-muted-foreground">Sledujte své výsledky</span>
-          </div>
-        </DropdownMenuItem>
+      <DropdownMenuContent align="start" className="w-48">
+        <DropdownMenuItem>New Document</DropdownMenuItem>
+        <DropdownMenuItem>New Project</DropdownMenuItem>
+        <DropdownMenuItem>New Event</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -458,12 +431,12 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
 
   return (
     <div
-      className="relative flex h-screen flex-col overflow-hidden rounded-l-xl bg-[rgb(245,245,245)] dark:bg-[#1f1f1f] border-r border-neutral-200 dark:border-neutral-800"
+      className="relative flex h-screen flex-col overflow-hidden rounded-l-xl bg-neutral-100"
       style={{ width: `${SIDEBAR_PANEL_WIDTH}px` }}
     >
       <div
         key={module.id}
-        className="relative flex min-h-0 flex-1 animate-in fade-in slide-in-from-right-2 flex-col text-neutral-500 dark:text-neutral-400 duration-200"
+        className="relative flex min-h-0 flex-1 animate-in fade-in slide-in-from-right-2 flex-col text-neutral-500 duration-200"
       >
         <div className="shrink-0 p-3">
           <div className="mb-2 flex items-center gap-2">
@@ -480,7 +453,7 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
           {primarySections.map((section) => (
             <div key={section.id}>
               {section.label && (
-                <div className="mb-2 pl-3 text-sm text-neutral-500 dark:text-neutral-400">
+                <div className="mb-2 pl-3 text-sm text-neutral-500">
                   {section.label}
                 </div>
               )}
@@ -507,28 +480,28 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
                 className="group/setup"
               >
                 <div
-                  className={cn("rounded-lg p-2", setupOpen && "bg-neutral-100 dark:bg-neutral-800/50")}
+                  className={cn("rounded-lg p-2", setupOpen && "bg-neutral-200/50")}
                 >
                   <CollapsibleTrigger
                     className={cn(
                       "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
                       setupOpen && "hidden",
                       isSetupActive
-                        ? "bg-purple-500/15 dark:bg-purple-500/15 font-medium text-purple-700 dark:text-purple-400"
-                        : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                        ? "bg-blue-100/50 font-medium text-blue-600"
+                        : "text-neutral-600 hover:bg-neutral-200/50"
                     )}
                   >
                     <Settings
                       className={cn(
                         "size-4",
-                        isSetupActive ? "text-purple-700 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
+                        isSetupActive ? "text-blue-600" : "text-neutral-500"
                       )}
                     />
-                    <span className="font-medium">Konfigurace</span>
+                    <span className="font-medium">Configuration</span>
                     <ChevronRight
                       className={cn(
                         "ml-auto size-4",
-                        isSetupActive ? "text-purple-400" : "text-neutral-400 dark:text-neutral-500"
+                        isSetupActive ? "text-blue-400" : "text-neutral-400"
                       )}
                     />
                   </CollapsibleTrigger>
@@ -599,7 +572,7 @@ function SidebarPanel({ module, utilities }: SidebarPanelProps) {
             )}
 
             {utilities.length > 0 && (
-              <div className="mt-3 border-t border-neutral-200 dark:border-neutral-700 pt-3">
+              <div className="mt-3 border-t border-neutral-200 pt-3">
                 <nav className="flex flex-col gap-0.5">
                   {utilities.map((item) => (
                     <NavItem
@@ -639,23 +612,23 @@ function NavItem({ item, isActive }: { item: NavItemConfig; isActive: boolean })
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
       className={cn(
-        "group flex h-8 items-center justify-between rounded-lg px-2 py-1.5 text-sm leading-none transition-colors duration-75",
+        "group flex h-8 items-center justify-between rounded-lg p-2 text-sm leading-none transition-[background-color,color,font-weight] duration-75",
         isActive
-          ? "bg-purple-500/15 dark:bg-purple-500/15 font-medium text-purple-700 dark:text-purple-400 hover:bg-purple-500/20 dark:hover:bg-purple-500/20"
-          : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          ? "bg-blue-100/50 font-medium text-blue-600 hover:bg-blue-100/80 active:bg-blue-100"
+          : "text-neutral-700 hover:bg-black/5 active:bg-black/10"
       )}
     >
       <span className="flex min-w-0 items-center gap-2.5">
         <Icon
           className={cn(
             "size-4 shrink-0",
-            isActive ? "text-purple-700 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
+            isActive ? "text-blue-600" : "text-neutral-600"
           )}
         />
         <span className="truncate">{item.label}</span>
       </span>
       {isExternal && (
-        <ExternalLink className="size-3.5 text-neutral-500 dark:text-neutral-400 transition-transform duration-75 group-hover:-translate-y-px group-hover:translate-x-px" />
+        <ExternalLink className="size-3.5 text-neutral-500 transition-transform duration-75 group-hover:-translate-y-px group-hover:translate-x-px" />
       )}
     </a>
   );
@@ -698,21 +671,21 @@ function ContentArea({ children }: ContentAreaProps) {
   const showCornerFills = isPanelOpen;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-[rgb(245,245,245)] dark:bg-[rgb(26,26,26)] md:py-2 md:pr-2">
+    <div className="flex min-h-0 flex-1 flex-col bg-neutral-200 md:py-2 md:pr-2">
       <div className="relative flex min-h-0 flex-1 flex-col">
         <div
           className={cn(
-            "absolute -left-2 top-0 z-0 hidden h-3 w-5 bg-[rgb(245,245,245)] dark:bg-[#1f1f1f] transition-opacity duration-300 md:block",
+            "absolute -left-2 top-0 z-0 hidden h-3 w-5 bg-neutral-100 transition-opacity duration-300 md:block",
             showCornerFills ? "opacity-100" : "opacity-0"
           )}
         />
         <div
           className={cn(
-            "absolute -left-2 bottom-0 z-0 hidden h-3 w-5 bg-[rgb(245,245,245)] dark:bg-[#1f1f1f] transition-opacity duration-300 md:block",
+            "absolute -left-2 bottom-0 z-0 hidden h-3 w-5 bg-neutral-100 transition-opacity duration-300 md:block",
             showCornerFills ? "opacity-100" : "opacity-0"
           )}
         />
-        <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-[rgb(245,245,245)] dark:md:bg-[rgb(26,26,26)] md:pb-0">
+        <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-white md:pb-0">
           <div className="flex-1 overflow-auto p-6 pb-24 md:pb-6">
             {children}
           </div>
@@ -820,7 +793,7 @@ function MobileNavigation({
                   {activeModule.sections.map((section) => (
                     <div key={section.id}>
                       {section.label && (
-                        <div className="mb-2 pl-2 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                        <div className="mb-2 pl-2 text-xs font-medium uppercase tracking-wide text-neutral-500">
                           {section.label}
                         </div>
                       )}
@@ -839,9 +812,9 @@ function MobileNavigation({
                 </div>
 
                 {utilities.length > 0 && (
-                  <div className="mt-6 border-t border-neutral-200 dark:border-neutral-700 pt-3">
-                    <div className="mb-2 pl-2 text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
-                      NÁSTROJE
+                  <div className="mt-6 border-t border-neutral-200 pt-3">
+                    <div className="mb-2 pl-2 text-xs font-medium uppercase tracking-wide text-neutral-500">
+                      Utilities
                     </div>
                     <nav className="flex flex-col gap-0.5">
                       {utilities.map((item) => (
@@ -861,7 +834,7 @@ function MobileNavigation({
         </DrawerContent>
       </Drawer>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 dark:border-neutral-800 bg-[rgb(245,245,245)] dark:bg-[#1a1a1a] backdrop-blur-lg md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur md:hidden">
         <div
           className="grid"
           style={{
@@ -880,10 +853,10 @@ function MobileNavigation({
                   onOpenChange(true);
                 }}
                 className={cn(
-                  "flex flex-col items-center gap-1 py-3 text-xs transition-colors",
+                  "flex flex-col items-center gap-1 py-2 text-xs",
                   isActive
-                    ? "text-purple-600 dark:text-purple-400 font-medium"
-                    : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200"
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
                 aria-label={module.label}
               >
@@ -928,23 +901,23 @@ function MobileNavItem({
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
       className={cn(
-        "group flex h-8 items-center justify-between rounded-lg px-2 py-1.5 text-sm leading-none transition-colors duration-75",
+        "group flex h-8 items-center justify-between rounded-lg p-2 text-sm leading-none transition-[background-color,color,font-weight] duration-75",
         isActive
-          ? "bg-purple-500/15 dark:bg-purple-500/15 font-medium text-purple-700 dark:text-purple-400 hover:bg-purple-500/20 dark:hover:bg-purple-500/20"
-          : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          ? "bg-blue-100/50 font-medium text-blue-600 hover:bg-blue-100/80 active:bg-blue-100"
+          : "text-neutral-700 hover:bg-black/5 active:bg-black/10"
       )}
     >
       <span className="flex min-w-0 items-center gap-2.5">
         <Icon
           className={cn(
             "size-4 shrink-0",
-            isActive ? "text-purple-700 dark:text-purple-400" : "text-neutral-500 dark:text-neutral-400"
+            isActive ? "text-blue-600" : "text-neutral-600"
           )}
         />
         <span className="truncate">{item.label}</span>
       </span>
       {isExternal && (
-        <ExternalLink className="size-3.5 text-neutral-500 dark:text-neutral-400 transition-transform duration-75 group-hover:-translate-y-px group-hover:translate-x-px" />
+        <ExternalLink className="size-3.5 text-neutral-500 transition-transform duration-75 group-hover:-translate-y-px group-hover:translate-x-px" />
       )}
     </a>
   );
@@ -952,84 +925,77 @@ function MobileNavItem({
 
 const navigationData = {
   railIcons: [
-    { moduleId: "home", label: "Domů", icon: Home, defaultPath: "/dashboard" },
-    { moduleId: "analytics", label: "Analytika", icon: BarChart3, defaultPath: "/dashboard/analytics" },
-    { moduleId: "integrations", label: "Kurzy", icon: BookOpen, defaultPath: "/dashboard/integrations" },
-    { moduleId: "billing", label: "Platby", icon: CreditCard, defaultPath: "/dashboard/billing" },
+    { moduleId: "home", label: "Home", icon: Home, defaultPath: "/dashboard" },
+    { moduleId: "analytics", label: "Analytics", icon: BarChart3, defaultPath: "/dashboard/analytics" },
+    { moduleId: "integrations", label: "Courses", icon: Puzzle, defaultPath: "/dashboard/integrations" },
+    { moduleId: "billing", label: "Billing", icon: CreditCard, defaultPath: "/dashboard/billing" },
   ] as RailIconConfig[],
   modules: [
     {
       id: "home",
-      label: "Domů",
+      label: "Home",
       icon: Home,
       defaultPath: "/dashboard",
       sections: [
         {
           id: "main",
-          label: "PŘEHLED",
           items: [
-            { id: "overview", label: "Můj Dashboard", icon: Home, path: "/dashboard" },
-            { id: "analytics", label: "Pokrok a Statistiky", icon: BarChart3, path: "/dashboard/analytics" },
-            { id: "api", label: "API Dokumentace", icon: Code2, path: "/dashboard/api" },
+            { id: "overview", label: "Overview", icon: Home, path: "/dashboard" },
+            { id: "analytics", label: "Analytics", icon: BarChart3, path: "/dashboard/analytics" },
+            { id: "api", label: "API", icon: Code2, path: "/dashboard/api" },
           ],
         },
       ],
     },
     {
       id: "analytics",
-      label: "Analytika",
+      label: "Analytics",
       icon: BarChart3,
       defaultPath: "/dashboard/analytics",
       sections: [
         {
           id: "main",
-          label: "VAŠE VÝSLEDKY",
           items: [
-            { id: "overview", label: "Celkový Přehled", icon: BarChart3, path: "/dashboard/analytics" },
-            { id: "reports", label: "Reporty a Grafy", icon: FileText, path: "/dashboard/analytics" },
-            { id: "progress", label: "Historie Pokroku", icon: Users, path: "/dashboard/analytics" },
+            { id: "overview", label: "Overview", icon: BarChart3, path: "/dashboard/analytics" },
+            { id: "reports", label: "Reports", icon: FileText, path: "/dashboard/analytics" },
           ],
         },
       ],
     },
     {
       id: "integrations",
-      label: "Kurzy",
-      icon: BookOpen,
+      label: "Courses",
+      icon: Puzzle,
       defaultPath: "/dashboard/integrations",
       sections: [
         {
           id: "main",
-          label: "VZDĚLÁVÁNÍ",
           items: [
-            { id: "all-courses", label: "Všechny Kurzy", icon: BookOpen, path: "/dashboard/integrations" },
-            { id: "my-courses", label: "Moje Kurzy", icon: Users, path: "/dashboard/integrations" },
-            { id: "favorites", label: "Oblíbené", icon: FileText, path: "/dashboard/integrations" },
+            { id: "all-courses", label: "All Courses", icon: BookOpen, path: "/dashboard/integrations" },
+            { id: "my-courses", label: "My Courses", icon: Users, path: "/dashboard/integrations" },
           ],
         },
       ],
     },
     {
       id: "billing",
-      label: "Platby",
+      label: "Billing",
       icon: CreditCard,
       defaultPath: "/dashboard/billing",
       sections: [
         {
           id: "main",
-          label: "PŘEDPLATNÉ",
           items: [
-            { id: "overview", label: "Můj Plán", icon: CreditCard, path: "/dashboard/billing" },
-            { id: "invoices", label: "Faktury", icon: FileText, path: "/dashboard/billing" },
-            { id: "payment", label: "Platební Údaje", icon: Settings, path: "/dashboard/billing" },
+            { id: "overview", label: "Overview", icon: CreditCard, path: "/dashboard/billing" },
+            { id: "invoices", label: "Invoices", icon: FileText, path: "/dashboard/billing" },
           ],
         },
       ],
     },
   ] as NavModuleConfig[],
   utilities: [
-    { id: "settings", label: "Nastavení", icon: Settings, path: "/dashboard/settings" },
-    { id: "help", label: "Pomoc a Podpora", icon: HelpCircle, path: "#" },
+    { id: "settings", label: "Settings", icon: Settings, path: "/dashboard/settings" },
+    { id: "help", label: "Help & Support", icon: HelpCircle, path: "#" },
   ] as NavItemConfig[],
 };
 
