@@ -1,8 +1,8 @@
 import {
-  BadgeCheck,
   ChevronRight,
   Clock,
   MessageSquareCode,
+  Star,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -16,119 +16,158 @@ import { Card } from "@/components/ui/card";
 interface DataItem {
   id: string;
   name: string;
-  username: string;
   date: string;
   avatar: string;
   content: string;
+  rating: number;
+  reviewCount?: number;
+  photoCount?: number;
+  isLocalGuide?: boolean;
 }
 
 const DATA: DataItem[] = [
   {
     id: "1",
-    name: "John Doe",
-    username: "johndoe",
-    date: "2023-10-05",
+    name: "Zuzana Hykyšová",
+    date: "3 months ago",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-1.webp",
+    rating: 5,
+    reviewCount: 3,
     content:
-      "This platform has completely transformed the way I manage my projects. The tools are not only intuitive but also incredibly powerful, allowing me to streamline my workflow like never before. It's a game-changer for productivity!",
+      "Honza Kottas helped me again with a problem that had been bothering me for a month and that neither massages nor acupuncture helped. Honza's gentle, sensitive work brought me noticeable relief and improvement, not immediately, but within a few days.",
   },
   {
     id: "2",
-    name: "Jane Smith",
-    username: "janesmith",
-    date: "2023-09-30",
+    name: "Lukáš Lebeda",
+    date: "8 months ago",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-2.webp",
+    rating: 5,
+    reviewCount: 2,
     content:
-      "The collaboration features are truly outstanding, allowing my team and I to work together seamlessly no matter where we are, which has made remote work significantly easier. The real-time editing and intuitive sharing options have transformed how we operate, eliminating the headaches of version control and endless email chains.",
+      "I highly recommend Mr. Kottas, with whom I am dealing with a long-term neurological problem. I have been to various physiotherapy exercises/therapy and for the first time I feel that someone really understands the problem and uses the right path and technique. 5/5",
   },
   {
     id: "3",
-    name: "Alice Johnson",
-    username: "alicej",
-    date: "2023-09-25",
+    name: "Veronika Harapátová",
+    date: "a year ago",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-3.webp",
-    content: "The analytics are a game-changer!",
+    rating: 5,
+    reviewCount: 5,
+    photoCount: 1,
+    content:
+      "I didn't believe my 3-year-old daughter could be calm for an hour, but Mr. Kottas exudes such calmness that she enjoyed the entire visit and, even though she felt relieved right away, she would like to go there again, as she found the entire treatment pleasant.",
   },
   {
     id: "4",
-    name: "Bob Brown",
-    username: "bobbrown",
-    date: "2023-09-20",
+    name: "Hanka Ježková",
+    date: "a year ago",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-4.webp",
+    rating: 5,
+    reviewCount: 1,
     content:
-      "I love how easy it is to integrate this platform with my existing tools. It has streamlined my workflow significantly, saving me hours every week.",
+      "Děkuju za skvělý přístup ! Pan Kottas byl úžasný a hned po první návštěvě se mi dost ulevilo. Co ještě oceňuji je dostupnost do Diresu - tramvajová zastávka je kousíček:))",
   },
   {
     id: "5",
-    name: "Charlie Davis",
-    username: "charlied",
-    date: "2023-09-15",
+    name: "Žaneta Kárová",
+    date: "a year ago",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-5.webp",
-    content:
-      "The design templates are fantastic. They've helped me deliver projects faster without compromising on quality. Highly recommend!",
+    rating: 5,
+    reviewCount: 15,
+    photoCount: 14,
+    isLocalGuide: true,
+    content: "Great personal approach, highly recommend and thank you 🙏",
   },
   {
     id: "6",
-    name: "Eva Wilson",
-    username: "evawilson",
-    date: "2023-09-10",
+    name: "Milan Harapát",
+    date: "a year ago",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-6.webp",
+    rating: 5,
+    reviewCount: 3,
     content:
-      "This platform has made project management so much easier. It's intuitive, efficient, and keeps everyone on the same page.",
+      "Profesionální přístup a okamžité zlepšení po první návštěvě. Pan Kottas opravdu rozumí svému oboru a ví, jak pomoci. Mohu jen doporučit!",
   },
   {
     id: "7",
-    name: "Frank Miller",
-    username: "frankm",
-    date: "2023-09-05",
+    name: "Petra Nováková",
+    date: "2 months ago",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-7.webp",
+    rating: 5,
+    reviewCount: 8,
     content:
-      "The branding tools are amazing. They've helped us maintain consistency across all our campaigns, which has been a huge win for our team.",
-  },
-  {
-    id: "8",
-    name: "Grace Lee",
-    username: "gracelee",
-    date: "2023-08-30",
-    avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-8.webp",
-    content:
-      "The vector editing tools are fantastic. They've made my creative process so much smoother and more enjoyable.",
-  },
-  {
-    id: "9",
-    name: "Henry Garcia",
-    username: "henryg",
-    date: "2023-08-25",
-    avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-4.webp",
-    content:
-      "The animation features are incredible. They've taken my projects to the next level, and I couldn't be happier with the results.",
+      "Po dlouhodobých bolestech zad jsem konečně našla pomoc u pana Kottase. Jeho individuální přístup a odbornost jsou na vysoké úrovni. Děkuji!",
   },
 ];
 
 const TestimonialCard = ({ testimonial }: { testimonial: DataItem }) => (
   <Card className="relative mb-5 break-inside-avoid rounded-xl p-5 shadow-sm">
-    <div className="flex items-center gap-4">
+    <div className="flex items-start gap-4">
       <Avatar className="h-10 w-10 rounded-full ring-1 ring-muted">
         <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
       </Avatar>
-      <div>
-        <div className="flex items-center gap-2">
-          <p className="text-sm font-medium">{testimonial.name}</p>
-          <BadgeCheck className="h-4 w-4 fill-cyan-400 stroke-white" />
+      <div className="flex-1">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-sm font-medium">{testimonial.name}</p>
+            <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+              {testimonial.isLocalGuide && (
+                <span className="mr-1 text-xs">Local Guide ·</span>
+              )}
+              {testimonial.reviewCount && (
+                <span>{testimonial.reviewCount} reviews</span>
+              )}
+              {testimonial.photoCount && (
+                <span> · {testimonial.photoCount} photos</span>
+              )}
+            </div>
+          </div>
+          <div className="ml-auto hover:cursor-pointer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 48 48"
+              className="h-5 w-5"
+            >
+              <path
+                fill="#4285F4"
+                d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"
+              />
+              <path
+                fill="#34A853"
+                d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"
+              />
+              <path
+                fill="#EA4335"
+                d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"
+              />
+            </svg>
+          </div>
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          @{testimonial.username}
-        </p>
-      </div>
-      <div className="ml-auto hover:cursor-pointer">
-        <img src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/x.svg" alt="X logo" className="h-4 w-4" />
+
+        <div className="mt-2 flex items-center gap-1">
+          {[...Array(5)].map((_, i) => (
+            <Star
+              key={i}
+              className={cn(
+                "h-3.5 w-3.5",
+                i < testimonial.rating
+                  ? "fill-yellow-400 stroke-yellow-400"
+                  : "fill-gray-200 stroke-gray-200"
+              )}
+            />
+          ))}
+        </div>
       </div>
     </div>
 
     <div className="my-4 border-t border-dashed border-border" />
 
     <div className="text-sm text-foreground">
-      <q>{testimonial.content}</q>
+      <p>{testimonial.content}</p>
     </div>
 
     <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
@@ -198,10 +237,20 @@ const TestimonialSection = ({ className }: TestimonialSectionProps) => {
             Hear what our customers <br /> are saying
           </h2>
 
-          <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row">
-            <span>
-              Discover how <b>Shadcnblocks</b> is transforming workflows across
-              industries.
+          <div className="mt-4 flex flex-col items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className="h-5 w-5 fill-yellow-400 stroke-yellow-400"
+                  />
+                ))}
+              </div>
+              <span className="text-2xl font-semibold">5.0</span>
+            </div>
+            <span className="text-sm text-muted-foreground">
+              Based on 7 Google reviews
             </span>
           </div>
         </div>
@@ -216,12 +265,8 @@ const TestimonialSection = ({ className }: TestimonialSectionProps) => {
 
         <div className="flex justify-center">
           <Button className="mt-4 gap-2 rounded-lg px-5 py-3 text-sm shadow-sm transition-colors hover:bg-primary/90 focus:outline-none disabled:pointer-events-none disabled:opacity-50">
-            <span className="flex items-center gap-1">
-              <span>See More</span>
-              <span className="text-muted/80">-</span>
-              <span className="text-muted/80">Feedback</span>
-            </span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground/80" />
+            <span>Navštivte nás také</span>
+            <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
