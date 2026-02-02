@@ -9,12 +9,67 @@ import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 
 export const HeroSection = () => {
     const [isMuted, setIsMuted] = useState(true)
+    const [glowColors, setGlowColors] = useState({
+        primary: 'rgba(112, 51, 255, 0.5)',
+        secondary: 'rgba(139, 92, 246, 0.3)',
+        tertiary: 'rgba(168, 85, 247, 0.3)'
+    })
     const videoRef = useRef<HTMLVideoElement>(null)
+    const canvasRef = useRef<HTMLCanvasElement>(null)
 
     useEffect(() => {
         if (videoRef.current) {
             videoRef.current.play()
         }
+
+        const video = videoRef.current
+        const canvas = canvasRef.current
+        if (!video || !canvas) return
+
+        const context = canvas.getContext('2d', { willReadFrequently: true })
+        if (!context) return
+
+        const extractColors = () => {
+            if (video.paused || video.ended) return
+
+            canvas.width = 160
+            canvas.height = 90
+            context.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+            const data = imageData.data
+
+            let r = 0, g = 0, b = 0
+            const step = 4 * 10
+
+            for (let i = 0; i < data.length; i += step) {
+                r += data[i]
+                g += data[i + 1]
+                b += data[i + 2]
+            }
+
+            const pixelCount = data.length / step / 4
+            r = Math.floor(r / pixelCount)
+            g = Math.floor(g / pixelCount)
+            b = Math.floor(b / pixelCount)
+
+            const brightness = (r + g + b) / 3
+            const saturationBoost = brightness > 100 ? 1.3 : 1.5
+
+            r = Math.min(255, Math.floor(r * saturationBoost))
+            g = Math.min(255, Math.floor(g * saturationBoost))
+            b = Math.min(255, Math.floor(b * saturationBoost))
+
+            setGlowColors({
+                primary: `rgba(${r}, ${g}, ${b}, 0.6)`,
+                secondary: `rgba(${Math.floor(r * 0.9)}, ${Math.floor(g * 0.9)}, ${Math.floor(b * 0.9)}, 0.4)`,
+                tertiary: `rgba(${Math.floor(r * 0.8)}, ${Math.floor(g * 0.8)}, ${Math.floor(b * 0.8)}, 0.3)`
+            })
+        }
+
+        const interval = setInterval(extractColors, 150)
+
+        return () => clearInterval(interval)
     }, [])
 
     const toggleMute = () => {
@@ -93,11 +148,25 @@ export const HeroSection = () => {
                 <div className="group relative lg:scale-115" data-aos="fade-left" data-aos-delay="200">
                     {/* Enhanced animated glow effect */}
                     <div className="absolute inset-0 -z-10">
-                        <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[75%] w-[85%] animate-pulse bg-gradient-to-r from-primary/30 via-purple-500/30 to-primary/30 blur-3xl" />
+                        <div
+                            className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[75%] w-[85%] blur-3xl transition-all duration-500"
+                            style={{
+                                background: `radial-gradient(ellipse at center, ${glowColors.primary}, ${glowColors.secondary}, transparent)`
+                            }}
+                        />
                     </div>
 
                     {/* Browser Window Container with Ambient Glow */}
-                    <div className="relative mx-auto w-full overflow-hidden rounded-2xl border border-border/50 bg-background transition-all duration-500 animate-[glow_4s_ease-in-out_infinite]">
+                    <div
+                        className="relative mx-auto w-full overflow-hidden rounded-2xl border border-border/50 bg-background transition-all duration-300"
+                        style={{
+                            boxShadow: `
+                                0 0 60px -15px ${glowColors.primary},
+                                0 0 100px -20px ${glowColors.secondary},
+                                0 0 140px -25px ${glowColors.tertiary}
+                            `
+                        }}
+                    >
                         {/* Browser Navigation Bar */}
                         <div className="relative flex h-8 items-center justify-between border-b border-border/50 bg-muted/50 px-4">
                             {/* Traffic Light Buttons */}
@@ -127,9 +196,13 @@ export const HeroSection = () => {
                                 loop
                                 muted
                                 playsInline
+                                crossOrigin="anonymous"
                             >
                                 <source src="/logos/uvodnistrana.mp4" type="video/mp4" />
                             </video>
+
+                            {/* Hidden canvas for color extraction */}
+                            <canvas ref={canvasRef} className="hidden" />
 
                             {/* Sound Control Button */}
                             <button
@@ -147,8 +220,14 @@ export const HeroSection = () => {
                     </div>
 
                     {/* Decorative elements */}
-                    <div className="-right-8 -bottom-8 absolute -z-10 size-32 rounded-full bg-primary/30 blur-3xl lg:size-40" />
-                    <div className="-top-8 -left-8 absolute -z-10 size-28 rounded-full bg-primary/30 blur-3xl lg:size-36" />
+                    <div
+                        className="-right-8 -bottom-8 absolute -z-10 size-32 rounded-full blur-3xl lg:size-40 transition-all duration-500"
+                        style={{ backgroundColor: glowColors.secondary }}
+                    />
+                    <div
+                        className="-top-8 -left-8 absolute -z-10 size-28 rounded-full blur-3xl lg:size-36 transition-all duration-500"
+                        style={{ backgroundColor: glowColors.tertiary }}
+                    />
                 </div>
             </div>
 
