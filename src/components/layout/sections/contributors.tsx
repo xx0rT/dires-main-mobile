@@ -78,8 +78,8 @@ const Feature283 = ({ className }: Feature283Props) => {
 
   return (
     <section className={cn("py-32", className)}>
-      <div className="relative container">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="relative container flex flex-col items-center">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 max-w-7xl">
           {/* Column 1 */}
           <div className="grid gap-4">
             {column1Images.map((image, index) => (
@@ -205,7 +205,7 @@ const Feature283 = ({ className }: Feature283Props) => {
             <div className="h-17 w-full rounded-2xl bg-muted"></div>
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4 max-w-7xl">
           {/* Column 1 */}
           <div className="grid gap-4">
             {column1Images.map((image, index) => (

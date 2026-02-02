@@ -185,7 +185,7 @@ const TestimonialSection = ({ className }: TestimonialSectionProps) => {
 
   return (
     <section className={cn("py-32", className)}>
-      <div className="container">
+      <div className="container flex flex-col items-center">
         <div className="my-4 flex justify-center">
           <Badge variant="outline" className="rounded-sm py-2 shadow-md">
             <MessageSquareCode className="mr-2 size-4 text-muted-foreground" />
@@ -206,7 +206,7 @@ const TestimonialSection = ({ className }: TestimonialSectionProps) => {
           </div>
         </div>
 
-        <div className="relative mt-14 w-full px-4 after:absolute after:inset-x-0 after:-bottom-2 after:h-96 after:bg-linear-to-t after:from-background sm:px-8 md:px-16 lg:px-32">
+        <div className="relative mt-14 w-full max-w-7xl px-4 after:absolute after:inset-x-0 after:-bottom-2 after:h-96 after:bg-linear-to-t after:from-background sm:px-8 md:px-16 lg:px-32">
           <div className="columns-1 gap-5 md:columns-2 lg:columns-3">
             {reorderedData.map((testimonial) => (
               <TestimonialCard key={testimonial.id} testimonial={testimonial} />
