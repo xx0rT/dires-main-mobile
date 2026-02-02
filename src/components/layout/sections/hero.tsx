@@ -96,8 +96,8 @@ export const HeroSection = () => {
                         <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[75%] w-[85%] animate-pulse bg-gradient-to-r from-primary/30 via-purple-500/30 to-primary/30 blur-3xl" />
                     </div>
 
-                    {/* Browser Window Container */}
-                    <div className="relative mx-auto w-full overflow-hidden rounded-2xl border border-border/50 bg-background shadow-2xl transition-all duration-500 group-hover:shadow-primary/20">
+                    {/* Browser Window Container with Ambient Glow */}
+                    <div className="relative mx-auto w-full overflow-hidden rounded-2xl border border-border/50 bg-background transition-all duration-500 animate-[glow_4s_ease-in-out_infinite]">
                         {/* Browser Navigation Bar */}
                         <div className="relative flex h-8 items-center justify-between border-b border-border/50 bg-muted/50 px-4">
                             {/* Traffic Light Buttons */}

@@ -73,11 +73,27 @@ html {
     transform: translateY(-100%);
   }
 }
+
+/* Ambient glow animation */
+@keyframes glow {
+  0%, 100% {
+    box-shadow:
+      0 0 60px -15px rgba(112, 51, 255, 0.5),
+      0 0 100px -20px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 80px -10px rgba(112, 51, 255, 0.7),
+      0 0 120px -15px rgba(139, 92, 246, 0.5),
+      0 0 160px -30px rgba(168, 85, 247, 0.3);
+  }
+}
+
 @layer utilities {
   .animate-marquee {
     animation: marquee var(--duration) linear infinite;
   }
-  
+
   .animate-marquee-vertical {
     animation: marquee-vertical var(--duration) linear infinite;
   }
