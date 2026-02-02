@@ -24,7 +24,7 @@ export default function HomePage() {
         <FeaturesSection />
       </div>
 
-      <div className="bg-muted/70 transition-colors duration-700">
+      <div className="bg-background transition-colors duration-700">
         <TestimonialSection />
       </div>
 
