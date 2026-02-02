@@ -10,9 +10,11 @@ import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 export const HeroSection = () => {
     const [isMuted, setIsMuted] = useState(true)
     const [glowColors, setGlowColors] = useState({
-        primary: 'rgba(112, 51, 255, 0.5)',
-        secondary: 'rgba(139, 92, 246, 0.3)',
-        tertiary: 'rgba(168, 85, 247, 0.3)'
+        top: 'rgba(112, 51, 255, 0.5)',
+        right: 'rgba(139, 92, 246, 0.5)',
+        bottom: 'rgba(168, 85, 247, 0.5)',
+        left: 'rgba(112, 51, 255, 0.5)',
+        center: 'rgba(139, 92, 246, 0.3)'
     })
     const videoRef = useRef<HTMLVideoElement>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -29,18 +31,12 @@ export const HeroSection = () => {
         const context = canvas.getContext('2d', { willReadFrequently: true })
         if (!context) return
 
-        const extractColors = () => {
-            if (video.paused || video.ended) return
-
-            canvas.width = 160
-            canvas.height = 90
-            context.drawImage(video, 0, 0, canvas.width, canvas.height)
-
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+        const extractRegionColor = (x: number, y: number, width: number, height: number) => {
+            const imageData = context.getImageData(x, y, width, height)
             const data = imageData.data
 
             let r = 0, g = 0, b = 0
-            const step = 4 * 10
+            const step = 4 * 4
 
             for (let i = 0; i < data.length; i += step) {
                 r += data[i]
@@ -54,16 +50,39 @@ export const HeroSection = () => {
             b = Math.floor(b / pixelCount)
 
             const brightness = (r + g + b) / 3
-            const saturationBoost = brightness > 100 ? 1.3 : 1.5
+            const saturationBoost = brightness > 80 ? 1.4 : 1.6
 
             r = Math.min(255, Math.floor(r * saturationBoost))
             g = Math.min(255, Math.floor(g * saturationBoost))
             b = Math.min(255, Math.floor(b * saturationBoost))
 
+            return { r, g, b }
+        }
+
+        const extractColors = () => {
+            if (video.paused || video.ended) return
+
+            canvas.width = 160
+            canvas.height = 90
+            context.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+            const edgeThickness = 15
+
+            const topColor = extractRegionColor(0, 0, canvas.width, edgeThickness)
+            const bottomColor = extractRegionColor(0, canvas.height - edgeThickness, canvas.width, edgeThickness)
+            const leftColor = extractRegionColor(0, 0, edgeThickness, canvas.height)
+            const rightColor = extractRegionColor(canvas.width - edgeThickness, 0, edgeThickness, canvas.height)
+
+            const centerX = Math.floor(canvas.width / 2) - 20
+            const centerY = Math.floor(canvas.height / 2) - 20
+            const centerColor = extractRegionColor(centerX, centerY, 40, 40)
+
             setGlowColors({
-                primary: `rgba(${r}, ${g}, ${b}, 0.6)`,
-                secondary: `rgba(${Math.floor(r * 0.9)}, ${Math.floor(g * 0.9)}, ${Math.floor(b * 0.9)}, 0.4)`,
-                tertiary: `rgba(${Math.floor(r * 0.8)}, ${Math.floor(g * 0.8)}, ${Math.floor(b * 0.8)}, 0.3)`
+                top: `rgba(${topColor.r}, ${topColor.g}, ${topColor.b}, 0.5)`,
+                right: `rgba(${rightColor.r}, ${rightColor.g}, ${rightColor.b}, 0.5)`,
+                bottom: `rgba(${bottomColor.r}, ${bottomColor.g}, ${bottomColor.b}, 0.5)`,
+                left: `rgba(${leftColor.r}, ${leftColor.g}, ${leftColor.b}, 0.5)`,
+                center: `rgba(${centerColor.r}, ${centerColor.g}, ${centerColor.b}, 0.3)`
             })
         }
 
@@ -151,7 +170,7 @@ export const HeroSection = () => {
                         <div
                             className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[75%] w-[85%] blur-3xl transition-all duration-500"
                             style={{
-                                background: `radial-gradient(ellipse at center, ${glowColors.primary}, ${glowColors.secondary}, transparent)`
+                                background: `radial-gradient(ellipse at center, ${glowColors.center}, transparent)`
                             }}
                         />
                     </div>
@@ -161,9 +180,11 @@ export const HeroSection = () => {
                         className="relative mx-auto w-full overflow-hidden rounded-2xl border border-border/50 bg-background transition-all duration-300"
                         style={{
                             boxShadow: `
-                                0 0 60px -15px ${glowColors.primary},
-                                0 0 100px -20px ${glowColors.secondary},
-                                0 0 140px -25px ${glowColors.tertiary}
+                                0 -60px 80px -40px ${glowColors.top},
+                                60px 0 80px -40px ${glowColors.right},
+                                0 60px 80px -40px ${glowColors.bottom},
+                                -60px 0 80px -40px ${glowColors.left},
+                                0 0 100px -30px ${glowColors.center}
                             `
                         }}
                     >
@@ -222,11 +243,11 @@ export const HeroSection = () => {
                     {/* Decorative elements */}
                     <div
                         className="-right-8 -bottom-8 absolute -z-10 size-32 rounded-full blur-3xl lg:size-40 transition-all duration-500"
-                        style={{ backgroundColor: glowColors.secondary }}
+                        style={{ backgroundColor: glowColors.bottom }}
                     />
                     <div
                         className="-top-8 -left-8 absolute -z-10 size-28 rounded-full blur-3xl lg:size-36 transition-all duration-500"
-                        style={{ backgroundColor: glowColors.tertiary }}
+                        style={{ backgroundColor: glowColors.left }}
                     />
                 </div>
             </div>
