@@ -238,7 +238,7 @@ const Faq12 = ({ className }: Faq12Props) => {
   return (
     <section
       className={cn(
-        "min-h-screen bg-[#F2F2F2] py-32 dark:bg-[#24242B]",
+        "min-h-screen py-32",
         className,
       )}
     >

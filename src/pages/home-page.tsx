@@ -1,5 +1,4 @@
 import { BenefitsSection } from '@/components/layout/sections/benefits'
-import { CommunitySection } from '@/components/layout/sections/community'
 import { ContactSection } from '@/components/layout/sections/contact'
 import { Feature283 } from '@/components/layout/sections/contributors'
 import { FAQSection } from '@/components/layout/sections/faq'
@@ -26,35 +25,31 @@ export default function HomePage() {
       </div>
 
       <div className="bg-muted/70 transition-colors duration-700">
-        <ServicesSection />
+        <TestimonialSection />
       </div>
 
       <div className="bg-background transition-colors duration-700">
-        <PricingSection />
+        <ServicesSection />
       </div>
 
-      <div className="ml-75px bg-muted/70 transition-colors duration-700">
+      <div className="bg-muted/70 transition-colors duration-700">
         <Feature283 />
       </div>
 
       <div className="bg-background transition-colors duration-700">
-        <TestimonialSection />
-      </div>
-
-      <div className="bg-muted/70 transition-colors duration-700">
         <TeamSection />
       </div>
 
-      <div className="bg-background transition-colors duration-700">
-        <CommunitySection />
+      <div className="bg-muted/70 transition-colors duration-700">
+        <PricingSection />
       </div>
 
       <div className="bg-background transition-colors duration-700">
-        <ContactSection />
+        <FAQSection />
       </div>
 
       <div className="bg-muted/70 transition-colors duration-700">
-        <FAQSection />
+        <ContactSection />
       </div>
     </>
   )
