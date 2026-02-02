@@ -1,120 +1,334 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Forward } from "lucide-react";
-import { useState } from "react";
 
 import { cn } from "@/lib/utils";
-
-import { Button } from "@/components/ui/button";
 
 interface Feature283Props {
   className?: string;
 }
 
-interface ImageData {
-  src: string;
-  className: string;
-  name: string;
-}
-
 const Feature283 = ({ className }: Feature283Props) => {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  const images: ImageData[] = [
+  const column1Images = [
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/guri3/img11.jpeg",
-      className:
-        "w-40 absolute -left-10 top-1/2 h-52 -translate-x-full -translate-y-1/2 overflow-hidden rounded-2xl",
-      name: "Marie Kolářová",
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw1.jpeg",
+      alt: "Gallery Image 1",
+      height: "23rem",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/guri3/img1.jpeg",
-      className:
-        "size-28 absolute -top-3 left-10 -translate-x-full -translate-y-full overflow-hidden rounded-2xl",
-      name: "Tomáš Novotný",
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw2.jpeg",
+      alt: "Gallery Image 2",
+      height: "28rem",
     },
     {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/guri3/img7.jpeg",
-      className:
-        "size-32 absolute -bottom-3 left-10 -translate-x-full translate-y-full overflow-hidden rounded-2xl",
-      name: "Jana Dvořáková",
-    },
-    {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/guri3/img12.jpeg",
-      className:
-        "w-45 absolute -right-10 top-1/2 h-52 -translate-y-1/2 translate-x-full overflow-hidden rounded-2xl",
-      name: "Petr Svoboda",
-    },
-    {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/guri3/img13.jpeg",
-      className:
-        "size-28 absolute -top-3 right-10 -translate-y-full translate-x-full overflow-hidden rounded-2xl",
-      name: "Lucie Procházková",
-    },
-    {
-      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/guri3/img3.jpeg",
-      className:
-        "size-32 absolute -bottom-3 right-10 translate-x-full translate-y-full overflow-hidden rounded-2xl",
-      name: "Martin Černý",
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw3.jpeg",
+      alt: "Gallery Image 3",
+      height: "12rem",
     },
   ];
 
-  const description =
-    "Setkejte se s inspirativními fyzioterapeuty, kteří prošli našimi kurzy a dnes dosahují výjimečných výsledků ve svých kariérách.";
+  const column2Images = [
+    {
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw4.jpeg",
+      alt: "Gallery Image 4",
+      height: "13rem",
+    },
+    {
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw5.jpeg",
+      alt: "Gallery Image 5",
+      height: "32rem",
+    },
+    {
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw6.jpeg",
+      alt: "Gallery Image 6",
+      height: "18rem",
+    },
+  ];
+
+  const column3Images = [
+    {
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw7.jpeg",
+      alt: "Gallery Image 7",
+      height: "32rem",
+    },
+    {
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw8.jpeg",
+      alt: "Gallery Image 8",
+      height: "32rem",
+    },
+  ];
+
+  const column4Images = [
+    {
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw9.jpeg",
+      alt: "Gallery Image 9",
+      height: "13rem",
+    },
+    {
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw10.jpeg",
+      alt: "Gallery Image 10",
+      height: "22.5rem",
+    },
+    {
+      src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/lummi/bw11.jpeg",
+      alt: "Gallery Image 11",
+      height: "22rem",
+    },
+  ];
 
   return (
-    <section className={cn("h-full h-screen overflow-hidden py-32", className)}>
-      <div className="container mx-auto flex h-full w-full flex-col items-center justify-center px-4">
-        <div className="relative flex flex-col items-center justify-center">
-          <h2
-            className="relative py-2 text-center font-sans text-4xl font-semibold tracking-tighter md:text-5xl"
-          >
-            Naši úspěšní absolventi,<br />na které můžete být hrdí
-          </h2>
-          <p
-            className="mx-auto mt-4 max-w-xl px-5 text-center text-sm text-muted-foreground md:text-base leading-relaxed"
-          >
-            {description}
-          </p>
-          <Button className="mt-10 h-10 rounded-xl">
-            Staňte se absolventem <Forward />
-          </Button>
-          <div>
-            {images.map((image, index) => (
+    <section className={cn("py-32", className)}>
+      <div className="relative container">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {/* Column 1 */}
+          <div className="grid gap-4">
+            {column1Images.map((image, index) => (
               <motion.div
-                drag
-                key={index}
-                initial={{ y: "50%", opacity: 0, scale: 0.8 }}
-                whileInView={{ y: 0, opacity: 1, scale: 1 }}
+                initial={{
+                  opacity: 0,
+                  scale: 0.9,
+                  y: 50,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                }}
                 transition={{
-                  duration: 0.2,
-                  ease: "easeOut",
-                  delay: index * 0.1 + 0.5,
+                  duration: 0.5,
+                  delay: index * 0.1,
                 }}
-                animate={{
-                  filter:
-                    hoveredIndex !== null && hoveredIndex !== index
-                      ? "blur(10px)"
-                      : "blur(0px)",
-                  scale: hoveredIndex === index ? 1.05 : 1,
-                  transition: {
-                    duration: 0.3,
-                    ease: "easeOut",
-                    delay: 0,
-                  },
-                }}
-                onHoverStart={() => setHoveredIndex(index)}
-                onHoverEnd={() => setHoveredIndex(null)}
-                className={image.className}
+                key={index}
+                className="w-full overflow-hidden rounded-2xl bg-muted"
+                style={{ height: image.height }}
               >
                 <img
+                  className="h-full w-full rounded-2xl object-cover"
                   src={image.src}
-                  alt={image.name}
-                  className="pointer-events-none size-full object-cover"
+                  alt={image.alt}
                 />
               </motion.div>
             ))}
+          </div>
+
+          {/* Column 2 */}
+          <div className="grid gap-4">
+            {column2Images.map((image, index) => (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.9,
+                  y: -50,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                }}
+                key={index}
+                className="w-full overflow-hidden rounded-2xl bg-muted"
+                style={{ height: image.height }}
+              >
+                <img
+                  className="h-full w-full rounded-2xl object-cover"
+                  src={image.src}
+                  alt={image.alt}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Column 3 */}
+          <div className="grid gap-4">
+            {column3Images.map((image, index) => (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.9,
+                  y: 50,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                }}
+                key={index}
+                className="w-full overflow-hidden rounded-2xl bg-muted"
+                style={{ height: image.height }}
+              >
+                <img
+                  className="h-full w-full rounded-2xl object-cover"
+                  src={image.src}
+                  alt={image.alt}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Column 4 */}
+          <div className="grid gap-4">
+            {column4Images.map((image, index) => (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.9,
+                  y: -50,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                }}
+                key={index}
+                className="w-full overflow-hidden rounded-2xl bg-muted"
+                style={{ height: image.height }}
+              >
+                <img
+                  className="h-full w-full rounded-2xl object-cover"
+                  src={image.src}
+                  alt={image.alt}
+                />
+              </motion.div>
+            ))}
+            <div className="h-17 w-full rounded-2xl bg-muted"></div>
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+          {/* Column 1 */}
+          <div className="grid gap-4">
+            {column1Images.map((image, index) => (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.9,
+                  y: 50,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                }}
+                key={index}
+                className="w-full overflow-hidden rounded-2xl bg-muted"
+                style={{ height: image.height }}
+              >
+                <img
+                  className="h-full w-full rounded-2xl object-cover"
+                  src={image.src}
+                  alt={image.alt}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Column 2 */}
+          <div className="grid gap-4">
+            {column2Images.map((image, index) => (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.9,
+                  y: -50,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                }}
+                key={index}
+                className="w-full overflow-hidden rounded-2xl bg-muted"
+                style={{ height: image.height }}
+              >
+                <img
+                  className="h-full w-full rounded-2xl object-cover"
+                  src={image.src}
+                  alt={image.alt}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Column 3 */}
+          <div className="grid gap-4">
+            {column3Images.map((image, index) => (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.9,
+                  y: 50,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                }}
+                key={index}
+                className="w-full overflow-hidden rounded-2xl bg-muted"
+                style={{ height: image.height }}
+              >
+                <img
+                  className="h-full w-full rounded-2xl object-cover"
+                  src={image.src}
+                  alt={image.alt}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Column 4 */}
+          <div className="grid gap-4">
+            {column4Images.map((image, index) => (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.9,
+                  y: -50,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  scale: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.1,
+                }}
+                key={index}
+                className="w-full overflow-hidden rounded-2xl bg-muted"
+                style={{ height: image.height }}
+              >
+                <img
+                  className="h-full w-full rounded-2xl object-cover"
+                  src={image.src}
+                  alt={image.alt}
+                />
+              </motion.div>
+            ))}
+            <div className="h-17 w-full rounded-2xl bg-muted"></div>
           </div>
         </div>
       </div>
