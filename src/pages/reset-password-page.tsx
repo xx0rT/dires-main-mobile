@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -17,9 +17,14 @@ import {
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { site } from "@/config/site"
-import { supabase } from "@/lib/supabase"
 
 const formSchema = z.object({
+  email: z.string().email({
+    message: "Zadejte platný email.",
+  }),
+  code: z.string().min(6, {
+    message: "Ověřovací kód musí mít 6 číslic.",
+  }).max(6),
   newPassword: z.string().min(6, {
     message: "Heslo musí mít alespoň 6 znaků.",
   }),
@@ -33,11 +38,14 @@ const formSchema = z.object({
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [isResetting, setIsResetting] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      email: location.state?.email || "",
+      code: "",
       newPassword: "",
       confirmPassword: "",
     },
@@ -46,12 +54,28 @@ export default function ResetPasswordPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsResetting(true)
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: values.newPassword
-      })
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-and-reset-password`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          code: values.code,
+          newPassword: values.newPassword,
+        }),
+      });
 
-      if (error) {
-        toast.error(error.message)
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.attemptsRemaining !== undefined) {
+          toast.error(`${data.error}. Zbývající pokusy: ${data.attemptsRemaining}`)
+        } else {
+          toast.error(data.error || 'Něco se pokazilo')
+        }
         return
       }
 
@@ -84,12 +108,47 @@ export default function ResetPasswordPage() {
             </div>
             <CardTitle className="text-2xl text-center">Resetovat heslo</CardTitle>
             <CardDescription className="text-center">
-              Zadejte své nové heslo
+              Zadejte ověřovací kód z emailu a nové heslo
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="jmeno@priklad.cz"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ověřovací kód</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="123456"
+                          maxLength={6}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="newPassword"
@@ -129,7 +188,13 @@ export default function ResetPasswordPage() {
                 </Button>
               </form>
             </Form>
-            <div className="mt-6">
+            <div className="mt-6 space-y-3">
+              <Link
+                to="/auth/forgot-password"
+                className="flex items-center justify-center text-sm text-muted-foreground hover:text-primary hover:underline"
+              >
+                Znovu odeslat kód
+              </Link>
               <Link
                 to="/auth/sign-in"
                 className="flex items-center justify-center text-sm text-primary hover:underline"
