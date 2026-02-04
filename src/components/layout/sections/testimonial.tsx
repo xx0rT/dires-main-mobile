@@ -74,7 +74,7 @@ const DATA: DataItem[] = [
     date: "2023-09-10",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-6.webp",
     content:
-      "This platform has made project management so much easier. It's intuitive, efficient, and keeps everyone on the same page.",
+      "Skvělý osobní přístup, velice doporučuji a děkuji 🙏 …",
   },
   {
     id: "7",
@@ -83,7 +83,7 @@ const DATA: DataItem[] = [
     date: "2023-09-05",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-7.webp",
     content:
-      "The branding tools are amazing. They've helped us maintain consistency across all our campaigns, which has been a huge win for our team.",
+      "Skvělé",
   },
   {
     id: "8",
