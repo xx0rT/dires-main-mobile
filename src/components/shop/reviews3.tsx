@@ -141,7 +141,7 @@ const Reviews3 = ({
 
   return (
     <section className={cn("py-16 md:py-24", className)}>
-      <div className="container max-w-3xl">
+      <div className="container mx-auto max-w-3xl">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
