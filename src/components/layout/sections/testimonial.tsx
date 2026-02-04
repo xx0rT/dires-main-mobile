@@ -92,7 +92,7 @@ const DATA: DataItem[] = [
     date: "2023-08-30",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-8.webp",
     content:
-      "The vector editing tools are fantastic. They've made my creative process so much smoother and more enjoyable.",
+      "přístup terapeutů je profesionální a cílený na individuální potřeby. Už po pár sezeních jsem cítil velké zlepšení pohyblivosti.",
   },
   {
     id: "9",
@@ -101,7 +101,7 @@ const DATA: DataItem[] = [
     date: "2023-08-25",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-4.webp",
     content:
-      "The animation features are incredible. They've taken my projects to the next level, and I couldn't be happier with the results.",
+      "Program 4Core mě opravdu posunul. Lekce jsou srozumitelné a pomáhají nejen s tělem, ale i s celkovým cítěním správného držení těla.",
   },
 ];
 
