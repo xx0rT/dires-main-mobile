@@ -189,19 +189,18 @@ const TestimonialSection = ({ className }: TestimonialSectionProps) => {
         <div className="my-4 flex justify-center">
           <Badge variant="outline" className="rounded-sm py-2 shadow-md">
             <MessageSquareCode className="mr-2 size-4 text-muted-foreground" />
-            <span>Customer Feedback</span>
+            <span>Reference pacientů</span>
           </Badge>
         </div>
 
         <div className="flex flex-col items-center gap-6 px-4 sm:px-8 text-center">
           <h2 className="mb-2 text-center text-3xl font-semibold lg:text-5xl">
-            Hear what our customers <br /> are saying
+            Zjistěte, co říkají <br /> naši pacienti
           </h2>
 
           <div className="mt-4 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <span>
-              Discover how <b>Shadcnblocks</b> is transforming workflows across
-              industries.
+              Objevte, jak naše fyzioterapeutická péče mění životy a zlepšuje zdraví našich klientů.
             </span>
           </div>
         </div>
@@ -217,9 +216,9 @@ const TestimonialSection = ({ className }: TestimonialSectionProps) => {
         <div className="flex justify-center">
           <Button className="mt-4 gap-2 rounded-lg px-5 py-3 text-sm shadow-sm transition-colors hover:bg-primary/90 focus:outline-none disabled:pointer-events-none disabled:opacity-50">
             <span className="flex items-center gap-1">
-              <span>See More</span>
+              <span>Zobrazit více</span>
               <span className="text-muted/80">-</span>
-              <span className="text-muted/80">Feedback</span>
+              <span className="text-muted/80">Referencí</span>
             </span>
             <ChevronRight className="h-4 w-4 text-muted-foreground/80" />
           </Button>
