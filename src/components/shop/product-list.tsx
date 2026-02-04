@@ -77,11 +77,11 @@ const PRODUCTS_LIST: ProductList = [
     },
     products: [
       {
-        name: "Leather Sofa",
+        name: "Kožená pohovka",
         price: {
-          regular: 899.0,
-          sale: 799.0,
-          currency: "USD",
+          regular: 21900,
+          sale: 19490,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -95,10 +95,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Ceramic Mug",
+        name: "Keramický hrnek",
         price: {
-          regular: 5.99,
-          currency: "USD",
+          regular: 146,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -112,10 +112,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Tea Kettle",
+        name: "Čajová konvice",
         price: {
-          regular: 92.0,
-          currency: "USD",
+          regular: 2240,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "OUT_OF_STOCK",
@@ -129,10 +129,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Scented Candles",
+        name: "Vonné svíčky",
         price: {
-          regular: 50.0,
-          currency: "USD",
+          regular: 1220,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -146,10 +146,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: '5" x 7" Wood Frame',
+        name: "Dřevěný rámeček 13x18 cm",
         price: {
-          regular: 20.0,
-          currency: "USD",
+          regular: 487,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -163,10 +163,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Sphere Lamp",
+        name: "Kulová lampa",
         price: {
-          regular: 199.0,
-          currency: "USD",
+          regular: 4850,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -180,11 +180,11 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Leather Chair",
+        name: "Kožená židle",
         price: {
-          regular: 899.0,
-          sale: 799.0,
-          currency: "USD",
+          regular: 21900,
+          sale: 19490,
+          currency: "CZK",
         },
         link: "#",
         badges: [
@@ -208,10 +208,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Ceramic Cup",
+        name: "Keramický šálek",
         price: {
-          regular: 19.0,
-          currency: "USD",
+          regular: 463,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "OUT_OF_STOCK",
@@ -240,11 +240,11 @@ const PRODUCTS_LIST: ProductList = [
     },
     products: [
       {
-        name: "Dining Chair",
+        name: "Jídelní židle",
         price: {
-          regular: 299.0,
-          sale: 199.0,
-          currency: "USD",
+          regular: 7290,
+          sale: 4850,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "OUT_OF_STOCK",
@@ -258,10 +258,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Wall Clock",
+        name: "Nástěnné hodiny",
         price: {
-          regular: 159.0,
-          currency: "USD",
+          regular: 3880,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -275,11 +275,11 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Ceramic Plate",
+        name: "Keramický talíř",
         price: {
-          regular: 99.0,
-          sale: 89.0,
-          currency: "USD",
+          regular: 2410,
+          sale: 2170,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -299,10 +299,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Wooden Cabinet",
+        name: "Dřevěná skříňka",
         price: {
-          regular: 699.0,
-          currency: "USD",
+          regular: 17030,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -316,10 +316,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Wooden Chair",
+        name: "Dřevěná židle",
         price: {
-          regular: 49.0,
-          currency: "USD",
+          regular: 1195,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -333,10 +333,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Ceramic Cup",
+        name: "Keramický šálek",
         price: {
-          regular: 19.0,
-          currency: "USD",
+          regular: 463,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -350,10 +350,10 @@ const PRODUCTS_LIST: ProductList = [
         },
       },
       {
-        name: "Ceramic Cup",
+        name: "Keramický šálek",
         price: {
-          regular: 19.0,
-          currency: "USD",
+          regular: 463,
+          currency: "CZK",
         },
         link: "#",
         stockStatusCode: "IN_STOCK",
@@ -460,12 +460,12 @@ const ProductCard = ({
           </AspectRatio>
           {stockStatusCode === STOCK_STATUS.OUT_OF_STOCK && (
             <div className="absolute start-2.5 top-2.5 z-60">
-              <Badge>Sold Out</Badge>
+              <Badge>Vyprodáno</Badge>
             </div>
           )}
           {stockStatusCode === STOCK_STATUS.IN_STOCK && price.sale && (
             <div className="absolute start-2.5 top-2.5 z-60">
-              <Badge variant="destructive">Sale</Badge>
+              <Badge variant="destructive">Sleva</Badge>
             </div>
           )}
           <div className="absolute inset-x-5 top-1/2 z-60 hidden -translate-y-1/2 md:block">
@@ -475,7 +475,7 @@ const ProductCard = ({
                 className="w-full"
               >
                 <ShoppingCart />
-                Add to cart
+                Přidat do košíku
               </Button>
               <Button
                 variant="secondary"
@@ -487,7 +487,7 @@ const ProductCard = ({
                 }}
               >
                 <Eye />
-                Quick View
+                Rychlý náhled
               </Button>
             </div>
           </div>

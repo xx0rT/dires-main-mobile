@@ -28,28 +28,28 @@ interface CartItem {
 const DEFAULT_ITEMS: CartItem[] = [
   {
     id: "1",
-    name: "Minimalist Beige Sneakers",
+    name: "Minimalistické béžové tenisky",
     image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/clothes/Minimalist-Beige-Sneakers-2.png",
-    price: 120.0,
+    price: 2900,
     quantity: 1,
-    variant: "Size: EU 36",
+    variant: "Velikost: EU 36",
   },
   {
     id: "2",
-    name: "Embroidered Blue Top",
+    name: "Vyšívaný modrý top",
     image:
       "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/clothes/Woman-in-Embroidered-Blue-Top-2.png",
-    price: 140.0,
+    price: 3400,
     quantity: 1,
-    variant: "Size: S",
+    variant: "Velikost: S",
   },
   {
     id: "3",
-    name: "Classic Fedora Hat",
+    name: "Klasický fedora klobouk",
     image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/accessories/Classic-Fedora-Hat-2.png",
-    price: 84.0,
+    price: 2040,
     quantity: 1,
-    variant: "Color: Beige",
+    variant: "Barva: Béžová",
   },
 ];
 
@@ -78,14 +78,14 @@ export default function CartPage() {
   const applyPromoCode = () => {
     setPromoError(null);
     if (!promoCode.trim()) {
-      setPromoError("Please enter a promo code");
+      setPromoError("Prosím zadejte promo kód");
       return;
     }
     if (promoCode.toUpperCase() === "SAVE10") {
       setAppliedPromo(promoCode.toUpperCase());
       setPromoCode("");
     } else {
-      setPromoError("Invalid promo code");
+      setPromoError("Neplatný promo kód");
     }
   };
 
@@ -99,13 +99,15 @@ export default function CartPage() {
     0,
   );
   const discount = appliedPromo ? subtotal * 0.1 : 0;
-  const shipping = 9.99;
+  const shipping = 240;
   const total = subtotal - discount + shipping;
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("cs-CZ", {
       style: "currency",
-      currency: "USD",
+      currency: "CZK",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(price);
   };
 
@@ -116,12 +118,12 @@ export default function CartPage() {
           <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-full bg-muted">
             <ShoppingCart className="size-8 text-muted-foreground" />
           </div>
-          <h1 className="mb-4 text-2xl font-semibold">Your cart is empty</h1>
+          <h1 className="mb-4 text-2xl font-semibold">Váš košík je prázdný</h1>
           <p className="mb-8 text-muted-foreground">
-            Looks like you haven't added anything yet.
+            Vypadá to, že jste ještě nic nepřidali.
           </p>
           <Button asChild>
-            <a href="/shop">Continue Shopping</a>
+            <a href="/shop">Pokračovat v nákupu</a>
           </Button>
         </div>
       </section>
@@ -131,7 +133,7 @@ export default function CartPage() {
   return (
     <section className="py-32">
       <div className="container mx-auto">
-        <h1 className="mb-8 text-3xl font-semibold">Shopping Cart</h1>
+        <h1 className="mb-8 text-3xl font-semibold">Nákupní košík</h1>
 
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
@@ -169,7 +171,7 @@ export default function CartPage() {
                         variant="secondary"
                         className="mt-2 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                       >
-                        In Stock
+                        Skladem
                       </Badge>
                     </div>
 
@@ -202,7 +204,7 @@ export default function CartPage() {
                         {formatPrice(item.price * item.quantity)}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {formatPrice(item.price)} each
+                        {formatPrice(item.price)} za kus
                       </p>
                     </div>
                     <Button
@@ -212,7 +214,7 @@ export default function CartPage() {
                       onClick={() => removeItem(item.id)}
                     >
                       <Trash2 className="mr-1.5 size-4" />
-                      Remove
+                      Odebrat
                     </Button>
                   </div>
                 </div>
@@ -222,7 +224,7 @@ export default function CartPage() {
 
           <div className="lg:col-span-1">
             <div className="rounded-lg border bg-card p-6">
-              <h2 className="mb-4 text-lg font-semibold">Order Summary</h2>
+              <h2 className="mb-4 text-lg font-semibold">Souhrn objednávky</h2>
 
               <div className="mb-4">
                 {appliedPromo ? (
@@ -236,7 +238,7 @@ export default function CartPage() {
                         {appliedPromo}
                       </Badge>
                       <span className="text-sm text-green-700 dark:text-green-300">
-                        10% off
+                        Sleva 10%
                       </span>
                     </div>
                     <Button
@@ -245,14 +247,14 @@ export default function CartPage() {
                       className="h-auto p-1 text-muted-foreground hover:text-foreground"
                       onClick={removePromo}
                     >
-                      Remove
+                      Odebrat
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     <div className="flex gap-2">
                       <Input
-                        placeholder="Promo code"
+                        placeholder="Promo kód"
                         value={promoCode}
                         onChange={(e) => {
                           setPromoCode(e.target.value);
@@ -261,18 +263,18 @@ export default function CartPage() {
                         className="flex-1"
                       />
                       <Button variant="outline" onClick={applyPromoCode}>
-                        Apply
+                        Použít
                       </Button>
                     </div>
                     {promoError && (
                       <p className="text-sm text-destructive">{promoError}</p>
                     )}
                     <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      Try
+                      Zkuste
                       <Badge variant="outline" className="font-mono text-xs">
                         SAVE10
                       </Badge>
-                      for 10% off
+                      pro slevu 10%
                     </p>
                   </div>
                 )}
@@ -284,38 +286,38 @@ export default function CartPage() {
                 <div className="flex justify-between text-sm">
                   <span className="flex items-center gap-1.5 text-muted-foreground">
                     <ShoppingCart className="size-4" />
-                    {items.length} {items.length === 1 ? "item" : "items"}
+                    {items.length} {items.length === 1 ? "položka" : items.length < 5 ? "položky" : "položek"}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-muted-foreground">Mezisoučet</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
-                    <span>Discount</span>
+                    <span>Sleva</span>
                     <span>-{formatPrice(discount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
+                  <span className="text-muted-foreground">Doprava</span>
                   <span>{formatPrice(shipping)}</span>
                 </div>
 
                 <Separator />
 
                 <div className="flex justify-between font-semibold">
-                  <span>Total</span>
+                  <span>Celkem</span>
                   <span>{formatPrice(total)}</span>
                 </div>
               </div>
 
               <Button size="lg" className="mt-6 w-full">
-                Proceed to Checkout
+                Pokračovat k pokladně
               </Button>
 
               <p className="mt-4 text-center text-xs text-muted-foreground">
-                Taxes calculated at checkout
+                Daně vypočítány při placení
               </p>
 
               <Separator className="my-6" />
@@ -323,15 +325,15 @@ export default function CartPage() {
               <div className="space-y-3">
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <Truck className="size-5 shrink-0" />
-                  <span>Free shipping on orders over $150</span>
+                  <span>Doprava zdarma nad 3 600 Kč</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <RefreshCcw className="size-5 shrink-0" />
-                  <span>Free 30-day returns</span>
+                  <span>Bezplatné vrácení do 30 dnů</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
                   <Shield className="size-5 shrink-0" />
-                  <span>Secure checkout</span>
+                  <span>Bezpečná platba</span>
                 </div>
               </div>
             </div>

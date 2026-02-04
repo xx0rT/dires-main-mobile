@@ -24,6 +24,7 @@ const pricingPlans = [
     planType: "free_trial" as const,
     price: 0,
     duration: "3 dny",
+    currency: "CZK" as const,
     features: [
       "3denní zkušební verze zdarma",
       "Plný přístup ke všem funkcím",
@@ -37,8 +38,9 @@ const pricingPlans = [
     icon: Briefcase,
     name: "Měsíční plán",
     planType: "monthly" as const,
-    price: 30,
+    price: 730,
     duration: "měsíčně",
+    currency: "CZK" as const,
     features: [
       "Všechny funkce zkušební verze a navíc:",
       "Neomezené seznamy úkolů",
@@ -53,8 +55,9 @@ const pricingPlans = [
     icon: Building,
     name: "Doživotní přístup",
     planType: "lifetime" as const,
-    price: 200,
+    price: 4870,
     duration: "jednorázově",
+    currency: "CZK" as const,
     features: [
       "Všechny měsíční funkce a navíc:",
       "Doživotní přístup - zaplaťte jednou",
@@ -179,10 +182,10 @@ const Pricing20 = ({ className }: Pricing20Props) => {
 
                 <div className="flex items-baseline font-medium">
                   <span className="text-[3.5rem] leading-[120%] tracking-[-3.92px]">
-                    ${plan.price}
+                    {plan.price.toLocaleString('cs-CZ')}
                   </span>
-                  <span className="text-muted-foreground-subtle text-2xl tracking-[-0.96px]">
-                    {plan.planType === "free_trial" ? "" : plan.planType === "monthly" ? "/mo" : ""}
+                  <span className="text-muted-foreground-subtle text-2xl tracking-[-0.96px] ml-2">
+                    Kč{plan.planType === "monthly" ? "/měs" : ""}
                   </span>
                 </div>
                 <p className="text-muted-foreground">

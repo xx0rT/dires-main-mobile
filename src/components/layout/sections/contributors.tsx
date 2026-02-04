@@ -11,17 +11,17 @@ interface Feature283Props {
 const Feature283 = ({ className }: Feature283Props) => {
   const column1Images = [
     {
-      src: "https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768582/pexels-photo-3768582.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Physiotherapy Treatment",
       height: "23rem",
     },
     {
-      src: "https://images.pexels.com/photos/5794052/pexels-photo-5794052.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Patient Rehabilitation",
       height: "28rem",
     },
     {
-      src: "https://images.pexels.com/photos/4506221/pexels-photo-4506221.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768582/pexels-photo-3768582.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Therapeutic Exercise",
       height: "12rem",
     },
@@ -29,17 +29,17 @@ const Feature283 = ({ className }: Feature283Props) => {
 
   const column2Images = [
     {
-      src: "https://images.pexels.com/photos/5794051/pexels-photo-5794051.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Physical Therapy Session",
       height: "13rem",
     },
     {
-      src: "https://images.pexels.com/photos/4506270/pexels-photo-4506270.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768582/pexels-photo-3768582.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Back Therapy Treatment",
       height: "32rem",
     },
     {
-      src: "https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Rehabilitation Equipment",
       height: "18rem",
     },
@@ -47,12 +47,12 @@ const Feature283 = ({ className }: Feature283Props) => {
 
   const column3Images = [
     {
-      src: "https://images.pexels.com/photos/5794052/pexels-photo-5794052.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768582/pexels-photo-3768582.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Knee Therapy",
       height: "32rem",
     },
     {
-      src: "https://images.pexels.com/photos/4506221/pexels-photo-4506221.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Manual Therapy",
       height: "32rem",
     },
@@ -60,17 +60,17 @@ const Feature283 = ({ className }: Feature283Props) => {
 
   const column4Images = [
     {
-      src: "https://images.pexels.com/photos/5794051/pexels-photo-5794051.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Stretching Exercise",
       height: "13rem",
     },
     {
-      src: "https://images.pexels.com/photos/4506270/pexels-photo-4506270.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768582/pexels-photo-3768582.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Massage Therapy",
       height: "22.5rem",
     },
     {
-      src: "https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg?auto=compress&cs=tinysrgb&w=800",
+      src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
       alt: "Recovery Session",
       height: "22rem",
     },

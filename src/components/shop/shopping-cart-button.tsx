@@ -23,17 +23,17 @@ interface CartItem {
 const DEFAULT_ITEMS: CartItem[] = [
   {
     id: "1",
-    name: "Cotton Crew Tee",
+    name: "Bavlněné tričko",
     image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/clothes/minimalist-tank-top-flatlay.png",
-    price: 35.0,
+    price: 850,
     quantity: 1,
   },
   {
     id: "2",
-    name: "Slim Fit Chinos",
+    name: "Slim fit kalhoty",
     image:
       "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/clothes/pexels-jay-soundo-2148060180-30624171-2.png",
-    price: 68.0,
+    price: 1650,
     quantity: 1,
   },
 ];
@@ -56,9 +56,11 @@ const ShoppingCartButton = ({
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("cs-CZ", {
       style: "currency",
-      currency: "USD",
+      currency: "CZK",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(price);
   };
 
@@ -79,7 +81,7 @@ const ShoppingCartButton = ({
         <PopoverTrigger asChild>
           <Button variant="ghost" size="sm" className="relative gap-2">
             <ShoppingBag className="size-4" />
-            <span className="hidden sm:inline">Cart</span>
+            <span className="hidden sm:inline">Košík</span>
             {itemCount > 0 && (
               <span className="flex size-5 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
                 {itemCount}
@@ -119,7 +121,7 @@ const ShoppingCartButton = ({
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-muted-foreground">
-                            Qty: {item.quantity}
+                            Množství: {item.quantity}
                           </span>
                           <span className="text-sm font-medium">
                             {formatPrice(item.price)}
@@ -133,7 +135,7 @@ const ShoppingCartButton = ({
 
               <div className="border-t bg-muted/30 p-3">
                 <div className="mb-3 flex items-center justify-between">
-                  <span className="text-sm">Subtotal</span>
+                  <span className="text-sm">Mezisoučet</span>
                   <span className="font-semibold">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -142,14 +144,14 @@ const ShoppingCartButton = ({
                     size="sm"
                     onClick={handleViewCart}
                   >
-                    View Cart
+                    Zobrazit košík
                   </Button>
-                  <Button size="sm">Checkout</Button>
+                  <Button size="sm">K pokladně</Button>
                 </div>
 
                 <div className="mt-3 border-t pt-3">
                   <p className="mb-2 text-center text-xs text-muted-foreground">
-                    Express checkout
+                    Expresní pokladna
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     <Button
@@ -173,9 +175,9 @@ const ShoppingCartButton = ({
           ) : (
             <div className="p-6 text-center">
               <ShoppingBag className="mx-auto mb-2 size-8 text-muted-foreground" />
-              <p className="text-sm font-medium">Cart is empty</p>
+              <p className="text-sm font-medium">Košík je prázdný</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Add items to get started
+                Přidejte položky
               </p>
             </div>
           )}
