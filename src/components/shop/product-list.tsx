@@ -66,11 +66,11 @@ type ProductList = Array<{
 const PRODUCTS_LIST: ProductList = [
   {
     featuredPromotion: {
-      image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/other/linh-le-giP0e750Dr8-unsplash-1.jpg",
-      title: "Timeless pieces made for comfort and style.",
-      kicker: "Elevate Your Everyday Spaces",
+      image: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
+      title: "Profesionální pomůcky pro efektivní rehabilitaci",
+      kicker: "Vylepšete svou fyzioterapii",
       cta: {
-        label: "Shop Furniture & More",
+        label: "Prohlédnout vybavení",
         link: "#",
       },
       link: "#",
@@ -229,11 +229,11 @@ const PRODUCTS_LIST: ProductList = [
   {
     featuredPromotion: {
       image:
-        "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/other/pexels-karolina-grabowska-4207892-1.jpg",
-      title: "From candles to frames, small accents, big impressions.",
-      kicker: "Details That Make a Home",
+        "https://images.pexels.com/photos/4056535/pexels-photo-4056535.jpeg?auto=compress&cs=tinysrgb&w=800",
+      title: "Kvalitní pomůcky pro domácí i profesionální cvičení",
+      kicker: "Vaše cesta k lepšímu zdraví",
       cta: {
-        label: "Explore Home Accents",
+        label: "Zobrazit produkty",
         link: "#",
       },
       link: "#",

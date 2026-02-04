@@ -25,59 +25,59 @@ type ProductCategories2Props = {
 };
 
 const PRODUCT_CATEGORIES = {
-  title: "Product Categories",
+  title: "Kategorie produktů",
   productCategories: [
     {
-      title: "Sunglasses",
-      summary: "Modern shades blending style and sun protection",
+      title: "Posilovací gumy",
+      summary: "Elastické pásy pro rehabilitační cvičení",
       image: {
-        src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/accessories/Checkered-Sunglasses-on-Stone-Pedestal-2.png",
-        alt: "",
+        src: "https://images.pexels.com/photos/4056535/pexels-photo-4056535.jpeg?auto=compress&cs=tinysrgb&w=600",
+        alt: "Posilovací gumy",
       },
       link: "#",
     },
     {
-      title: "Jewelry",
-      summary: "Elegant pieces to elevate every look",
+      title: "Masážní pomůcky",
+      summary: "Profesionální nástroje pro uvolnění svalů",
       image: {
-        src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/accessories/Gold-Hoop-Earrings-on-Ceramic-Dish-2.png",
-        alt: "",
+        src: "https://images.pexels.com/photos/3768593/pexels-photo-3768593.jpeg?auto=compress&cs=tinysrgb&w=600",
+        alt: "Masážní pomůcky",
       },
       link: "#",
     },
     {
-      title: "Coats & Jackets",
-      summary: "Layer up with timeless outerwear styles",
+      title: "Balanční podložky",
+      summary: "Pro zlepšení stability a koordinace",
       image: {
-        src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/clothes/Minimalist-Fashion-Portrait-2.png",
-        alt: "",
+        src: "https://images.pexels.com/photos/4397840/pexels-photo-4397840.jpeg?auto=compress&cs=tinysrgb&w=600",
+        alt: "Balanční podložky",
       },
       link: "#",
     },
     {
-      title: "Bags",
-      summary: "Functional designs crafted for daily wear",
+      title: "Rehabilitační míče",
+      summary: "Pro posilování a funkční cvičení",
       image: {
-        src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/clothes/Woman-with-Tote-Bag-2.png",
-        alt: "",
+        src: "https://images.pexels.com/photos/3984340/pexels-photo-3984340.jpeg?auto=compress&cs=tinysrgb&w=600",
+        alt: "Rehabilitační míče",
       },
       link: "#",
     },
     {
-      title: "Shoes",
-      summary: "Step forward with comfort and style",
+      title: "Terapeutické válce",
+      summary: "Pro masáž a uvolnění svalového napětí",
       image: {
-        src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/clothes/Minimalist-Beige-Sneakers-2.png",
-        alt: "",
+        src: "https://images.pexels.com/photos/4498606/pexels-photo-4498606.jpeg?auto=compress&cs=tinysrgb&w=600",
+        alt: "Terapeutické válce",
       },
       link: "#",
     },
     {
-      title: "Dresses",
-      summary: "Effortless silhouettes for every occasion",
+      title: "Cvičební podložky",
+      summary: "Pohodlné podložky pro všechny cviky",
       image: {
-        src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/clothes/pexels-429124762-15555033-2.jpg",
-        alt: "",
+        src: "https://images.pexels.com/photos/3822906/pexels-photo-3822906.jpeg?auto=compress&cs=tinysrgb&w=600",
+        alt: "Cvičební podložky",
       },
       link: "#",
     },

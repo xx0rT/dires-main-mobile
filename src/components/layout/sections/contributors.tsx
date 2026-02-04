@@ -11,18 +11,18 @@ interface Feature283Props {
 const Feature283 = ({ className }: Feature283Props) => {
   const column1Images = [
     {
-      src: "https://images.pexels.com/photos/3768582/pexels-photo-3768582.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Physiotherapy Treatment",
+      src: "https://images.pexels.com/photos/4056535/pexels-photo-4056535.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Posilovací guma",
       height: "23rem",
     },
     {
-      src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Patient Rehabilitation",
+      src: "https://images.pexels.com/photos/3768593/pexels-photo-3768593.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Masážní pomůcky",
       height: "28rem",
     },
     {
-      src: "https://images.pexels.com/photos/3768582/pexels-photo-3768582.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Therapeutic Exercise",
+      src: "https://images.pexels.com/photos/4397840/pexels-photo-4397840.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Balanční cvičení",
       height: "12rem",
     },
   ];
@@ -30,48 +30,48 @@ const Feature283 = ({ className }: Feature283Props) => {
   const column2Images = [
     {
       src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Physical Therapy Session",
+      alt: "Fyzioterapie",
       height: "13rem",
     },
     {
-      src: "https://images.pexels.com/photos/3768582/pexels-photo-3768582.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Back Therapy Treatment",
+      src: "https://images.pexels.com/photos/4056535/pexels-photo-4056535.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Rehabilitační cvičení",
       height: "32rem",
     },
     {
-      src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Rehabilitation Equipment",
+      src: "https://images.pexels.com/photos/3768593/pexels-photo-3768593.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Terapeutické pomůcky",
       height: "18rem",
     },
   ];
 
   const column3Images = [
     {
-      src: "https://images.pexels.com/photos/3768582/pexels-photo-3768582.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Knee Therapy",
+      src: "https://images.pexels.com/photos/4397840/pexels-photo-4397840.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Balanční podložka",
       height: "32rem",
     },
     {
       src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Manual Therapy",
+      alt: "Manuální terapie",
       height: "32rem",
     },
   ];
 
   const column4Images = [
     {
-      src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Stretching Exercise",
+      src: "https://images.pexels.com/photos/4056535/pexels-photo-4056535.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Protahovací cvičení",
       height: "13rem",
     },
     {
-      src: "https://images.pexels.com/photos/3768582/pexels-photo-3768582.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Massage Therapy",
+      src: "https://images.pexels.com/photos/3768593/pexels-photo-3768593.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Masážní terapie",
       height: "22.5rem",
     },
     {
-      src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=800",
-      alt: "Recovery Session",
+      src: "https://images.pexels.com/photos/4397840/pexels-photo-4397840.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Rehabilitační sezení",
       height: "22rem",
     },
   ];

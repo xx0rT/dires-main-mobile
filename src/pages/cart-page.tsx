@@ -28,28 +28,27 @@ interface CartItem {
 const DEFAULT_ITEMS: CartItem[] = [
   {
     id: "1",
-    name: "Minimalistické béžové tenisky",
-    image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/clothes/Minimalist-Beige-Sneakers-2.png",
-    price: 2900,
-    quantity: 1,
-    variant: "Velikost: EU 36",
+    name: "Masážní míček pro fyzioterapii",
+    image: "https://images.pexels.com/photos/3768593/pexels-photo-3768593.jpeg?auto=compress&cs=tinysrgb&w=400",
+    price: 450,
+    quantity: 2,
+    variant: "Průměr: 8 cm",
   },
   {
     id: "2",
-    name: "Vyšívaný modrý top",
-    image:
-      "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/clothes/Woman-in-Embroidered-Blue-Top-2.png",
-    price: 3400,
+    name: "Posilovací guma - set 3 ks",
+    image: "https://images.pexels.com/photos/4056535/pexels-photo-4056535.jpeg?auto=compress&cs=tinysrgb&w=400",
+    price: 890,
     quantity: 1,
-    variant: "Velikost: S",
+    variant: "Odpor: Lehký, Střední, Těžký",
   },
   {
     id: "3",
-    name: "Klasický fedora klobouk",
-    image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/ecommerce/accessories/Classic-Fedora-Hat-2.png",
-    price: 2040,
+    name: "Balančná podložka",
+    image: "https://images.pexels.com/photos/4397840/pexels-photo-4397840.jpeg?auto=compress&cs=tinysrgb&w=400",
+    price: 1250,
     quantity: 1,
-    variant: "Barva: Béžová",
+    variant: "Barva: Modrá",
   },
 ];
 
