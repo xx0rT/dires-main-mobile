@@ -56,7 +56,7 @@ const DATA: DataItem[] = [
     date: "2023-09-20",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-4.webp",
     content:
-      "I love how easy it is to integrate this platform with my existing tools. It has streamlined my workflow significantly, saving me hours every week.",
+      "Nevěřila jsem, že moje 3 letá dcera dokáže být hodinu v klidu, ale z pana Kottase vyzařuje takový klid, že se jí celá návštěva líbila a i když se jí hned ulevilo, tak by tam chtěla jezdit znovu, jak jí bylo celé ošetření příjemné.",
   },
   {
     id: "5",
