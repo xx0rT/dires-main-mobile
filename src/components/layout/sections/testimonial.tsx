@@ -39,7 +39,7 @@ const DATA: DataItem[] = [
     date: "2023-09-30",
     avatar: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar-2.webp",
     content:
-      "The collaboration features are truly outstanding, allowing my team and I to work together seamlessly no matter where we are, which has made remote work significantly easier. The real-time editing and intuitive sharing options have transformed how we operate, eliminating the headaches of version control and endless email chains.",
+      "Honza Kottas helped me again with a problem that had been bothering me for a month and that neither massages nor acupuncture helped. Honza's gentle, sensitive work brought me noticeable relief and improvement, not immediately, but within a few hours I found out that it no longer hurts, my back doesn't pull, my hand doesn't tingle, my chest doesn't burn. I consider Honza a shaman, a healer. He has never helped me with problems that I would otherwise have gone to a neurologist with, with whom I have had a very bad experience. So I am truly happy that I know Honza and I warmly recommend him to everyone.",
   },
   {
     id: "3",
