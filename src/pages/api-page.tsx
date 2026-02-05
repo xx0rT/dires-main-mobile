@@ -8,90 +8,90 @@ const appointments = {
   today: [
     {
       id: 1,
-      time: '09:00 AM',
-      patient: 'Sarah Johnson',
-      treatment: 'Sports Injury Rehabilitation',
+      time: '09:00',
+      patient: 'Jana Nováková',
+      treatment: 'Rehabilitace sportovních zranění',
       duration: '60 min',
       status: 'confirmed',
-      notes: 'Follow-up session for knee injury'
+      notes: 'Kontrolní sezení pro zranění kolene'
     },
     {
       id: 2,
-      time: '10:30 AM',
-      patient: 'Michael Chen',
-      treatment: 'Post-Surgery Therapy',
+      time: '10:30',
+      patient: 'Petr Dvořák',
+      treatment: 'Pooperační terapie',
       duration: '45 min',
       status: 'confirmed',
-      notes: 'Initial assessment after shoulder surgery'
+      notes: 'Prvotní vyšetření po operaci ramene'
     },
     {
       id: 3,
-      time: '12:00 PM',
-      patient: 'Emma Davis',
-      treatment: 'Chronic Pain Management',
+      time: '12:00',
+      patient: 'Eva Marková',
+      treatment: 'Léčba chronické bolesti',
       duration: '60 min',
       status: 'pending',
-      notes: 'Lower back pain treatment'
+      notes: 'Léčba bolesti dolní části zad'
     },
     {
       id: 4,
-      time: '02:00 PM',
-      patient: 'James Wilson',
-      treatment: 'Mobility Enhancement',
+      time: '14:00',
+      patient: 'Tomáš Svoboda',
+      treatment: 'Zlepšení mobility',
       duration: '45 min',
       status: 'confirmed',
-      notes: 'Regular mobility exercises'
+      notes: 'Pravidelná cvičení mobility'
     },
     {
       id: 5,
-      time: '03:30 PM',
-      patient: 'Lisa Anderson',
-      treatment: 'Neck Pain Management',
+      time: '15:30',
+      patient: 'Lucie Procházková',
+      treatment: 'Léčba bolesti krku',
       duration: '60 min',
       status: 'confirmed',
-      notes: 'Cervical spine treatment'
+      notes: 'Léčba krční páteře'
     }
   ],
   upcoming: [
     {
       id: 6,
       date: '2024-01-20',
-      time: '10:00 AM',
-      patient: 'David Martinez',
-      treatment: 'Knee Rehabilitation',
+      time: '10:00',
+      patient: 'Martin Černý',
+      treatment: 'Rehabilitace kolene',
       duration: '60 min',
       status: 'confirmed',
-      notes: 'Post-ACL surgery rehabilitation'
+      notes: 'Rehabilitace po operaci ACL'
     },
     {
       id: 7,
       date: '2024-01-21',
-      time: '11:00 AM',
-      patient: 'Sarah Johnson',
-      treatment: 'Sports Injury Rehabilitation',
+      time: '11:00',
+      patient: 'Jana Nováková',
+      treatment: 'Rehabilitace sportovních zranění',
       duration: '60 min',
       status: 'confirmed',
-      notes: 'Continue knee strengthening exercises'
+      notes: 'Pokračování posilování kolene'
     },
     {
       id: 8,
       date: '2024-01-22',
-      time: '09:30 AM',
-      patient: 'Robert Taylor',
-      treatment: 'Balance and Coordination',
+      time: '09:30',
+      patient: 'Pavel Novotný',
+      treatment: 'Rovnováha a koordinace',
       duration: '45 min',
       status: 'pending',
-      notes: 'Fall prevention program'
+      notes: 'Program prevence pádů'
     },
     {
       id: 9,
       date: '2024-01-23',
-      time: '02:00 PM',
-      patient: 'Jennifer White',
-      treatment: 'Arthritis Management',
+      time: '14:00',
+      patient: 'Monika Horáková',
+      treatment: 'Léčba artritidy',
       duration: '60 min',
       status: 'confirmed',
-      notes: 'Joint mobility exercises'
+      notes: 'Cvičení mobility kloubů'
     }
   ]
 }
@@ -99,19 +99,19 @@ const appointments = {
 const statusConfig = {
   confirmed: {
     variant: 'default' as const,
-    label: 'Confirmed'
+    label: 'Potvrzeno'
   },
   pending: {
     variant: 'secondary' as const,
-    label: 'Pending'
+    label: 'Čeká'
   },
   completed: {
     variant: 'outline' as const,
-    label: 'Completed'
+    label: 'Dokončeno'
   },
   cancelled: {
     variant: 'destructive' as const,
-    label: 'Cancelled'
+    label: 'Zrušeno'
   }
 }
 
@@ -120,75 +120,75 @@ export default function ApiPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Appointments</h1>
-          <p className="text-muted-foreground">Manage your appointment schedule and patient visits.</p>
+          <h1 className="text-3xl font-bold">Objednávky</h1>
+          <p className="text-muted-foreground">Spravujte harmonogram objednávek a návštěvy pacientů.</p>
         </div>
         <Button>
           <RiAddLine className="mr-2 h-4 w-4" />
-          New Appointment
+          Nová objednávka
         </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Today's Appointments</CardTitle>
+            <CardTitle className="text-sm font-medium">Dnešní objednávky</CardTitle>
             <RiCalendarLine className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{appointments.today.length}</div>
             <p className="text-xs text-muted-foreground">
-              {appointments.today.filter(a => a.status === 'confirmed').length} confirmed
+              {appointments.today.filter(a => a.status === 'confirmed').length} potvrzeno
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Week</CardTitle>
+            <CardTitle className="text-sm font-medium">Tento týden</CardTitle>
             <RiCalendarLine className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{appointments.today.length + appointments.upcoming.length}</div>
-            <p className="text-xs text-muted-foreground">Across 5 days</p>
+            <p className="text-xs text-muted-foreground">V průběhu 5 dní</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Duration</CardTitle>
+            <CardTitle className="text-sm font-medium">Průměrná délka</CardTitle>
             <RiTimeLine className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">55 min</div>
-            <p className="text-xs text-muted-foreground">Per appointment</p>
+            <p className="text-xs text-muted-foreground">Na objednávku</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Míra dokončení</CardTitle>
             <RiCheckLine className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">96%</div>
-            <p className="text-xs text-green-600 dark:text-green-400">Excellent performance</p>
+            <p className="text-xs text-green-600 dark:text-green-400">Vynikající výkon</p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="today" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="today">Today</TabsTrigger>
-          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-          <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+          <TabsTrigger value="today">Dnes</TabsTrigger>
+          <TabsTrigger value="upcoming">Nadcházející</TabsTrigger>
+          <TabsTrigger value="calendar">Kalendářní zobrazení</TabsTrigger>
         </TabsList>
 
         <TabsContent value="today" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Today's Schedule</CardTitle>
-              <CardDescription>All appointments for today</CardDescription>
+              <CardTitle>Dnešní harmonogram</CardTitle>
+              <CardDescription>Všechny dnešní objednávky</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {appointments.today.map((appointment) => (
@@ -226,7 +226,7 @@ export default function ApiPage() {
                   <div className="flex items-center gap-2 ml-4">
                     <Button variant="outline" size="sm">
                       <RiCheckLine className="mr-2 h-4 w-4" />
-                      Complete
+                      Dokončit
                     </Button>
                     <Button variant="ghost" size="sm">
                       <RiMoreLine className="h-4 w-4" />
@@ -241,8 +241,8 @@ export default function ApiPage() {
         <TabsContent value="upcoming" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Upcoming Appointments</CardTitle>
-              <CardDescription>Scheduled appointments for the next 7 days</CardDescription>
+              <CardTitle>Nadcházející objednávky</CardTitle>
+              <CardDescription>Naplánované objednávky na následujících 7 dní</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {appointments.upcoming.map((appointment) => (
@@ -283,7 +283,7 @@ export default function ApiPage() {
 
                   <div className="flex items-center gap-2 ml-4">
                     <Button variant="outline" size="sm">
-                      Reschedule
+                      Přeplánovat
                     </Button>
                     <Button variant="ghost" size="sm">
                       <RiCloseLine className="h-4 w-4" />
@@ -298,15 +298,15 @@ export default function ApiPage() {
         <TabsContent value="calendar" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Calendar View</CardTitle>
-              <CardDescription>Monthly calendar with all appointments</CardDescription>
+              <CardTitle>Kalendářní zobrazení</CardTitle>
+              <CardDescription>Měsíční kalendář se všemi objednávkami</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-center h-[400px] text-muted-foreground">
                 <div className="text-center space-y-4">
                   <RiCalendarLine className="h-16 w-16 mx-auto opacity-50" />
-                  <p>Calendar view will be available soon</p>
-                  <p className="text-sm">Integrated calendar component coming in next update</p>
+                  <p>Kalendářní zobrazení bude brzy k dispozici</p>
+                  <p className="text-sm">Integrovaná komponenta kalendáře přijde v příští aktualizaci</p>
                 </div>
               </div>
             </CardContent>
