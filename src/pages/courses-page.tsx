@@ -322,15 +322,19 @@ export default function CoursesPage() {
   const showcaseCourses = buildShowcaseCourses()
 
   return (
-    <section className="py-32">
-      <div className="container">
-        <CoursesHero />
+    <div className="py-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="rounded-3xl bg-muted/40 px-6 py-16 sm:px-10 lg:px-16">
+          <CoursesHero />
+        </div>
 
-        <div id="courses" className="mt-24">
+        <div id="courses" className="mt-16 rounded-3xl bg-muted/40 px-6 py-12 sm:px-10 lg:px-16">
           <CourseShowcase courses={showcaseCourses} />
         </div>
 
-        <CoursesNews />
+        <div className="mt-16 rounded-3xl bg-muted/40 px-6 py-12 sm:px-10 lg:px-16">
+          <CoursesNews />
+        </div>
 
         {!user && (
           <motion.div
@@ -376,6 +380,6 @@ export default function CoursesPage() {
           }
         />
       </div>
-    </section>
+    </div>
   )
 }

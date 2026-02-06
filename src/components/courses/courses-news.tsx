@@ -50,7 +50,7 @@ interface CoursesNewsProps {
 
 const CoursesNews = ({ className }: CoursesNewsProps) => {
   return (
-    <section className={cn('py-32', className)}>
+    <section className={cn('py-4', className)}>
       <div className="flex flex-col items-start justify-between gap-5 lg:flex-row lg:gap-2">
         <div className="flex w-full max-w-56 items-center gap-3 text-sm">
           <span className="size-2 rounded-full bg-primary" />

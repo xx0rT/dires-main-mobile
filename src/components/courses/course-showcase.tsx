@@ -34,7 +34,7 @@ interface CourseShowcaseProps {
 
 const CourseShowcase = ({ className, courses }: CourseShowcaseProps) => {
   return (
-    <section className={cn('bg-background py-16', className)}>
+    <section className={cn('py-4', className)}>
       <div className="flex flex-col gap-8">
         {courses.map((course) => (
           <div
