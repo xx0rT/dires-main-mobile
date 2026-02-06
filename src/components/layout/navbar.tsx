@@ -675,16 +675,16 @@ const MobileNavigationMenu = ({ open }: MobileNavigationMenuProps) => {
       <SheetContent
         aria-describedby={undefined}
         side="top"
-        className="inset-0 z-998 h-dvh w-full bg-background pt-20 [&>button]:hidden"
+        className="inset-0 z-998 flex h-dvh w-full flex-col overflow-hidden bg-background pt-20 [&>button]:hidden"
       >
+        <div className="absolute -m-px h-px w-px overflow-hidden border-0 mask-clip-border p-0 text-nowrap whitespace-nowrap">
+          <SheetTitle className="text-primary">
+            Mobilni navigace
+          </SheetTitle>
+        </div>
         <div className="flex-1 overflow-y-auto">
           <div className="container py-8">
-            <div className="absolute -m-px h-px w-px overflow-hidden border-0 mask-clip-border p-0 text-nowrap whitespace-nowrap">
-              <SheetTitle className="text-primary">
-                Mobilni navigace
-              </SheetTitle>
-            </div>
-            <div className="flex min-h-full flex-col gap-6">
+            <div className="flex min-h-full flex-col gap-6 pb-8">
               <Accordion type="multiple" className="w-full">
                 {NAVIGATION.map((item, index) =>
                   renderMobileMenuItem(item, index),
