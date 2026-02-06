@@ -50,13 +50,12 @@ interface CoursesNewsProps {
 
 const CoursesNews = ({ className }: CoursesNewsProps) => {
   return (
-    <section className={cn('py-4', className)}>
-      <div className="flex flex-col items-start justify-between gap-5 lg:flex-row lg:gap-2">
-        <div className="flex w-full max-w-56 items-center gap-3 text-sm">
-          <span className="size-2 rounded-full bg-primary" />
-          Novinky
-        </div>
-        <div className="flex-1">
+    <section className={cn('relative py-4 overflow-hidden', className)}>
+      <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-64 w-[500px] rounded-full bg-primary/5 blur-[100px]" />
+      <div className="pointer-events-none absolute -bottom-24 right-0 h-48 w-[400px] rounded-full bg-primary/4 blur-[80px]" />
+
+      <div className="relative">
+        <div>
           <h2 className="text-3xl">
             Zustan v obraze
             <br />
@@ -70,7 +69,7 @@ const CoursesNews = ({ className }: CoursesNewsProps) => {
               <Fragment key={idx}>
                 <a
                   href={item.link}
-                  className="group flex flex-col justify-between gap-10 py-6 transition-all duration-400 lg:flex-row lg:items-center lg:hover:bg-muted"
+                  className="group flex flex-col justify-between gap-10 py-6 transition-all duration-400 lg:flex-row lg:items-center lg:hover:bg-muted/50"
                 >
                   <div className="flex items-center gap-2 text-lg transition-all duration-400 lg:group-hover:translate-x-8">
                     <p className="inline text-pretty text-primary">
