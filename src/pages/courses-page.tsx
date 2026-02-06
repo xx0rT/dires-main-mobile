@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { ShieldCheck, Check } from 'lucide-react'
+import { ShieldCheck, Check, Package, ShoppingCart } from 'lucide-react'
+import { RiBookOpenLine, RiCheckLine, RiTimeLine, RiShoppingBag3Line } from '@remixicon/react'
 import { toast } from 'sonner'
 import { useAuth } from '@/lib/auth-context'
 import { useSubscription } from '@/lib/use-subscription'
@@ -212,6 +213,24 @@ export default function CoursesPage() {
     }))
   }
 
+  const totalPacks = courses.length
+  const purchasedPacks = purchases.length
+  const completedPacks = enrollments.filter(e => e.completed).length
+  const totalVideos = courses.reduce((sum, c) => sum + c.lessons_count, 0)
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  }
+
   if (loading || subscriptionLoading) {
     return (
       <div className="flex min-h-[600px] items-center justify-center">
@@ -222,7 +241,7 @@ export default function CoursesPage() {
 
   if (user && !hasActiveSubscription) {
     return (
-      <div className="container mx-auto px-4 py-16">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -296,46 +315,83 @@ export default function CoursesPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 space-y-16">
+    <div className="relative mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="space-y-4 text-center"
       >
-        <h1 className="text-4xl font-bold md:text-5xl">
-          Video{' '}
-          <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            Balicky
-          </span>
-        </h1>
-        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          Kazdy balicek obsahuje sadu videi. Zakupte si balicek jednorázove a ziskejte pristup ke vsem videim uvnitr.
+        <h1 className="text-3xl font-bold">Video Balicky</h1>
+        <p className="mt-2 text-muted-foreground">
+          Kazdy balicek obsahuje sadu videi. Zakupte si balicek jednorazove a ziskejte pristup ke vsem videim uvnitr.
         </p>
       </motion.div>
 
-      <div className="mx-auto max-w-3xl space-y-16">
+      <motion.div
+        className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {[
+          { title: 'Celkem Balicku', value: totalPacks, icon: RiBookOpenLine, color: 'text-blue-600' },
+          { title: 'Zakoupenych', value: purchasedPacks, icon: RiShoppingBag3Line, color: 'text-green-600' },
+          { title: 'Dokoncenych', value: completedPacks, icon: RiCheckLine, color: 'text-emerald-600' },
+          { title: 'Celkem Videi', value: totalVideos, icon: RiTimeLine, color: 'text-orange-600' },
+        ].map(stat => {
+          const Icon = stat.icon
+          return (
+            <motion.div key={stat.title} variants={itemVariants}>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                  <Icon className={`h-4 w-4 ${stat.color}`} />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )
+        })}
+      </motion.div>
+
+      <div className="space-y-6">
         {packages.map((pkg, index) => (
-          <PackageSection
+          <motion.div
             key={pkg.id}
-            id={pkg.id}
-            title={pkg.title}
-            description={pkg.description}
-            icon={pkg.icon}
-            courses={getPackageCourses(pkg.id)}
-            index={index}
-            isAuthenticated={!!user}
-            buyingCourseId={buyingCourseId}
-            onBuy={handleBuy}
-            onPreview={handlePreview}
-          />
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
+          >
+            <Card>
+              <CardContent className="p-6">
+                <PackageSection
+                  id={pkg.id}
+                  title={pkg.title}
+                  description={pkg.description}
+                  icon={pkg.icon}
+                  courses={getPackageCourses(pkg.id)}
+                  isAuthenticated={isAuthenticated}
+                  buyingCourseId={buyingCourseId}
+                  onBuy={handleBuy}
+                  onPreview={handlePreview}
+                />
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
 
       {packages.length === 0 && !loading && (
-        <div className="py-12 text-center">
-          <p className="text-muted-foreground">Zadne kurzy nejsou k dispozici.</p>
-        </div>
+        <Card>
+          <CardContent className="py-12 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
+              <Package className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground">Zadne balicky nejsou k dispozici.</p>
+          </CardContent>
+        </Card>
       )}
 
       {!user && (
@@ -343,20 +399,26 @@ export default function CoursesPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="mx-auto max-w-2xl rounded-2xl border border-primary/20 bg-primary/5 px-6 py-12 text-center"
         >
-          <h3 className="mb-4 text-2xl font-bold">Pripraveni zacit?</h3>
-          <p className="mx-auto mb-6 max-w-md text-muted-foreground">
-            Vytvorte si ucet a ziskejte pristup ke kurzum
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <Button asChild size="lg">
-              <Link to="/auth/sign-up">Zacit nyni</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/auth/sign-in">Jiz mam ucet</Link>
-            </Button>
-          </div>
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="px-6 py-10 text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+                <ShoppingCart className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="mb-2 text-2xl font-bold">Pripraveni zacit?</h3>
+              <p className="mx-auto mb-6 max-w-md text-muted-foreground">
+                Vytvorte si ucet a ziskejte pristup ke kurzum
+              </p>
+              <div className="flex items-center justify-center gap-4">
+                <Button asChild size="lg">
+                  <Link to="/auth/sign-up">Zacit nyni</Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link to="/auth/sign-in">Jiz mam ucet</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
       )}
 

@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion'
-import { GraduationCap, Trophy, ChevronRight } from 'lucide-react'
+import { GraduationCap, Trophy } from 'lucide-react'
 import { CourseCard } from './course-card'
 import type { CourseStatus } from './course-card'
 import { Progress } from '@/components/ui/progress'
+import { Badge } from '@/components/ui/badge'
 
 const iconMap: Record<string, typeof GraduationCap> = {
   'graduation-cap': GraduationCap,
@@ -26,7 +26,6 @@ interface PackageSectionProps {
   description: string
   icon: string
   courses: PackageCourse[]
-  index: number
   isAuthenticated: boolean
   buyingCourseId: string | null
   onBuy: (courseId: string) => void
@@ -38,7 +37,6 @@ export function PackageSection({
   description,
   icon,
   courses,
-  index,
   isAuthenticated,
   buyingCourseId,
   onBuy,
@@ -49,31 +47,31 @@ export function PackageSection({
   const progressPercent = courses.length > 0 ? Math.round((completedCount / courses.length) * 100) : 0
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.12 }}
-    >
-      <div className="mb-8 flex items-center gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-          <IconComponent className="h-5 w-5 text-primary" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold truncate">{title}</h2>
-            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-            <span className="text-sm font-medium text-muted-foreground shrink-0">
-              {completedCount}/{courses.length}
-            </span>
+    <section>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+            <IconComponent className="h-5 w-5 text-primary" />
           </div>
-          <p className="text-sm text-muted-foreground truncate">{description}</p>
-          {completedCount > 0 && (
-            <Progress value={progressPercent} className="mt-2 h-1.5" />
-          )}
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold">{title}</h2>
+              <Badge variant="outline" className="text-[11px]">
+                {courses.length} balicku
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">{description}</p>
+          </div>
         </div>
+        {completedCount > 0 && (
+          <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+            <span className="font-medium">{completedCount}/{courses.length}</span>
+            <Progress value={progressPercent} className="h-1.5 w-20" />
+          </div>
+        )}
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {courses
           .sort((a, b) => a.order_index - b.order_index)
           .map((course, courseIndex) => (
@@ -94,6 +92,6 @@ export function PackageSection({
             />
           ))}
       </div>
-    </motion.section>
+    </section>
   )
 }
