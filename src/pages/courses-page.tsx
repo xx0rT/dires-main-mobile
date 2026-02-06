@@ -57,6 +57,7 @@ const packageImages = [
   'https://images.pexels.com/photos/4050315/pexels-photo-4050315.jpeg?auto=compress&cs=tinysrgb&w=800',
   'https://images.pexels.com/photos/4498606/pexels-photo-4498606.jpeg?auto=compress&cs=tinysrgb&w=800',
   'https://images.pexels.com/photos/7298867/pexels-photo-7298867.jpeg?auto=compress&cs=tinysrgb&w=800',
+  'https://images.pexels.com/photos/3985163/pexels-photo-3985163.jpeg?auto=compress&cs=tinysrgb&w=800',
 ]
 
 const avatars = [
@@ -70,6 +71,7 @@ const gradients = [
   'from-amber-100 to-orange-100',
   'from-rose-100 to-pink-100',
   'from-teal-100 to-green-100',
+  'from-sky-100 to-blue-100',
 ]
 
 export default function CoursesPage() {
@@ -349,8 +351,9 @@ export default function CoursesPage() {
     <div className="py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl bg-muted/40 px-6 py-16 sm:px-10 lg:px-16">
-          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/8 blur-[80px]" />
-          <div className="pointer-events-none absolute -bottom-20 left-1/4 h-48 w-64 rounded-full bg-primary/6 blur-[70px]" />
+          <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-primary/10 blur-[90px]" />
+          <div className="pointer-events-none absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-primary/8 blur-[80px]" />
+          <div className="pointer-events-none absolute left-1/2 top-1/3 h-56 w-96 -translate-x-1/2 rounded-full bg-primary/5 blur-[100px]" />
           <CoursesHero />
         </div>
 

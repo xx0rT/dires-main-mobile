@@ -28,7 +28,7 @@ const CoursesHero = ({ className }: CoursesHeroProps) => {
             alt="Fyzioterapie kurzy"
             className="size-full max-h-[550px] object-cover grayscale-100 transition-all duration-300 group-hover:grayscale-50"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent" />
           <div className="absolute inset-0 z-10 flex flex-col justify-between p-8">
             <Badge className="w-fit border border-background/20 bg-background/15 backdrop-blur-sm">
               <Sparkles className="size-4" />
@@ -67,7 +67,7 @@ const CoursesHero = ({ className }: CoursesHeroProps) => {
               alt="Rehabilitace"
               className="size-full max-h-[267px] object-cover grayscale-100 transition-all duration-300 group-hover:grayscale-50"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent" />
             <div className="absolute inset-0 z-10 flex flex-col justify-between p-8">
               <Badge className="w-fit border border-background/20 bg-background/15 backdrop-blur-sm">
                 Populární
@@ -96,7 +96,7 @@ const CoursesHero = ({ className }: CoursesHeroProps) => {
               alt="Pokrocile techniky"
               className="size-full max-h-[267px] object-cover grayscale-100 transition-all duration-300 group-hover:grayscale-50"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent" />
             <div className="absolute inset-0 z-10 flex flex-col justify-between p-8">
               <Badge className="w-fit border border-background/20 bg-background/15 backdrop-blur-sm">
                 Pokrocile

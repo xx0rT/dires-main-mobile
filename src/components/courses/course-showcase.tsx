@@ -295,7 +295,7 @@ const CourseShowcase = ({ className, courses }: CourseShowcaseProps) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {courses.map((course, idx) => (
           <CourseShowcaseCard key={course.title} course={course} index={idx} />
         ))}
