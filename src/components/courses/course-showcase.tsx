@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowRight,
   BookOpen,
+  ChevronDown,
+  ChevronUp,
   Clock,
   Eye,
   Film,
@@ -271,7 +273,13 @@ function CourseShowcaseCard({ course, index }: { course: ShowcaseCourse; index: 
   )
 }
 
+const INITIAL_VISIBLE = 3
+
 const CourseShowcase = ({ className, courses }: CourseShowcaseProps) => {
+  const [expanded, setExpanded] = useState(false)
+  const hasMore = courses.length > INITIAL_VISIBLE
+  const visibleCourses = expanded ? courses : courses.slice(0, INITIAL_VISIBLE)
+
   return (
     <section className={cn('py-4', className)}>
       <div className="mb-10 flex items-end justify-between">
@@ -296,10 +304,43 @@ const CourseShowcase = ({ className, courses }: CourseShowcaseProps) => {
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {courses.map((course, idx) => (
-          <CourseShowcaseCard key={course.title} course={course} index={idx} />
-        ))}
+        <AnimatePresence mode="popLayout">
+          {visibleCourses.map((course, idx) => (
+            <motion.div
+              key={course.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, delay: idx >= INITIAL_VISIBLE ? (idx - INITIAL_VISIBLE) * 0.08 : 0 }}
+            >
+              <CourseShowcaseCard course={course} index={idx} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
+
+      {hasMore && (
+        <div className="mt-8 flex justify-center">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => setExpanded(!expanded)}
+            className="gap-2"
+          >
+            {expanded ? (
+              <>
+                Zobrazit mene
+                <ChevronUp className="h-4 w-4" />
+              </>
+            ) : (
+              <>
+                Zobrazit vse ({courses.length - INITIAL_VISIBLE} dalsich)
+                <ChevronDown className="h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </div>
+      )}
     </section>
   )
 }
