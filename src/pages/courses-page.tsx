@@ -348,11 +348,15 @@ export default function CoursesPage() {
   return (
     <div className="py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-muted/40 px-6 py-16 sm:px-10 lg:px-16">
+        <div className="relative overflow-hidden rounded-3xl bg-muted/40 px-6 py-16 sm:px-10 lg:px-16">
+          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/8 blur-[80px]" />
+          <div className="pointer-events-none absolute -bottom-20 left-1/4 h-48 w-64 rounded-full bg-primary/6 blur-[70px]" />
           <CoursesHero />
         </div>
 
-        <div id="courses" className="mt-16 rounded-3xl bg-muted/40 px-6 py-12 sm:px-10 lg:px-16">
+        <div id="courses" className="relative mt-16 overflow-hidden rounded-3xl bg-muted/40 px-6 py-12 sm:px-10 lg:px-16">
+          <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-primary/8 blur-[80px]" />
+          <div className="pointer-events-none absolute -top-16 right-1/3 h-48 w-72 rounded-full bg-primary/6 blur-[70px]" />
           <CourseShowcase courses={showcaseCourses} />
         </div>
 
