@@ -269,12 +269,13 @@ const NAVIGATION: MenuItem[] = [
     ],
   },
   {
-    title: "Reference",
-    url: "/#testimonials",
+    title: "Kosik",
+    url: "/cart",
+    id: 100,
   },
   {
-    title: "Cenik",
-    url: "/#pricing",
+    title: "Prepnout tema",
+    id: 101,
   },
 ];
 
@@ -374,8 +375,6 @@ const Navbar10 = ({ className }: Navbar10Props) => {
               </NavigationMenuList>
             </div>
             <div className="flex items-center gap-2 justify-self-end">
-              <ModeToggle />
-              <ShoppingCartButton />
               <div className="hidden xl:flex xl:items-center xl:gap-2">
                 <Button variant="ghost" asChild size={isScrolled ? "sm" : "default"}>
                   <Link to="/auth/sign-in">Prihlasit se</Link>
@@ -411,6 +410,22 @@ const Navbar10 = ({ className }: Navbar10Props) => {
 };
 
 const DesktopMenuItem = ({ item, index }: DesktopMenuItemProps) => {
+  if (item.id === 100) {
+    return (
+      <NavigationMenuItem key={`desktop-menu-item-${index}`} value={`${index}`}>
+        <ShoppingCartButton />
+      </NavigationMenuItem>
+    );
+  }
+
+  if (item.id === 101) {
+    return (
+      <NavigationMenuItem key={`desktop-menu-item-${index}`} value={`${index}`}>
+        <ModeToggle />
+      </NavigationMenuItem>
+    );
+  }
+
   if (item.links || item.featuredLinks || item.groupLinks) {
     return (
       <NavigationMenuItem key={`desktop-menu-item-${index}`} value={`${index}`}>
@@ -758,6 +773,22 @@ const MobileNavigationMenu = ({ open }: MobileNavigationMenuProps) => {
 };
 
 const renderMobileMenuItem = (item: MenuItem, index: number) => {
+  if (item.id === 100) {
+    return (
+      <div key={item.title} className="flex h-[2.5rem] items-center">
+        <ShoppingCartButton />
+      </div>
+    );
+  }
+
+  if (item.id === 101) {
+    return (
+      <div key={item.title} className="flex h-[2.5rem] items-center">
+        <ModeToggle />
+      </div>
+    );
+  }
+
   if (item.links || item.featuredLinks || item.groupLinks) {
     return (
       <AccordionItem
