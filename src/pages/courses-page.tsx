@@ -1,15 +1,16 @@
 import { useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { ShieldCheck, Check, Package, ShoppingCart } from 'lucide-react'
-import { RiBookOpenLine, RiCheckLine, RiTimeLine, RiShoppingBag3Line } from '@remixicon/react'
+import { ShieldCheck, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuth } from '@/lib/auth-context'
 import { useSubscription } from '@/lib/use-subscription'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { PackageSection, type PackageCourse } from '@/components/courses/package-section'
+import { CoursesHero } from '@/components/courses/courses-hero'
+import { CourseShowcase, type ShowcaseCourse } from '@/components/courses/course-showcase'
+import { CoursesNews } from '@/components/courses/courses-news'
 import { CoursePreviewDialog } from '@/components/courses/course-preview-dialog'
 import type { CourseStatus } from '@/components/courses/course-card'
 
@@ -51,6 +52,19 @@ interface DBLesson {
   order_index: number
 }
 
+const gradients = [
+  'from-blue-100 to-cyan-100',
+  'from-green-100 to-emerald-100',
+  'from-amber-100 to-orange-100',
+  'from-rose-100 to-pink-100',
+  'from-teal-100 to-green-100',
+]
+
+const avatars = [
+  'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=100',
+  'https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=100',
+]
+
 export default function CoursesPage() {
   const { user, session } = useAuth()
   const navigate = useNavigate()
@@ -61,12 +75,12 @@ export default function CoursesPage() {
   const [enrollments, setEnrollments] = useState<DBEnrollment[]>([])
   const [purchases, setPurchases] = useState<DBPurchase[]>([])
   const [loading, setLoading] = useState(true)
-  const [buyingCourseId, setBuyingCourseId] = useState<string | null>(null)
+  const [, setBuyingCourseId] = useState<string | null>(null)
   const isAuthenticated = !!user
 
   const [previewOpen, setPreviewOpen] = useState(false)
-  const [previewCourse, setPreviewCourse] = useState<DBCourse | null>(null)
-  const [previewLessons, setPreviewLessons] = useState<DBLesson[]>([])
+  const [previewCourse] = useState<DBCourse | null>(null)
+  const [previewLessons] = useState<DBLesson[]>([])
 
   const loadData = useCallback(async () => {
     try {
@@ -184,51 +198,42 @@ export default function CoursesPage() {
     }
   }
 
-  const handlePreview = async (courseId: string) => {
-    const course = courses.find(c => c.id === courseId)
-    if (!course) return
+  const buildShowcaseCourses = (): ShowcaseCourse[] => {
+    return packages.map((pkg, idx) => {
+      const pkgCourses = courses.filter(c => c.package_id === pkg.id)
+      const totalLessons = pkgCourses.reduce((sum, c) => sum + c.lessons_count, 0)
+      const totalDuration = pkgCourses.reduce((sum, c) => sum + c.duration, 0)
+      const allPurchased = pkgCourses.length > 0 && pkgCourses.every(c => isPurchased(c.id))
+      const firstAvailable = pkgCourses.find(c => {
+        const status = getCourseStatus(c, pkgCourses)
+        return status === 'available' || status === 'purchased'
+      })
 
-    const { data: lessons } = await supabase
-      .from('course_lessons')
-      .select('id, course_id, title, description, duration, order_index')
-      .eq('course_id', courseId)
-      .order('order_index')
-
-    setPreviewCourse(course)
-    setPreviewLessons(lessons || [])
-    setPreviewOpen(true)
-  }
-
-  const getPackageCourses = (packageId: string): PackageCourse[] => {
-    const pkgCourses = courses.filter(c => c.package_id === packageId)
-    return pkgCourses.map(course => ({
-      id: course.id,
-      title: course.title,
-      description: course.description,
-      lessons_count: course.lessons_count,
-      duration: course.duration,
-      price: course.price,
-      order_index: course.order_index,
-      status: getCourseStatus(course, pkgCourses),
-    }))
-  }
-
-  const totalPacks = courses.length
-  const purchasedPacks = purchases.length
-  const completedPacks = enrollments.filter(e => e.completed).length
-  const totalVideos = courses.reduce((sum, c) => sum + c.lessons_count, 0)
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+      return {
+        badge: 'Balicek',
+        title: pkg.title,
+        description: pkg.description,
+        author: {
+          name: 'Fyzioterapie tým',
+          title: `${pkgCourses.length} kurzu v balicku`,
+          avatar: avatars[idx % avatars.length],
+        },
+        image: `https://images.pexels.com/photos/${idx % 2 === 0 ? '4506109' : '5473182'}/pexels-photo-${idx % 2 === 0 ? '4506109' : '5473182'}.jpeg?auto=compress&cs=tinysrgb&w=400`,
+        lessons: pkgCourses.length,
+        videos: totalLessons,
+        duration: `${totalDuration} minut`,
+        audience: ['Fyzioterapeuti', 'Studenti'],
+        gradient: gradients[idx % gradients.length],
+        cta: {
+          text: allPurchased
+            ? 'Pokracovat'
+            : firstAvailable
+              ? 'Zobrazit'
+              : 'Koupit',
+          url: firstAvailable ? `/course/${firstAvailable.id}` : '#courses',
+        },
+      }
+    })
   }
 
   if (loading || subscriptionLoading) {
@@ -314,131 +319,63 @@ export default function CoursesPage() {
     )
   }
 
+  const showcaseCourses = buildShowcaseCourses()
+
   return (
-    <div className="relative mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <h1 className="text-3xl font-bold">Video Balicky</h1>
-        <p className="mt-2 text-muted-foreground">
-          Kazdy balicek obsahuje sadu videi. Zakupte si balicek jednorazove a ziskejte pristup ke vsem videim uvnitr.
-        </p>
-      </motion.div>
+    <section className="py-32">
+      <div className="container">
+        <CoursesHero />
 
-      <motion.div
-        className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {[
-          { title: 'Celkem Balicku', value: totalPacks, icon: RiBookOpenLine, color: 'text-blue-600' },
-          { title: 'Zakoupenych', value: purchasedPacks, icon: RiShoppingBag3Line, color: 'text-green-600' },
-          { title: 'Dokoncenych', value: completedPacks, icon: RiCheckLine, color: 'text-emerald-600' },
-          { title: 'Celkem Videi', value: totalVideos, icon: RiTimeLine, color: 'text-orange-600' },
-        ].map(stat => {
-          const Icon = stat.icon
-          return (
-            <motion.div key={stat.title} variants={itemVariants}>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                  <Icon className={`h-4 w-4 ${stat.color}`} />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )
-        })}
-      </motion.div>
+        <div id="courses" className="mt-24">
+          <CourseShowcase courses={showcaseCourses} />
+        </div>
 
-      <div className="space-y-6">
-        {packages.map((pkg, index) => (
+        <CoursesNews />
+
+        {!user && (
           <motion.div
-            key={pkg.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-16"
           >
-            <Card>
-              <CardContent className="p-6">
-                <PackageSection
-                  id={pkg.id}
-                  title={pkg.title}
-                  description={pkg.description}
-                  icon={pkg.icon}
-                  courses={getPackageCourses(pkg.id)}
-                  isAuthenticated={isAuthenticated}
-                  buyingCourseId={buyingCourseId}
-                  onBuy={handleBuy}
-                  onPreview={handlePreview}
-                />
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="px-6 py-10 text-center">
+                <h3 className="mb-2 text-2xl font-bold">Pripraveni zacit?</h3>
+                <p className="mx-auto mb-6 max-w-md text-muted-foreground">
+                  Vytvorte si ucet a ziskejte pristup ke kurzum
+                </p>
+                <div className="flex items-center justify-center gap-4">
+                  <Button asChild size="lg">
+                    <Link to="/auth/sign-up">Zacit nyni</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg">
+                    <Link to="/auth/sign-in">Jiz mam ucet</Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
-        ))}
+        )}
+
+        <CoursePreviewDialog
+          open={previewOpen}
+          onOpenChange={setPreviewOpen}
+          courseTitle={previewCourse?.title || ''}
+          courseDescription={previewCourse?.description || ''}
+          coursePrice={previewCourse?.price}
+          isPurchased={previewCourse ? isPurchased(previewCourse.id) : false}
+          lessons={previewLessons}
+          onBuy={
+            previewCourse && isAuthenticated && !isPurchased(previewCourse.id)
+              ? () => {
+                  setPreviewOpen(false)
+                  handleBuy(previewCourse.id)
+                }
+              : undefined
+          }
+        />
       </div>
-
-      {packages.length === 0 && !loading && (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
-              <Package className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <p className="text-muted-foreground">Zadne balicky nejsou k dispozici.</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {!user && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <Card className="border-primary/20 bg-primary/5">
-            <CardContent className="px-6 py-10 text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                <ShoppingCart className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mb-2 text-2xl font-bold">Pripraveni zacit?</h3>
-              <p className="mx-auto mb-6 max-w-md text-muted-foreground">
-                Vytvorte si ucet a ziskejte pristup ke kurzum
-              </p>
-              <div className="flex items-center justify-center gap-4">
-                <Button asChild size="lg">
-                  <Link to="/auth/sign-up">Zacit nyni</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link to="/auth/sign-in">Jiz mam ucet</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      <CoursePreviewDialog
-        open={previewOpen}
-        onOpenChange={setPreviewOpen}
-        courseTitle={previewCourse?.title || ''}
-        courseDescription={previewCourse?.description || ''}
-        coursePrice={previewCourse?.price}
-        isPurchased={previewCourse ? isPurchased(previewCourse.id) : false}
-        lessons={previewLessons}
-        onBuy={
-          previewCourse && isAuthenticated && !isPurchased(previewCourse.id)
-            ? () => {
-                setPreviewOpen(false)
-                handleBuy(previewCourse.id)
-              }
-            : undefined
-        }
-      />
-    </div>
+    </section>
   )
 }
