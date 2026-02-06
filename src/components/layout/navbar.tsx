@@ -100,6 +100,7 @@ type NavLinkProps = {
 const NAVIGATION: MenuItem[] = [
   {
     title: "Dires",
+    url: "/",
     id: 1,
     groupLinks: [
       {
@@ -215,6 +216,7 @@ const NAVIGATION: MenuItem[] = [
   },
   {
     title: "Kurzy",
+    url: "/courses",
     id: 3,
     groupLinks: [
       {
@@ -433,7 +435,13 @@ const DesktopMenuItem = ({ item, index }: DesktopMenuItemProps) => {
     return (
       <NavigationMenuItem key={`desktop-menu-item-${index}`} value={`${index}`}>
         <NavigationMenuTrigger className="h-fit bg-transparent font-normal text-foreground/60">
-          {item.title}
+          {item.url ? (
+            <Link to={item.url} className="hover:text-foreground transition-colors">
+              {item.title}
+            </Link>
+          ) : (
+            item.title
+          )}
         </NavigationMenuTrigger>
         <NavigationMenuContent className="hidden !rounded-xl !border-0 !p-0 xl:block">
           <div className="w-dvw animate-[fade-in-slide-down_0.35s_cubic-bezier(0.33,1,0.68,1)_forwards] px-8 pt-6 pb-12">
