@@ -1,20 +1,21 @@
 import {
-  Book,
+  Activity,
+  BookOpen,
+  Brain,
   ChevronRight,
-  Code,
-  Database,
-  Globe,
-  Layout,
+  ClipboardList,
+  Dumbbell,
+  GraduationCap,
+  HandHeart,
+  HeartPulse,
+  LayoutGrid,
   MenuIcon,
-  Monitor,
-  Paintbrush,
-  Server,
-  Settings,
-  Shield,
   Sparkles,
-  Terminal,
+  Stethoscope,
+  Trophy,
   Users,
   X,
+  Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -25,8 +26,10 @@ import {
   useRef,
   useState,
 } from "react";
+import { Link } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
+import { site } from "@/config/site";
 
 import {
   Accordion,
@@ -90,223 +93,188 @@ type NavLinkProps = {
   link: MenuLink;
   onMouseEnter?: MouseEventHandler<HTMLAnchorElement>;
   onMouseLeave?: MouseEventHandler<HTMLAnchorElement>;
-  showDescription?: boolean;
-};
-
-const LOGO = {
-  url: "https://www.shadcnblocks.com",
-  src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/block-1.svg",
-  alt: "logo",
-  title: "Shadcnblocks.com",
 };
 
 const NAVIGATION: MenuItem[] = [
   {
-    title: "Products",
+    title: "Kurzy",
     id: 1,
     links: [
       {
-        label: "Insights",
-        icon: Book,
+        label: "Manualni terapie",
+        icon: HandHeart,
         description:
-          "Latest company news, updates, insights, and announcements",
-        url: "#",
+          "Tradicni ceske techniky manualni terapie a mekkych tkani",
+        url: "/courses",
         image:
-          "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/photos/jeremy-bishop-iEjCQtcsVPY-unsplash.jpg",
+          "https://images.pexels.com/photos/5473182/pexels-photo-5473182.jpeg?auto=compress&cs=tinysrgb&w=800",
       },
       {
-        label: "Engineering",
-        icon: Code,
+        label: "Sportovni rehabilitace",
+        icon: Dumbbell,
         description:
-          "Deep technical articles, tutorials, guides, and documentation",
-        url: "#",
+          "Specializovane kurzy pro lecbu sportovnich zraneni a prevenci",
+        url: "/courses",
         image:
-          "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/photos/carles-rabada-f7UprkNqi08-unsplash.jpg",
+          "https://images.pexels.com/photos/4498606/pexels-photo-4498606.jpeg?auto=compress&cs=tinysrgb&w=800",
       },
       {
-        label: "Culture",
-        icon: Users,
+        label: "Neurologicka rehabilitace",
+        icon: Brain,
         description:
-          "Team values, experiences, stories, goals, and traditions",
-        url: "#",
+          "Pokrocile techniky Vojtovy a Bobathovy metody",
+        url: "/courses",
         image:
-          "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/photos/john-murphey-ZWUWSEY6OGk-unsplash.jpg",
+          "https://images.pexels.com/photos/7089401/pexels-photo-7089401.jpeg?auto=compress&cs=tinysrgb&w=800",
       },
       {
-        label: "Press",
-        icon: Globe,
+        label: "Pediatricka fyzioterapie",
+        icon: HeartPulse,
         description:
-          "Mentions in media, interviews, articles, and publications",
-        url: "#",
+          "Specialni pristupy k detske rehabilitaci a vyvoji",
+        url: "/courses",
         image:
-          "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/photos/kevin-charit-1fL2Q1JcbNc-unsplash.jpg",
+          "https://images.pexels.com/photos/3985163/pexels-photo-3985163.jpeg?auto=compress&cs=tinysrgb&w=800",
       },
       {
-        label: "API",
-        icon: Monitor,
-        description: "Programmatic access using our secure REST API",
-        url: "#",
+        label: "Ergonomie a prevence",
+        icon: ClipboardList,
+        description: "Kurzy zamerenych na prevenci a spravne drzeni tela",
+        url: "/courses",
         image:
-          "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/photos/pat-whelen-gWfpmH0H2bM-unsplash.jpg",
+          "https://images.pexels.com/photos/4506109/pexels-photo-4506109.jpeg?auto=compress&cs=tinysrgb&w=800",
       },
       {
-        label: "CLI",
-        icon: Terminal,
-        description: "Command line tools for automation and productivity",
-        url: "#",
+        label: "Lecba bolesti",
+        icon: Activity,
+        description: "Moderni pristupy k managementu chronicke bolesti",
+        url: "/courses",
         image:
-          "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/photos/sam-wermut-FiUuNWxnb3k-unsplash.jpg",
-      },
-      {
-        label: "SDKs",
-        icon: Code,
-        description: "Software kits for easy and fast integration",
-        url: "#",
-        image:
-          "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/photos/vasilis-karkalas-qOaeVSKyhhE-unsplash.jpg",
+          "https://images.pexels.com/photos/5473223/pexels-photo-5473223.jpeg?auto=compress&cs=tinysrgb&w=800",
       },
     ],
   },
   {
-    title: "Solutions",
+    title: "Sluzby",
     id: 2,
     featuredLinks: [
       {
-        label: "Icons",
+        label: "Online vzdelavani",
         icon: Sparkles,
-        description: "Lucide open-source icon library for developers",
+        description: "Pristup ke studijnim materialam kdykoliv a odkudkoliv",
         background:
-          "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/photos/john-murphey-ZWUWSEY6OGk-unsplash.jpg",
-        url: "#",
+          "https://images.pexels.com/photos/4506105/pexels-photo-4506105.jpeg?auto=compress&cs=tinysrgb&w=800",
+        url: "/#services",
       },
       {
-        label: "Themes",
-        icon: Paintbrush,
-        description:
-          "Customizable UI themes, styles, and appearance presets",
+        label: "Certifikace",
+        icon: GraduationCap,
+        description: "Mezinarodne uznavane certifikaty pro fyzioterapeuty",
         background:
-          "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/photos/kevin-charit-1fL2Q1JcbNc-unsplash.jpg",
-        url: "#",
+          "https://images.pexels.com/photos/7176026/pexels-photo-7176026.jpeg?auto=compress&cs=tinysrgb&w=800",
+        url: "/#services",
       },
     ],
     links: [
       {
+        label: "Individualni konzultace",
+        icon: Stethoscope,
         description:
-          "Tailored eCommerce solutions for growing online businesses",
-        url: "#",
-        company: {
-          logo: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-1.svg",
-          name: "ARC",
-        },
+          "Osobni poradenstvi s nasimi odborniky pro vas profesni rust",
+        url: "/#services",
       },
       {
-        description:
-          "Optimized development tools for SaaS web platforms",
-        url: "#",
-        company: {
-          logo: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-2.svg",
-          name: "descript",
-        },
+        label: "Skupinove workshopy",
+        icon: Users,
+        description: "Prakticke workshopy v malych skupinach pod odbornym vedenim",
+        url: "/#services",
       },
       {
+        label: "Firemni skoleni",
+        icon: LayoutGrid,
         description:
-          "Bank-grade security for finance-based web applications",
-        url: "#",
-        company: {
-          logo: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-3.svg",
-          name: "MERCURY",
-        },
+          "Skoleni na miru pro kliniky a zdravotnicka zarizeni",
+        url: "/#services",
       },
       {
+        label: "Mentoring program",
+        icon: Trophy,
         description:
-          "Healthcare infrastructure built for medical tech platforms",
-        url: "#",
-        company: {
-          logo: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-4.svg",
-          name: "ramp",
-        },
+          "Dlouhodoby mentoring pro zacínajici fyzioterapeuty",
+        url: "/#services",
       },
     ],
   },
   {
-    title: "Platform",
+    title: "Platforma",
     id: 3,
     imageLink: {
-      url: "#",
+      url: "/courses",
       image:
-        "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/photos/carles-rabada-f7UprkNqi08-unsplash.jpg",
-      label: "Explore New Components",
+        "https://images.pexels.com/photos/5473177/pexels-photo-5473177.jpeg?auto=compress&cs=tinysrgb&w=800",
+      label: "Prozkoumejte nase kurzy",
     },
     groupLinks: [
       {
-        title: "Core Services",
+        title: "Pro studenty",
         links: [
           {
-            label: "Hosting",
-            icon: Server,
-            description:
-              "Global infrastructure hosting your scalable web apps",
-            url: "#",
+            label: "Video kurzy",
+            icon: BookOpen,
+            description: "Profesionalne natocene videolekce s odborniky",
+            url: "/courses",
           },
           {
-            label: "Auth",
-            icon: Shield,
-            description:
-              "Secure authentication and role-based user access",
-            url: "#",
+            label: "Praktika",
+            icon: HandHeart,
+            description: "Prakticke lekce pod odbornym dohledem",
+            url: "/courses",
           },
           {
-            label: "Database",
-            icon: Database,
+            label: "Zkousky a testy",
+            icon: ClipboardList,
             description:
-              "Reliable, scalable storage for application data needs",
-            url: "#",
+              "Overeni znalosti a ziskani certifikatu",
+            url: "/courses",
           },
         ],
       },
       {
-        title: "Design System",
+        title: "Pro odborníky",
         links: [
           {
-            label: "Components",
-            icon: Layout,
+            label: "Pokrocile techniky",
+            icon: Zap,
             description:
-              "Reusable components built for consistent UI experiences",
-            url: "#",
+              "Specializovane kurzy pro zkusene fyzioterapeuty",
+            url: "/courses",
           },
           {
-            label: "Tokens",
-            icon: Settings,
+            label: "Konference",
+            icon: Users,
             description:
-              "Design tokens standardizing consistent branding elements",
-            url: "#",
+              "Odborne konference a networking s kolegy z oboru",
+            url: "/#contact",
           },
           {
-            label: "Icons",
+            label: "Novinky z oboru",
             icon: Sparkles,
-            description:
-              "Lucide icons used across multiple interface elements",
-            url: "#",
+            description: "Aktualni trendy a vyzkum ve fyzioterapii",
+            url: "/#features",
           },
         ],
       },
     ],
   },
   {
-    title: "Resources",
-    url: "#",
+    title: "Reference",
+    url: "/#testimonials",
   },
   {
-    title: "Pricing",
-    url: "#",
+    title: "Cenik",
+    url: "/#pricing",
   },
 ];
-
-const BUTTON = {
-  label: "Sign up",
-  isPrimary: true,
-  url: "#",
-};
 
 const MOBILE_BREAKPOINT = 1024;
 
@@ -316,6 +284,7 @@ interface Navbar10Props {
 
 const Navbar10 = ({ className }: Navbar10Props) => {
   const [open, setOpen] = useState<boolean>(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -325,11 +294,16 @@ const Navbar10 = ({ className }: Navbar10Props) => {
     };
 
     handleResize();
-
     window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
     };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -337,31 +311,46 @@ const Navbar10 = ({ className }: Navbar10Props) => {
   }, [open]);
 
   const handleMobileMenu = () => {
-    const nextOpen = !open;
-    setOpen(nextOpen);
+    setOpen(!open);
   };
 
   return (
     <Fragment>
       <section
         className={cn(
-          "pointer-events-auto absolute top-0 z-999 flex w-full items-center justify-center bg-background",
+          "pointer-events-auto fixed top-0 z-999 flex w-full items-center justify-center bg-background transition-all duration-500 ease-out",
+          isScrolled && "shadow-[0px_1px_0px_0px_rgba(0,0,0,0.05),0px_2px_8px_0px_rgba(16,25,36,0.08)]",
           className,
         )}
       >
-        <NavigationMenu className="h-20 max-w-full after:absolute after:inset-0 after:z-998 after:block after:size-full after:bg-background after:content-[''] [&>div:last-child>div]:mt-0 [&>div:last-child>div]:animate-none [&>div:last-child>div]:rounded-none [&>div:last-child>div]:border-0 [&>div:last-child>div]:border-b [&>div:last-child>div]:!shadow-[0px_-1px_0px_0px_rgba(0,0,0,0.05),0px_0px_0px_1px_rgba(17,26,37,0.05),0px_2px_5px_0px_rgba(16,25,36,0.1),0px_5px_20px_0px_rgba(16,25,36,0.1)]">
+        <NavigationMenu
+          className={cn(
+            "max-w-full transition-all duration-500 ease-out after:absolute after:inset-0 after:z-998 after:block after:size-full after:bg-background after:content-[''] [&>div:last-child>div]:mt-0 [&>div:last-child>div]:animate-none [&>div:last-child>div]:rounded-none [&>div:last-child>div]:border-0 [&>div:last-child>div]:border-b [&>div:last-child>div]:!shadow-[0px_-1px_0px_0px_rgba(0,0,0,0.05),0px_0px_0px_1px_rgba(17,26,37,0.05),0px_2px_5px_0px_rgba(16,25,36,0.1),0px_5px_20px_0px_rgba(16,25,36,0.1)]",
+            isScrolled ? "h-14" : "h-20",
+          )}
+        >
           <div className="relative z-999 container grid w-full grid-cols-2 items-center justify-between gap-8 xl:grid-cols-3">
-            <a
-              href={LOGO.url}
+            <Link
+              to="/"
               className="flex max-h-8 items-center gap-2 text-lg font-semibold tracking-tighter"
             >
               <img
-                src={LOGO.src}
-                alt={LOGO.alt}
-                className="inline-block size-6"
+                src={site.logo}
+                alt={site.name}
+                className={cn(
+                  "inline-block transition-all duration-500",
+                  isScrolled ? "size-5" : "size-7",
+                )}
               />
-              <span className="hidden md:inline-block">{LOGO.title}</span>
-            </a>
+              <span
+                className={cn(
+                  "hidden font-bold transition-all duration-500 md:inline-block",
+                  isScrolled ? "text-lg" : "text-xl",
+                )}
+              >
+                {site.name}
+              </span>
+            </Link>
             <div className="hidden xl:flex">
               <NavigationMenuList>
                 {NAVIGATION.map((item, index) => (
@@ -373,13 +362,16 @@ const Navbar10 = ({ className }: Navbar10Props) => {
                 ))}
               </NavigationMenuList>
             </div>
-            <div className="justify-self-end">
-              <div className="hidden xl:block">
-                <Button variant="ghost" asChild>
-                  <a href={BUTTON.url}>
-                    {BUTTON.label}
+            <div className="flex items-center gap-2 justify-self-end">
+              <div className="hidden xl:flex xl:items-center xl:gap-2">
+                <Button variant="ghost" asChild size={isScrolled ? "sm" : "default"}>
+                  <Link to="/auth/sign-in">Prihlasit se</Link>
+                </Button>
+                <Button asChild size={isScrolled ? "sm" : "default"}>
+                  <Link to="/auth/sign-up">
+                    Zacit
                     <ChevronRight />
-                  </a>
+                  </Link>
                 </Button>
               </div>
               <div className="xl:hidden">
@@ -455,7 +447,6 @@ const DropdownMenu1 = ({ links }: { links?: MenuLink[] }) => {
     imageRefs.current.forEach((img, i) => {
       if (!img) return;
       const isActive = i === activeIndex;
-
       img.classList.toggle("opacity-100", isActive);
       img.classList.toggle("translate-y-0", isActive);
       img.classList.toggle("opacity-0", !isActive);
@@ -471,7 +462,6 @@ const DropdownMenu1 = ({ links }: { links?: MenuLink[] }) => {
           link.classList.add("opacity-50");
         }
       });
-
       updateImageClasses(index);
     };
 
@@ -479,7 +469,6 @@ const DropdownMenu1 = ({ links }: { links?: MenuLink[] }) => {
     linksRef.current.forEach((link) => {
       link?.classList.remove("opacity-50");
     });
-
     updateImageClasses(0);
   };
 
@@ -628,7 +617,7 @@ const FeaturedImageLink = ({ link }: { link?: MenuLink }) => {
           className="overflow-hidden rounded-[0.25rem] bg-muted"
         >
           <div className="size-full">
-            <Badge className="absolute top-2 left-2">New</Badge>
+            <Badge className="absolute top-2 left-2">Nove</Badge>
             <div className="flex w-full flex-col items-center justify-center gap-8 pt-10">
               <div className="text-2xl font-semibold">{link.label}</div>
               <div className="w-[80%]">
@@ -729,7 +718,7 @@ const MobileNavigationMenu = ({ open }: MobileNavigationMenuProps) => {
           <div className="container py-8">
             <div className="absolute -m-px h-px w-px overflow-hidden border-0 mask-clip-border p-0 text-nowrap whitespace-nowrap">
               <SheetTitle className="text-primary">
-                Mobile Navigation
+                Mobilni navigace
               </SheetTitle>
             </div>
             <div className="flex min-h-full flex-col gap-6">
@@ -739,9 +728,14 @@ const MobileNavigationMenu = ({ open }: MobileNavigationMenuProps) => {
                 )}
               </Accordion>
 
-              <Button asChild>
-                <a href={BUTTON.url}>{BUTTON.label}</a>
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button variant="outline" asChild>
+                  <Link to="/auth/sign-in">Prihlasit se</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/auth/sign-up">Zacit</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -764,30 +758,30 @@ const renderMobileMenuItem = (item: MenuItem, index: number) => {
         <AccordionContent className="flex flex-col gap-6 p-2">
           {item.featuredLinks && (
             <div className="flex flex-col gap-2 p-2">
-              {item.featuredLinks.map((link, index) => (
-                <NavLink key={`default-nav-link-${index}`} link={link} />
+              {item.featuredLinks.map((link, i) => (
+                <NavLink key={`featured-nav-link-${i}`} link={link} />
               ))}
             </div>
           )}
 
           {item.links && (
             <div className="flex flex-col gap-2 p-2">
-              {item.links.map((link, index) => (
-                <NavLink key={`default-nav-link-${index}`} link={link} />
+              {item.links.map((link, i) => (
+                <NavLink key={`default-nav-link-${i}`} link={link} />
               ))}
             </div>
           )}
 
           {item.groupLinks && (
             <div className="flex flex-col gap-2 p-2">
-              {item.groupLinks.map((group, index1) => (
-                <div className="mb-8 last:mb-0" key={`group-link-${index1}`}>
+              {item.groupLinks.map((group, i1) => (
+                <div className="mb-8 last:mb-0" key={`group-link-${i1}`}>
                   <div className="mb-4 text-xs text-muted-foreground">
                     {group.title}
                   </div>
                   <ul className="flex flex-col gap-2">
-                    {group.links.map((link, index2) => (
-                      <li key={`group-link-${index1}-${index2}`}>
+                    {group.links.map((link, i2) => (
+                      <li key={`group-link-${i1}-${i2}`}>
                         <NavLink link={link} />
                       </li>
                     ))}
