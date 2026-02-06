@@ -356,7 +356,10 @@ export default function CoursesPage() {
           <CourseShowcase courses={showcaseCourses} />
         </div>
 
-        <div className="mt-16 rounded-3xl bg-muted/40 px-6 py-12 sm:px-10 lg:px-16">
+        <div className="relative mt-16 overflow-hidden rounded-3xl bg-muted/40 px-6 py-12 sm:px-10 lg:px-16">
+          <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-primary/8 blur-[80px]" />
+          <div className="pointer-events-none absolute -bottom-16 -right-16 h-56 w-56 rounded-full bg-primary/6 blur-[70px]" />
+          <div className="pointer-events-none absolute right-1/4 top-0 h-40 w-80 rounded-full bg-primary/4 blur-[90px]" />
           <CoursesNews />
         </div>
 

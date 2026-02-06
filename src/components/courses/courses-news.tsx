@@ -50,12 +50,8 @@ interface CoursesNewsProps {
 
 const CoursesNews = ({ className }: CoursesNewsProps) => {
   return (
-    <section className={cn('relative py-4 overflow-hidden', className)}>
-      <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-64 w-[500px] rounded-full bg-primary/5 blur-[100px]" />
-      <div className="pointer-events-none absolute -bottom-24 right-0 h-48 w-[400px] rounded-full bg-primary/4 blur-[80px]" />
-
+    <section className={cn('relative py-4', className)}>
       <div className="relative">
-        <div>
           <h2 className="text-3xl">
             Zustan v obraze
             <br />
@@ -95,7 +91,6 @@ const CoursesNews = ({ className }: CoursesNewsProps) => {
               </Fragment>
             ))}
           </div>
-        </div>
       </div>
     </section>
   )
