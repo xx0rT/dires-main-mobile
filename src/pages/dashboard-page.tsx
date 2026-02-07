@@ -139,7 +139,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8 relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="absolute inset-0 -z-10 pointer-events-none">
-        <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/3 left-1/2 h-[40%] w-[60%] animate-pulse bg-gradient-to-r from-primary/15 via-purple-500/15 to-primary/15 blur-3xl" />
+        <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/3 left-1/2 h-[40%] w-[60%] animate-pulse bg-gradient-to-r from-primary/15 via-blue-400/15 to-primary/15 blur-3xl" />
       </div>
 
       <motion.div
@@ -175,7 +175,7 @@ export default function DashboardPage() {
         {[
           { title: 'Dokončené Kurzy', value: stats.completedCourses, icon: RiTrophyLine, color: 'text-green-600' },
           { title: 'Probíhající Kurzy', value: stats.inProgressCourses, icon: RiBookOpenLine, color: 'text-blue-600' },
-          { title: 'Hodin Studia', value: stats.totalHoursSpent, icon: RiTimeLine, color: 'text-purple-600' },
+          { title: 'Hodin Studia', value: stats.totalHoursSpent, icon: RiTimeLine, color: 'text-blue-600' },
           { title: 'Dokončené Lekce', value: stats.completedModules, icon: RiCheckLine, color: 'text-orange-600' }
         ].map((stat) => {
           const Icon = stat.icon
@@ -240,7 +240,7 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 {enrollments.slice(0, 3).map((enrollment) => (
                   <div key={enrollment.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors">
-                    <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
+                    <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-blue-400/20 flex items-center justify-center">
                       <RiBookOpenLine className="h-8 w-8 text-primary/70" />
                     </div>
                     <div className="flex-1 space-y-2">

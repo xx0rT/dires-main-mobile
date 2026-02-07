@@ -527,7 +527,7 @@ export const CoursePlayerPage = () => {
             particleCount: 150,
             spread: 100,
             origin: { y: 0.5 },
-            colors: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b'],
+            colors: ['#10b981', '#3b82f6', '#2563eb', '#f59e0b'],
           });
 
           toast.success("🎉 Kurz úspěšně dokončen!", {
@@ -604,7 +604,7 @@ export const CoursePlayerPage = () => {
           particleCount: 150,
           spread: 100,
           origin: { y: 0.5 },
-          colors: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b'],
+          colors: ['#10b981', '#3b82f6', '#2563eb', '#f59e0b'],
         });
 
         toast.success("🎉 Odemknut další kurz!", {
