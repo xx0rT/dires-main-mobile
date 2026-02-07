@@ -37,7 +37,7 @@ export const HeroSection = () => {
             <div className="container relative z-10 mx-auto w-full px-4 flex-1 flex flex-col pt-4">
                 <div className="grid gap-8 py-16 md:grid-cols-2 md:items-center md:gap-10 lg:grid-cols-[0.8fr,1.2fr] lg:gap-16 xl:gap-20 xl:py-20 flex-1">
                 {/* Left side - Copy */}
-                <div className="space-y-6 text-center md:space-y-7" data-aos="fade-right">
+                <div className="space-y-6 text-center md:space-y-7" data-aos="fade-up">
                     <Badge
                         variant="outline"
                         className="rounded-2xl py-2 text-sm"
@@ -90,7 +90,7 @@ export const HeroSection = () => {
                 </div>
 
                 {/* Right side - Preview */}
-                <div className="group relative lg:scale-115" data-aos="fade-left" data-aos-delay="200">
+                <div className="group relative lg:scale-115" data-aos="fade-up" data-aos-delay="200">
                     {/* Enhanced animated glow effect */}
                     <div className="absolute inset-0 -z-10">
                         <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[75%] w-[85%] animate-pulse bg-gradient-to-r from-primary/30 via-blue-400/30 to-primary/30 blur-3xl" />
