@@ -785,7 +785,7 @@ function MobileNavigation({
           <DrawerHeader>
             <DrawerTitle>{activeModule?.label ?? "Navigace"}</DrawerTitle>
           </DrawerHeader>
-          <ScrollArea className="max-h-[70vh] px-4 pb-6">
+          <ScrollArea className="max-h-[70vh] px-[15px] pb-6">
             {activeModule ? (
               <>
                 <div className="flex flex-col gap-6">
@@ -835,7 +835,7 @@ function MobileNavigation({
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur md:hidden">
         <div
-          className="grid"
+          className="grid px-[15px]"
           style={{
             gridTemplateColumns: `repeat(${railIcons.length}, minmax(0, 1fr))`,
           }}
