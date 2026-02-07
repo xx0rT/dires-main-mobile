@@ -4,6 +4,7 @@ import { Toaster } from 'sonner'
 import { AuthProvider } from './lib/auth-context'
 import MarketingLayout from './layouts/marketing-layout'
 import DashboardLayout from './layouts/dashboard-layout'
+import AdminLayout from './layouts/admin-layout'
 import HomePage from './pages/home-page'
 import CoursesPage from './pages/courses-page'
 import ShopPage from './pages/shop-page'
@@ -24,6 +25,10 @@ import ForgotPasswordPage from './pages/forgot-password-page'
 import ResetPasswordPage from './pages/reset-password-page'
 import { CoursePlayerPage } from './pages/course-player-page'
 import ScrollToTop from './components/layout/scroll-to-top'
+import AdminOverviewPage from './pages/admin/admin-overview-page'
+import AdminUsersPage from './pages/admin/admin-users-page'
+import AdminCoursesPage from './pages/admin/admin-courses-page'
+import AdminInvoicesPage from './pages/admin/admin-invoices-page'
 
 export default function App() {
   return (
@@ -53,6 +58,12 @@ export default function App() {
             <Route path="billing" element={<BillingPage />} />
             <Route path="integrations" element={<IntegrationsPage />} />
             <Route path="settings" element={<SettingsPage />} />
+          </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminOverviewPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+            <Route path="courses" element={<AdminCoursesPage />} />
+            <Route path="invoices" element={<AdminInvoicesPage />} />
           </Route>
         </Routes>
         <Toaster />

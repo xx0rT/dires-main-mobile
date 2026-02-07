@@ -13,6 +13,7 @@ import {
   PanelLeftClose,
   Plus,
   Settings,
+  Shield,
   Users,
   BarChart3,
   CreditCard,
@@ -21,6 +22,7 @@ import * as React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
+import { useAdmin } from "@/lib/use-admin";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -286,6 +288,7 @@ function SidebarRail({
 
 function UserMenu() {
   const { user } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
 
   return (
@@ -314,6 +317,15 @@ function UserMenu() {
         <DropdownMenuItem onClick={() => navigate('/dashboard/settings')}>Nastavení</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/')}>Domovská stránka</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/dashboard/billing')}>Fakturace</DropdownMenuItem>
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate('/admin')}>
+              <Shield className="mr-2 size-4 text-red-500" />
+              Admin Panel
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate('/auth/sign-in')}>Odhlásit se</DropdownMenuItem>
       </DropdownMenuContent>
