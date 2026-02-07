@@ -17,13 +17,11 @@ import {
 } from '@/components/ui/sidebar'
 
 import {
-  RiFindReplaceLine,
   RiLogoutCircleLine,
   RiMore2Line,
   RiTimer2Line,
   RiHomeLine,
   RiUserLine,
-  RiLockLine,
   RiBankCardLine,
 } from '@remixicon/react'
 
@@ -105,7 +103,13 @@ export function NavUser() {
             <DropdownMenuItem asChild className="gap-3 px-1">
               <Link to="/dashboard/settings">
                 <RiUserLine size={20} className="text-muted-foreground/70" aria-hidden="true" />
-                <span>Účet</span>
+                <span>Nastaveni</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="gap-3 px-1">
+              <Link to="/">
+                <RiHomeLine size={20} className="text-muted-foreground/70" aria-hidden="true" />
+                <span>Domovska stranka</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="gap-3 px-1">
@@ -114,22 +118,7 @@ export function NavUser() {
                 <span>Fakturace</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="gap-3 px-1">
-              <RiLockLine size={20} className="text-muted-foreground/70" aria-hidden="true" />
-              <span>Zabezpečení</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="gap-3 px-1">
-              <RiFindReplaceLine size={20} className="text-muted-foreground/70" aria-hidden="true" />
-              <span>Historie</span>
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild className="gap-3 px-1">
-              <Link to="/">
-                <RiHomeLine size={20} className="text-muted-foreground/70" aria-hidden="true" />
-                <span>Domovská stránka</span>
-              </Link>
-            </DropdownMenuItem>
-
             <DropdownMenuItem className="cursor-pointer gap-3 px-1" onClick={signOut}>
               <RiLogoutCircleLine size={20} className="text-muted-foreground/70" aria-hidden="true" />
               <span>Odhlásit se</span>
