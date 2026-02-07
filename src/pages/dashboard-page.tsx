@@ -146,17 +146,17 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex items-start justify-between"
+        className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
       >
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-2xl sm:text-3xl font-bold">
             {getGreeting()}, {user?.email?.split('@')[0] || 'Studente'}
           </h1>
           <p className="text-muted-foreground mt-2">
             Vítejte zpět na vaší vzdělávací platformě. Pokračujte ve svém učení.
           </p>
         </div>
-        <div className="min-w-[320px]">
+        <div className="w-full lg:w-auto lg:min-w-[320px]">
           <SubscriptionTimerCard
             subscription={subscription}
             hasActiveSubscription={hasActiveSubscription}
@@ -239,12 +239,25 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-4">
                 {enrollments.slice(0, 3).map((enrollment) => (
-                  <div key={enrollment.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors">
-                    <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-blue-400/20 flex items-center justify-center">
-                      <RiBookOpenLine className="h-8 w-8 text-primary/70" />
+                  <div key={enrollment.id} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-primary/20 to-blue-400/20 flex items-center justify-center">
+                        <RiBookOpenLine className="h-6 w-6 sm:h-8 sm:w-8 text-primary/70" />
+                      </div>
+                      <div className="sm:hidden flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-sm">{enrollment.course.title}</h3>
+                          {enrollment.completed_at && (
+                            <Badge variant="default" className="bg-green-600 text-xs">
+                              <RiTrophyLine className="h-3 w-3 mr-1" />
+                              Dokončeno
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
                     </div>
                     <div className="flex-1 space-y-2">
-                      <div className="flex items-center justify-between">
+                      <div className="hidden sm:flex items-center justify-between">
                         <h3 className="font-semibold">{enrollment.course.title}</h3>
                         {enrollment.completed_at && (
                           <Badge variant="default" className="bg-green-600">
@@ -261,7 +274,7 @@ export default function DashboardPage() {
                         <Progress value={enrollment.progress_percentage} className="h-2" />
                       </div>
                     </div>
-                    <Button size="sm" asChild>
+                    <Button size="sm" asChild className="w-full sm:w-auto">
                       <Link to="/dashboard/integrations">
                         Pokračovat
                       </Link>
