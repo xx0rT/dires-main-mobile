@@ -52,7 +52,7 @@ const TextReveal: FC<TextRevealProps> = ({
       className={cn("relative z-0 h-[200vh] mx-auto", className)}
       style={{ maxWidth: maxWidth || "56rem" }}
     >
-      <div className="sticky top-20 mx-auto flex h-[50%] items-center justify-center bg-transparent px-[1rem] py-[5rem]">
+      <div className="sticky top-0 mx-auto flex h-[50%] items-center justify-center bg-transparent px-[1rem] py-[5rem]">
         <div ref={targetRef} className="flex flex-col justify-center items-center w-full">
           <span className="text-center text-lg font-medium tracking-tight text-foreground">
             {title}

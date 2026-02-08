@@ -346,7 +346,7 @@ const Navbar10 = ({ className }: Navbar10Props) => {
             isScrolled ? "h-14" : "h-20",
           )}
         >
-          <div className="relative z-999 container grid w-full grid-cols-2 items-center justify-between gap-8 px-6 xl:grid-cols-3">
+          <div className="relative z-999 container grid w-full grid-cols-2 items-center justify-between gap-8 xl:grid-cols-3">
             <Link
               to="/"
               className="flex max-h-8 items-center gap-2 text-lg font-semibold tracking-tighter"
