@@ -12,7 +12,7 @@ import { TestimonialSection } from '@/components/layout/sections/testimonial'
 export default function HomePage() {
   return (
     <>
-      <div className="bg-background transition-colors duration-700">
+      <div className="bg-background transition-colors duration-700 overflow-x-clip">
         <HeroSection />
       </div>
 
