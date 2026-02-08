@@ -166,13 +166,21 @@ export default function CoursesPage() {
       return
     }
 
+    const { data: { session: freshSession }, error: sessionError } = await supabase.auth.getSession()
+
+    if (sessionError || !freshSession) {
+      toast.error('Prosim prihlaste se znovu')
+      navigate('/auth/sign-in')
+      return
+    }
+
     setBuyingCourseId(courseId)
     try {
       const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/course-checkout`
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${freshSession.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ courseId }),
@@ -181,6 +189,7 @@ export default function CoursesPage() {
       const data = await response.json()
 
       if (!response.ok) {
+        console.error('Checkout failed:', { status: response.status, error: data.error })
         throw new Error(data.error || 'Chyba pri vytvareni platby')
       }
 
