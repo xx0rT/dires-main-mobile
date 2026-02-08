@@ -25,7 +25,6 @@ import ForgotPasswordPage from './pages/forgot-password-page'
 import ResetPasswordPage from './pages/reset-password-page'
 import { CoursePlayerPage } from './pages/course-player-page'
 import ScrollToTop from './components/layout/scroll-to-top'
-import VerticalScrollLock from './components/layout/vertical-scroll-lock'
 import AdminOverviewPage from './pages/admin/admin-overview-page'
 import AdminUsersPage from './pages/admin/admin-users-page'
 import AdminCoursesPage from './pages/admin/admin-courses-page'
@@ -40,7 +39,6 @@ export default function App() {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthProvider>
         <ScrollToTop />
-        <VerticalScrollLock />
         <Routes>
           <Route path="/" element={<MarketingLayout />}>
             <Route index element={<HomePage />} />
