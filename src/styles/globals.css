@@ -171,7 +171,9 @@
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
 }
 
-html {
+html,
+body {
+  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
