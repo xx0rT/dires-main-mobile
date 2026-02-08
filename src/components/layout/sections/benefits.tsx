@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export const BenefitsSection = () => {
   return (
-    <section id="benefits" className="py-32">
+    <section id="benefits" className="py-32" style={{ overflowX: 'clip' }}>
       <div className="container flex flex-col items-center justify-center mx-auto">
         <div className="flex max-w-4xl mx-auto w-full justify-center">
           <TextReveal
