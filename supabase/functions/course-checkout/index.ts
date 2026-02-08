@@ -27,7 +27,7 @@ Deno.serve(async (req: Request) => {
 
     const supabaseClient = await import("npm:@supabase/supabase-js@2");
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -40,14 +40,20 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const token = authHeader.replace("Bearer ", "");
-    const supabaseAuth = supabaseClient.createClient(supabaseUrl, supabaseAnonKey);
+    const supabase = supabaseClient.createClient(supabaseUrl, supabaseServiceKey, {
+      global: {
+        headers: {
+          Authorization: authHeader,
+        },
+      },
+    });
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.error("Auth error:", authError);
       return new Response(
-        JSON.stringify({ error: "Invalid session" }),
+        JSON.stringify({ error: "Invalid session or expired token" }),
         {
           status: 401,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -56,11 +62,6 @@ Deno.serve(async (req: Request) => {
     }
 
     const { courseId }: CourseCheckoutRequest = await req.json();
-
-    const supabase = supabaseClient.createClient(
-      supabaseUrl,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
-    );
 
     const { data: course, error: courseError } = await supabase
       .from("courses")
