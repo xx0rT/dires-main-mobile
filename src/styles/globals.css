@@ -173,14 +173,10 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
-  max-width: 100vw;
 }
 
 body {
   letter-spacing: var(--tracking-normal);
-  overflow-x: hidden;
-  max-width: 100vw;
 }
 
 @layer base {
