@@ -171,13 +171,17 @@
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
 }
 
+html,
+body {
+  overflow-x: clip;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
   letter-spacing: var(--tracking-normal);
-  overflow-x: hidden;
 }
 
 @layer base {
