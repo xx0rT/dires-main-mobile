@@ -401,7 +401,7 @@ const Navbar10 = ({ className }: Navbar10Props) => {
                 {user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className={cn("gap-2", isScrolled ? "h-9 px-3" : "h-11 px-4")}>
+                      <Button variant="ghost" className={cn("gap-2 group", isScrolled ? "h-9 px-3" : "h-11 px-4")}>
                         <Avatar className={cn(isScrolled ? "size-7" : "size-8")}>
                           <AvatarFallback className="text-xs font-medium">
                             {user.email?.charAt(0).toUpperCase() || 'U'}
@@ -410,10 +410,14 @@ const Navbar10 = ({ className }: Navbar10Props) => {
                         <span className={cn("font-medium", isScrolled ? "text-sm" : "text-base")}>
                           {user.email?.split('@')[0] || 'User'}
                         </span>
-                        <ChevronDown className={cn(isScrolled ? "size-4" : "size-4")} />
+                        <ChevronDown className={cn("transition-transform duration-200 group-data-[state=open]:rotate-180", isScrolled ? "size-4" : "size-4")} />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuContent
+                      align="center"
+                      className="w-56 animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2"
+                      sideOffset={8}
+                    >
                       <div className="flex items-center gap-2 p-2">
                         <Avatar className="size-8">
                           <AvatarFallback className="text-xs">
