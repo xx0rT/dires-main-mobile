@@ -171,13 +171,8 @@
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
 }
 
-html,
-body,
-#root {
-  overflow-x: clip;
-}
-
 html {
+  overflow-x: clip;
   scroll-behavior: smooth;
 }
 
