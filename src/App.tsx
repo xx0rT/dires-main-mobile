@@ -34,6 +34,7 @@ import AdminPromoCodesPage from './pages/admin/admin-promo-codes-page'
 import TeamPage from './pages/team-page'
 import TeamMemberPage from './pages/team-member-page'
 import BlogPage from './pages/blog-page'
+import BlogPostPage from './pages/blog-post-page'
 
 export default function App() {
   return (
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="tym" element={<TeamPage />} />
             <Route path="tym/:slug" element={<TeamMemberPage />} />
             <Route path="blog" element={<BlogPage />} />
+            <Route path="blog/:slug" element={<BlogPostPage />} />
           </Route>
           <Route path="/potvrzeni-objednavky" element={<OrderConfirmationPage />} />
           <Route path="/prihlaseni" element={<SignInPage />} />

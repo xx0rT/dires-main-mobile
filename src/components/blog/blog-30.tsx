@@ -44,17 +44,17 @@ interface Blog30Props {
 
 const Blog30 = ({ className }: Blog30Props) => {
   return (
-    <section className={cn("bg-background py-32", className)}>
+    <section className={cn("bg-background py-16", className)}>
       <div className="container">
-        <h1 className="mb-12 max-w-lg font-sans text-5xl font-extrabold tracking-tight text-foreground md:text-7xl">
-          Objevte nase clanky
+        <h1 className="mb-8 max-w-lg font-sans text-4xl font-extrabold tracking-tight text-foreground md:text-6xl">
+          Objevte naše články
         </h1>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-8">
           {blogPosts.map((post, index) => (
             <div
               key={post.id}
-              className="flex flex-col items-center gap-16 md:flex-row"
+              className="flex flex-col items-center gap-8 md:flex-row"
             >
               <div className="flex h-80 w-full items-center justify-center overflow-hidden rounded-3xl bg-muted md:w-140">
                 <img

@@ -13,26 +13,26 @@ interface Blog12Props {
 
 const Blog12 = ({ className }: Blog12Props) => {
   return (
-    <section className={cn("py-32", className)}>
+    <section className={cn("py-16", className)}>
       <div className="container">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 text-center">
           <Badge variant="outline" className="gap-1 py-1">
-            <FileText className="h-full w-4" /> Nas Blog
+            <FileText className="h-full w-4" /> Náš Blog
           </Badge>
           <h1 className="text-4xl font-semibold text-balance">
-            Objevte nejnovejsi trendy
+            Objevte nejnovější trendy ve fyzioterapii
           </h1>
           <p className="text-muted-foreground">
-            Prozkoumejte nas blog pro poucne clanky, osobni uvahy a napady, ktere inspiruji k akci v tematech, o ktera mate zajem.
+            Prozkoumejte náš blog s odbornými články, osobními úvahami a nápady pro váš profesní rozvoj.
           </p>
         </div>
-        <div className="mt-20 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <a className="rounded-xl border" href="#">
+        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <a className="group rounded-xl border transition-all hover:shadow-lg hover:border-primary/50" href="/blog/jak-ziskat-maximalni-vysledky">
             <div className="p-2">
               <img
                 src="https://images.pexels.com/photos/5473182/pexels-photo-5473182.jpeg?auto=compress&cs=tinysrgb&w=800"
                 alt="Fyzioterapie v praxi"
-                className="aspect-video w-full rounded-lg object-cover"
+                className="aspect-video w-full rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
               />
             </div>
             <div className="px-3 pt-2 pb-4">
@@ -59,12 +59,12 @@ const Blog12 = ({ className }: Blog12Props) => {
               </div>
             </div>
           </a>
-          <a className="rounded-xl border" href="#">
+          <a className="group rounded-xl border transition-all hover:shadow-lg hover:border-primary/50" href="/blog/rozdil-mezi-akutni-a-chronickou-bolesti">
             <div className="p-2">
               <img
                 src="https://images.pexels.com/photos/7659567/pexels-photo-7659567.jpeg?auto=compress&cs=tinysrgb&w=800"
                 alt="Diagnostika a lecba"
-                className="aspect-video w-full rounded-lg object-cover"
+                className="aspect-video w-full rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
               />
             </div>
             <div className="px-3 pt-2 pb-4">
@@ -91,12 +91,12 @@ const Blog12 = ({ className }: Blog12Props) => {
               </div>
             </div>
           </a>
-          <a className="rounded-xl border" href="#">
+          <a className="group rounded-xl border transition-all hover:shadow-lg hover:border-primary/50" href="/blog/optimalizace-vasi-rutiny">
             <div className="p-2">
               <img
                 src="https://images.pexels.com/photos/6111616/pexels-photo-6111616.jpeg?auto=compress&cs=tinysrgb&w=800"
                 alt="Prevence zraneni"
-                className="aspect-video w-full rounded-lg object-cover"
+                className="aspect-video w-full rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
               />
             </div>
             <div className="px-3 pt-2 pb-4">
@@ -124,9 +124,9 @@ const Blog12 = ({ className }: Blog12Props) => {
             </div>
           </a>
         </div>
-        <div className="mt-10 flex justify-center">
-          <Button variant="outline">
-            Vsechny clanky <ArrowRight className="ml-2 h-full w-4" />
+        <div className="mt-8 flex justify-center">
+          <Button variant="outline" size="lg" className="rounded-full">
+            Všechny články <ArrowRight className="ml-2 h-full w-4" />
           </Button>
         </div>
       </div>

@@ -102,12 +102,12 @@ const Blog21 = ({ className }: Blog21Props) => {
   return (
     <section
       className={cn(
-        "bg-linear-to-b from-background to-muted/20 py-24",
+        "bg-linear-to-b from-background to-muted/20 py-12",
         className,
       )}
     >
       <div className="container">
-        <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
               Nejnovejsi clanky
@@ -198,13 +198,13 @@ const Blog21 = ({ className }: Blog21Props) => {
           ))}
         </CarouselContent>
       </Carousel>
-      <div className="mt-16 flex items-center justify-center">
+      <div className="mt-8 flex items-center justify-center">
         <Button
           variant="outline"
           size="lg"
           className="rounded-full px-8 font-medium hover:bg-primary hover:text-primary-foreground"
         >
-          Vsechny clanky
+          Všechny články
         </Button>
       </div>
     </section>
