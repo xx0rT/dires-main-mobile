@@ -13,10 +13,8 @@ import {
   Trophy,
   Target
 } from "lucide-react";
-import { mockCourses, mockModules, mockDatabase } from "@/lib/mock-data";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
-import { useSubscription } from "@/lib/use-subscription";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -36,29 +34,28 @@ interface Course {
   id: string;
   title: string;
   description: string;
-  image_url: string;
+  thumbnail_url: string;
   price: number;
   order_index: number;
+  package_id: string | null;
 }
 
-interface CourseModule {
+interface CourseLesson {
   id: string;
   course_id: string;
   title: string;
   description: string;
-  content: string;
-  video_url: string | null;
+  video_url: string;
   order_index: number;
-  duration_minutes: number;
+  duration: number;
 }
 
 export const CoursePlayerPage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const { user } = useAuth();
-  const { hasActiveSubscription, loading: subscriptionLoading } = useSubscription();
   const navigate = useNavigate();
   const [course, setCourse] = useState<Course | null>(null);
-  const [modules, setModules] = useState<CourseModule[]>([]);
+  const [modules, setModules] = useState<CourseLesson[]>([]);
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
   const [completedModules, setCompletedModules] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -123,22 +120,44 @@ export const CoursePlayerPage = () => {
   const saveWatchTime = async () => {
     if (!user || !modules[currentModuleIndex] || !playerRef.current) return;
 
-    const moduleId = modules[currentModuleIndex].id;
+    const lessonId = modules[currentModuleIndex].id;
     const currentWatchTime = watchTimeRef.current;
 
     if (currentWatchTime > lastSavedTimeRef.current) {
       try {
         const currentVideoPosition = Math.floor(playerRef.current.getCurrentTime ? playerRef.current.getCurrentTime() : 0);
+        const isCompleted = completedModulesRef.current.has(lessonId);
+        const progressPct = videoDuration > 0 ? Math.min(Math.round((currentVideoPosition / videoDuration) * 100), 100) : 0;
 
-        mockDatabase.upsertModuleProgress({
-          user_id: user.id,
-          module_id: moduleId,
-          course_id: courseId || '',
-          watch_time_seconds: Math.floor(currentWatchTime),
-          last_watched_position: currentVideoPosition,
-          is_completed: completedModulesRef.current.has(moduleId),
-          completed_at: completedModulesRef.current.has(moduleId) ? new Date().toISOString() : null
-        });
+        const { data: existing } = await supabase
+          .from('user_course_progress')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('lesson_id', lessonId)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase
+            .from('user_course_progress')
+            .update({
+              completed: isCompleted,
+              progress_percent: progressPct,
+              last_watched_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', existing.id);
+        } else {
+          await supabase
+            .from('user_course_progress')
+            .insert({
+              user_id: user.id,
+              course_id: courseId,
+              lesson_id: lessonId,
+              completed: isCompleted,
+              progress_percent: progressPct,
+              last_watched_at: new Date().toISOString(),
+            });
+        }
 
         lastSavedTimeRef.current = currentWatchTime;
       } catch (error) {
@@ -150,16 +169,22 @@ export const CoursePlayerPage = () => {
   const loadModuleProgress = async () => {
     if (!user || !modules[currentModuleIndex]) return;
 
-    const moduleId = modules[currentModuleIndex].id;
+    const lessonId = modules[currentModuleIndex].id;
 
     try {
-      const data = mockDatabase.getModuleProgressSingle(user.id, moduleId);
+      const { data } = await supabase
+        .from('user_course_progress')
+        .select('progress_percent, completed')
+        .eq('user_id', user.id)
+        .eq('lesson_id', lessonId)
+        .maybeSingle();
 
       if (data) {
-        watchTimeRef.current = data.watch_time_seconds || 0;
-        lastSavedTimeRef.current = data.watch_time_seconds || 0;
-        setActualWatchTime(data.watch_time_seconds || 0);
-        setLastPosition(data.last_watched_position || 0);
+        const estimatedSeconds = Math.floor((data.progress_percent / 100) * (modules[currentModuleIndex].duration * 60));
+        watchTimeRef.current = estimatedSeconds;
+        lastSavedTimeRef.current = estimatedSeconds;
+        setActualWatchTime(estimatedSeconds);
+        setLastPosition(estimatedSeconds);
       } else {
         watchTimeRef.current = 0;
         lastSavedTimeRef.current = 0;
@@ -384,7 +409,11 @@ export const CoursePlayerPage = () => {
 
   const loadCourseData = async () => {
     try {
-      const courseData = mockCourses.find(c => c.id === courseId);
+      const { data: courseData } = await supabase
+        .from('courses')
+        .select('id, title, description, thumbnail_url, price, order_index, package_id')
+        .eq('id', courseId!)
+        .maybeSingle();
 
       if (!courseData) {
         setLoading(false);
@@ -393,74 +422,62 @@ export const CoursePlayerPage = () => {
 
       setCourse(courseData);
 
-      const modulesData = mockModules
-        .filter(m => m.course_id === courseId)
-        .sort((a, b) => a.order_index - b.order_index);
+      const { data: lessonsData } = await supabase
+        .from('course_lessons')
+        .select('id, course_id, title, description, video_url, duration, order_index')
+        .eq('course_id', courseId!)
+        .order('order_index');
 
-      if (modulesData) setModules(modulesData);
+      if (lessonsData) setModules(lessonsData);
 
       if (user) {
-        const { data: enrollmentData, error: enrollError } = await supabase
-          .from('course_enrollments')
-          .select('id')
+        const [{ data: enrollmentData }, { data: purchaseData }] = await Promise.all([
+          supabase
+            .from('course_enrollments')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('course_id', courseId!)
+            .maybeSingle(),
+          supabase
+            .from('course_purchases')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('course_id', courseId!)
+            .maybeSingle(),
+        ]);
+
+        setIsEnrolled(!!enrollmentData || !!purchaseData);
+
+        const { data: progressData } = await supabase
+          .from('user_course_progress')
+          .select('lesson_id, completed')
           .eq('user_id', user.id)
-          .eq('course_id', courseId)
-          .maybeSingle();
+          .eq('course_id', courseId!);
 
-        const { data: purchaseData, error: purchError } = await supabase
-          .from('course_purchases')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('course_id', courseId)
-          .maybeSingle();
-
-        if (enrollError) console.error('Error loading enrollment:', enrollError);
-        if (purchError) console.error('Error loading purchase:', purchError);
-
-        const hasAccess = !!enrollmentData || !!purchaseData;
-
-        if (!hasAccess) {
-          const localEnrollment = mockDatabase.getEnrollments(user.id).find(e => e.course_id === courseId);
-          setIsEnrolled(!!localEnrollment);
-        } else {
-          setIsEnrolled(true);
+        if (progressData) {
+          const completed = new Set(
+            progressData
+              .filter(p => p.completed)
+              .map(p => p.lesson_id)
+          );
+          setCompletedModules(completed);
         }
       } else {
         setIsEnrolled(false);
       }
 
-      const progressData = mockDatabase.getModuleProgress(user?.id || '', courseId);
+      const { data: nextCourseData } = await supabase
+        .from('courses')
+        .select('id')
+        .eq('published', true)
+        .eq('package_id', courseData.package_id)
+        .gt('order_index', courseData.order_index)
+        .order('order_index')
+        .limit(1)
+        .maybeSingle();
 
-      if (progressData && user) {
-        const completed = new Set(
-          progressData
-            .filter(p => p.is_completed)
-            .map(p => p.module_id)
-        );
-        setCompletedModules(completed);
-
-        if (modulesData && completed.size === modulesData.length && completed.size > 0) {
-          const progressPercentage = 100;
-
-          mockDatabase.updateEnrollment(user.id, courseId || '', {
-            progress_percentage: progressPercentage,
-            completed_at: new Date().toISOString(),
-          });
-        } else if (modulesData && modulesData.length > 0) {
-          const progressPercentage = (completed.size / modulesData.length) * 100;
-
-          mockDatabase.updateEnrollment(user.id, courseId || '', {
-            progress_percentage: progressPercentage,
-          });
-        }
-      }
-
-      const nextCourseCheck = mockCourses
-        .filter(c => c.is_published && c.order_index > courseData.order_index)
-        .sort((a, b) => a.order_index - b.order_index)[0];
-
-      if (nextCourseCheck) {
-        setNextCourseId(nextCourseCheck.id);
+      if (nextCourseData) {
+        setNextCourseId(nextCourseData.id);
       }
     } catch (error) {
       console.error("Error loading course data:", error);
@@ -472,38 +489,48 @@ export const CoursePlayerPage = () => {
   const markModuleComplete = async (moduleId: string) => {
     if (!user || completedModules.has(moduleId)) return;
 
-    const currentModule = modules.find(m => m.id === moduleId);
-    if (!currentModule) return;
-
-    const currentWatchTime = watchTimeRef.current;
+    const currentLesson = modules.find(m => m.id === moduleId);
+    if (!currentLesson) return;
 
     try {
       await saveWatchTime();
 
-      mockDatabase.upsertModuleProgress({
-        user_id: user.id,
-        module_id: moduleId,
-        course_id: courseId || '',
-        is_completed: true,
-        completed_at: new Date().toISOString(),
-        watch_time_seconds: Math.floor(currentWatchTime),
-        last_watched_position: Math.floor(watchedTime),
-      });
+      const { data: existing } = await supabase
+        .from('user_course_progress')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('lesson_id', moduleId)
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from('user_course_progress')
+          .update({
+            completed: true,
+            progress_percent: 100,
+            last_watched_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existing.id);
+      } else {
+        await supabase
+          .from('user_course_progress')
+          .insert({
+            user_id: user.id,
+            course_id: courseId,
+            lesson_id: moduleId,
+            completed: true,
+            progress_percent: 100,
+            last_watched_at: new Date().toISOString(),
+          });
+      }
 
       setCompletedModules(prev => new Set([...prev, moduleId]));
 
-      const totalModules = modules.length;
-      const completedCount = completedModules.size + 1;
-      const progressPercentage = (completedCount / totalModules) * 100;
-
-      mockDatabase.updateEnrollment(user.id, courseId || '', {
-        progress_percentage: progressPercentage,
-      });
-
-      toast.success("✅ Modul dokončen!", {
+      toast.success("Modul dokoncen!", {
         description: currentModuleIndex < modules.length - 1
-          ? "Přechod na další modul..."
-          : "🎉 Gratulujeme! Dokončili jste kurz!"
+          ? "Prechod na dalsi modul..."
+          : "Gratulujeme! Dokoncili jste kurz!"
       });
 
       if (currentModuleIndex < modules.length - 1) {
@@ -517,8 +544,8 @@ export const CoursePlayerPage = () => {
       }
     } catch (error) {
       console.error("Error marking module complete:", error);
-      toast.error("❌ Chyba při dokončování modulu", {
-        description: "Zkuste to prosím znovu."
+      toast.error("Chyba pri dokoncovani modulu", {
+        description: "Zkuste to prosim znovu."
       });
     }
   };
@@ -527,67 +554,29 @@ export const CoursePlayerPage = () => {
     if (!user || !course) return;
 
     try {
-      mockDatabase.updateEnrollment(user.id, courseId || '', {
-        completed_at: new Date().toISOString(),
+      await supabase
+        .from('course_enrollments')
+        .update({ completed: true, completion_date: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .eq('course_id', courseId!);
+
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.5 },
+        colors: ['#10b981', '#3b82f6', '#2563eb', '#f59e0b'],
       });
 
-      const nextCourse = mockCourses
-        .filter(c => c.is_published && c.order_index > course.order_index)
-        .sort((a, b) => a.order_index - b.order_index)[0];
+      toast.success("Kurz uspesne dokoncen!", {
+        description: "Gratulujeme!",
+        duration: 5000,
+      });
 
-      if (nextCourse) {
-        setNextCourseId(nextCourse.id);
-
-        const existingEnrollment = mockDatabase.getEnrollments(user.id).find(e => e.course_id === nextCourse.id);
-
-        const isNewCourse = !existingEnrollment;
-
-        if (isNewCourse) {
-          mockDatabase.addEnrollment({
-            user_id: user.id,
-            course_id: nextCourse.id,
-            progress_percentage: 0,
-            completed_at: null
-          });
-
-          confetti({
-            particleCount: 150,
-            spread: 100,
-            origin: { y: 0.5 },
-            colors: ['#10b981', '#3b82f6', '#2563eb', '#f59e0b'],
-          });
-
-          toast.success("🎉 Kurz úspěšně dokončen!", {
-            description: `Odemkli jste další kurz: ${nextCourse.title}`,
-            duration: 5000,
-          });
-        } else {
-          toast.success("🎉 Kurz úspěšně dokončen!", {
-            description: `Přechod na další kurz: ${nextCourse.title}`,
-            duration: 3000,
-          });
-        }
-
-        setTimeout(() => {
-          navigate(`/kurz/${nextCourse.id}`);
-        }, 2000);
-      } else {
-        setNextCourseId(null);
-
-        toast.success("🏆 Kurz úspěšně dokončen!", {
-          description: "Gratulujeme! Dokončili jste všechny dostupné kurzy!",
-          duration: 5000,
-        });
-
-        setTimeout(() => {
-          navigate("/kurzy");
-        }, 2000);
-      }
+      setTimeout(() => {
+        navigate("/prehled/integrace");
+      }, 2000);
     } catch (error) {
-      console.error("Error unlocking next course:", error);
-      toast.error("❌ Chyba při odemykání dalšího kurzu", {
-        description: "Zkuste to prosím znovu."
-      });
+      console.error("Error completing course:", error);
     }
   };
 
@@ -604,58 +593,15 @@ export const CoursePlayerPage = () => {
   };
 
   const continueToNextCourse = async () => {
-    if (!nextCourseId || !user || !course) return;
-
-    try {
-      const nextCourseData = mockCourses.find(c => c.id === nextCourseId && c.is_published);
-
-      if (!nextCourseData) {
-        toast.error("Další kurz nebyl nalezen");
-        navigate("/kurzy");
-        return;
-      }
-
-      const existingEnrollment = mockDatabase.getEnrollments(user.id).find(e => e.course_id === nextCourseData.id);
-
-      const isNewCourse = !existingEnrollment;
-
-      if (isNewCourse) {
-        mockDatabase.addEnrollment({
-          user_id: user.id,
-          course_id: nextCourseData.id,
-          progress_percentage: 0,
-          completed_at: null
-        });
-
-        confetti({
-          particleCount: 150,
-          spread: 100,
-          origin: { y: 0.5 },
-          colors: ['#10b981', '#3b82f6', '#2563eb', '#f59e0b'],
-        });
-
-        toast.success("🎉 Odemknut další kurz!", {
-          description: nextCourseData.title,
-        });
-      }
-
-      navigate(`/kurz/${nextCourseData.id}`);
-    } catch (error) {
-      console.error("Error continuing to next course:", error);
-      toast.error("Chyba při přechodu na další kurz");
-      navigate("/kurzy");
-    }
+    if (!nextCourseId) return;
+    navigate(`/kurz/${nextCourseId}`);
   };
 
   if (!user) {
     return <Navigate to="/prihlaseni" replace />;
   }
 
-  if (!hasActiveSubscription && !subscriptionLoading) {
-    return <Navigate to="/kurzy" replace />;
-  }
-
-  if (loading || subscriptionLoading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -713,13 +659,13 @@ export const CoursePlayerPage = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const totalSeconds = videoDuration > 0 ? videoDuration : currentModule.duration_minutes * 60;
+  const totalSeconds = videoDuration > 0 ? videoDuration : currentModule.duration * 60;
   const remainingSeconds = Math.max(0, totalSeconds - watchedTime);
 
-  const totalCourseMinutes = modules.reduce((acc, m) => acc + m.duration_minutes, 0);
+  const totalCourseMinutes = modules.reduce((acc, m) => acc + m.duration, 0);
   const completedMinutes = modules
     .filter(m => completedModules.has(m.id))
-    .reduce((acc, m) => acc + m.duration_minutes, 0);
+    .reduce((acc, m) => acc + m.duration, 0);
   const currentModuleWatchedMinutes = Math.floor(watchedTime / 60);
   const remainingCourseMinutes = Math.max(0, totalCourseMinutes - completedMinutes - currentModuleWatchedMinutes);
 
@@ -861,14 +807,6 @@ export const CoursePlayerPage = () => {
                   <p className="text-sm font-medium mb-2">Popis modulu</p>
                   <p className="text-muted-foreground leading-relaxed">{currentModule.description}</p>
                 </div>
-                {currentModule.content && (
-                  <div>
-                    <p className="text-sm font-medium mb-3">Detailní obsah</p>
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                      <div dangerouslySetInnerHTML={{ __html: currentModule.content }} />
-                    </div>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
@@ -886,7 +824,7 @@ export const CoursePlayerPage = () => {
                       <CardTitle className="text-lg">{nextModule.title}</CardTitle>
                       <CardDescription className="flex items-center gap-1 mt-1">
                         <Clock className="h-3 w-3" />
-                        {nextModule.duration_minutes} min
+                        {nextModule.duration} min
                       </CardDescription>
                     </div>
                     <Button
@@ -982,7 +920,7 @@ export const CoursePlayerPage = () => {
                   Moduly kurzu
                 </CardTitle>
                 <CardDescription>
-                  {modules.length} modulů • {modules.reduce((acc, m) => acc + m.duration_minutes, 0)} minut celkem
+                  {modules.length} modulů • {modules.reduce((acc, m) => acc + m.duration, 0)} minut celkem
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1028,7 +966,7 @@ export const CoursePlayerPage = () => {
                             </p>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               <Clock className="h-3 w-3" />
-                              <span>{module.duration_minutes} min</span>
+                              <span>{module.duration} min</span>
                               {isLocked && (
                                 <>
                                   <span>•</span>
