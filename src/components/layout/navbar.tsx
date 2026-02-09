@@ -145,6 +145,12 @@ const NAVIGATION: MenuItem[] = [
         title: "Vice",
         links: [
           {
+            label: "Blog",
+            icon: BookOpen,
+            description: "Clanky a novinky ze sveta fyzioterapie",
+            url: "/blog",
+          },
+          {
             label: "Reference",
             icon: Star,
             description: "Co o nas rikaji nasi klienti",
@@ -287,11 +293,6 @@ const NAVIGATION: MenuItem[] = [
         "https://images.pexels.com/photos/5473182/pexels-photo-5473182.jpeg?auto=compress&cs=tinysrgb&w=800",
       label: "Prozkoumejte nase kurzy",
     },
-  },
-  {
-    title: "Blog",
-    url: "/blog",
-    id: 4,
   },
   {
     title: "Kosik",
