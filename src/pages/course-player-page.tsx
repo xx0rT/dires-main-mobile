@@ -11,7 +11,9 @@ import {
   BookOpen,
   ArrowRight,
   Trophy,
-  Target
+  Target,
+  Lock,
+  CalendarClock
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
@@ -58,6 +60,7 @@ export const CoursePlayerPage = () => {
   const [modules, setModules] = useState<CourseLesson[]>([]);
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
   const [completedModules, setCompletedModules] = useState<Set<string>>(new Set());
+  const [completionDates, setCompletionDates] = useState<Map<string, string>>(new Map());
   const [loading, setLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [nextCourseId, setNextCourseId] = useState<string | null>(null);
@@ -90,6 +93,7 @@ export const CoursePlayerPage = () => {
     setCourse(null);
     setLoading(true);
     setCompletedModules(new Set());
+    setCompletionDates(new Map());
     setNextCourseId(null);
     setVideoProgress(0);
     setWatchedTime(0);
@@ -450,7 +454,7 @@ export const CoursePlayerPage = () => {
 
         const { data: progressData } = await supabase
           .from('user_course_progress')
-          .select('lesson_id, completed')
+          .select('lesson_id, completed, completed_at')
           .eq('user_id', user.id)
           .eq('course_id', courseId!);
 
@@ -461,6 +465,14 @@ export const CoursePlayerPage = () => {
               .map(p => p.lesson_id)
           );
           setCompletedModules(completed);
+
+          const dates = new Map<string, string>();
+          for (const p of progressData) {
+            if (p.completed && p.completed_at) {
+              dates.set(p.lesson_id, p.completed_at);
+            }
+          }
+          setCompletionDates(dates);
         }
       } else {
         setIsEnrolled(false);
@@ -495,6 +507,7 @@ export const CoursePlayerPage = () => {
     try {
       await saveWatchTime();
 
+      const now = new Date().toISOString();
       const { data: existing } = await supabase
         .from('user_course_progress')
         .select('id')
@@ -507,9 +520,10 @@ export const CoursePlayerPage = () => {
           .from('user_course_progress')
           .update({
             completed: true,
+            completed_at: now,
             progress_percent: 100,
-            last_watched_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
+            last_watched_at: now,
+            updated_at: now,
           })
           .eq('id', existing.id);
       } else {
@@ -520,24 +534,24 @@ export const CoursePlayerPage = () => {
             course_id: courseId,
             lesson_id: moduleId,
             completed: true,
+            completed_at: now,
             progress_percent: 100,
-            last_watched_at: new Date().toISOString(),
+            last_watched_at: now,
           });
       }
 
       setCompletedModules(prev => new Set([...prev, moduleId]));
+      setCompletionDates(prev => new Map(prev).set(moduleId, now));
+
+      const isLast = currentModuleIndex === modules.length - 1;
 
       toast.success("Modul dokoncen!", {
-        description: currentModuleIndex < modules.length - 1
-          ? "Prechod na dalsi modul..."
-          : "Gratulujeme! Dokoncili jste kurz!"
+        description: isLast
+          ? "Gratulujeme! Dokoncili jste kurz!"
+          : "Dalsi modul bude dostupny zitra."
       });
 
-      if (currentModuleIndex < modules.length - 1) {
-        setTimeout(() => {
-          goToNextModule();
-        }, 1500);
-      } else {
+      if (isLast) {
         setTimeout(async () => {
           await unlockNextCourse();
         }, 2000);
@@ -582,7 +596,15 @@ export const CoursePlayerPage = () => {
 
   const goToNextModule = () => {
     if (currentModuleIndex < modules.length - 1) {
-      setCurrentModuleIndex(currentModuleIndex + 1);
+      const nextIdx = currentModuleIndex + 1;
+      const status = getLessonLockStatus(nextIdx);
+      if (status === 'available') {
+        setCurrentModuleIndex(nextIdx);
+      } else {
+        toast.info("Dalsi modul bude dostupny zitra.", {
+          description: "Kazdy den se odemkne novy modul."
+        });
+      }
     }
   };
 
@@ -648,10 +670,35 @@ export const CoursePlayerPage = () => {
     );
   }
 
+  const getLessonLockStatus = (index: number): 'available' | 'locked' | 'daily_locked' => {
+    if (index === 0) return 'available';
+    if (completedModules.has(modules[index].id)) return 'available';
+
+    const prevLesson = modules[index - 1];
+    if (!completedModules.has(prevLesson.id)) return 'locked';
+
+    const prevCompletedAt = completionDates.get(prevLesson.id);
+    if (!prevCompletedAt) return 'available';
+
+    const completedDate = new Date(prevCompletedAt);
+    const now = new Date();
+
+    const completedDay = new Date(completedDate.getFullYear(), completedDate.getMonth(), completedDate.getDate());
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    if (completedDay.getTime() >= today.getTime()) {
+      return 'daily_locked';
+    }
+
+    return 'available';
+  };
+
   const isCurrentModuleCompleted = completedModules.has(currentModule.id);
   const courseProgress = (completedModules.size / modules.length) * 100;
   const isLastModule = currentModuleIndex === modules.length - 1;
-  const nextModule = !isLastModule ? modules[currentModuleIndex + 1] : null;
+  const nextModuleIndex = !isLastModule ? currentModuleIndex + 1 : null;
+  const nextModule = nextModuleIndex !== null ? modules[nextModuleIndex] : null;
+  const nextModuleLockStatus = nextModuleIndex !== null ? getLessonLockStatus(nextModuleIndex) : null;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -811,15 +858,39 @@ export const CoursePlayerPage = () => {
             </Card>
 
             {nextModule && (
-              <Card className="border-primary/20 bg-primary/5">
+              <Card className={
+                nextModuleLockStatus === 'daily_locked'
+                  ? "border-amber-500/30 bg-amber-500/5"
+                  : nextModuleLockStatus === 'locked'
+                    ? "border-border bg-muted/30 opacity-60"
+                    : "border-primary/20 bg-primary/5"
+              }>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <ArrowRight className="h-4 w-4 text-primary" />
-                        <span className="text-xs font-medium text-primary uppercase tracking-wider">
-                          Další modul
-                        </span>
+                        {nextModuleLockStatus === 'daily_locked' ? (
+                          <>
+                            <CalendarClock className="h-4 w-4 text-amber-500" />
+                            <span className="text-xs font-medium text-amber-500 uppercase tracking-wider">
+                              Dostupne zitra
+                            </span>
+                          </>
+                        ) : nextModuleLockStatus === 'locked' ? (
+                          <>
+                            <Lock className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                              Dokoncete aktualni modul
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <ArrowRight className="h-4 w-4 text-primary" />
+                            <span className="text-xs font-medium text-primary uppercase tracking-wider">
+                              Dalsi modul
+                            </span>
+                          </>
+                        )}
                       </div>
                       <CardTitle className="text-lg">{nextModule.title}</CardTitle>
                       <CardDescription className="flex items-center gap-1 mt-1">
@@ -827,14 +898,21 @@ export const CoursePlayerPage = () => {
                         {nextModule.duration} min
                       </CardDescription>
                     </div>
-                    <Button
-                      onClick={goToNextModule}
-                      size="sm"
-                      className="shrink-0"
-                    >
-                      Přehrát
-                      <PlayCircle className="h-4 w-4 ml-2" />
-                    </Button>
+                    {nextModuleLockStatus === 'available' ? (
+                      <Button
+                        onClick={goToNextModule}
+                        size="sm"
+                        className="shrink-0"
+                      >
+                        Prehrat
+                        <PlayCircle className="h-4 w-4 ml-2" />
+                      </Button>
+                    ) : nextModuleLockStatus === 'daily_locked' ? (
+                      <Badge className="bg-amber-500/15 text-amber-600 border-amber-500/30 shrink-0 gap-1">
+                        <CalendarClock className="h-3 w-3" />
+                        Zitra
+                      </Badge>
+                    ) : null}
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -852,23 +930,32 @@ export const CoursePlayerPage = () => {
                 variant="outline"
               >
                 <ChevronLeft className="h-4 w-4 mr-2" />
-                Předchozí modul
+                Predchozi modul
               </Button>
               {isLastModule && courseProgress === 100 && nextCourseId ? (
                 <Button
                   onClick={continueToNextCourse}
                   className="bg-gradient-to-r from-primary to-primary/80"
                 >
-                  Přejít na další kurz
+                  Prejit na dalsi kurz
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
                 <Button
                   onClick={goToNextModule}
-                  disabled={currentModuleIndex === modules.length - 1}
+                  disabled={!nextModule || nextModuleLockStatus !== 'available'}
                 >
-                  Další modul
-                  <ChevronRight className="h-4 w-4 ml-2" />
+                  {nextModuleLockStatus === 'daily_locked' ? (
+                    <>
+                      <CalendarClock className="h-4 w-4 mr-2" />
+                      Dostupne zitra
+                    </>
+                  ) : (
+                    <>
+                      Dalsi modul
+                      <ChevronRight className="h-4 w-4 ml-2" />
+                    </>
+                  )}
                 </Button>
               )}
             </div>
@@ -926,8 +1013,9 @@ export const CoursePlayerPage = () => {
               <CardContent>
                 <div className="space-y-2">
                   {modules.map((module, index) => {
-                    const isPreviousCompleted = index === 0 || completedModules.has(modules[index - 1].id);
-                    const isLocked = !isPreviousCompleted && !completedModules.has(module.id);
+                    const lockStatus = getLessonLockStatus(index);
+                    const isLocked = lockStatus === 'locked' || lockStatus === 'daily_locked';
+                    const isDailyLocked = lockStatus === 'daily_locked';
                     const isCompleted = completedModules.has(module.id);
                     const isCurrent = index === currentModuleIndex;
 
@@ -939,6 +1027,8 @@ export const CoursePlayerPage = () => {
                         className={`w-full text-left p-3 rounded-lg border transition-all hover:shadow-md ${
                           isCurrent
                             ? "border-primary bg-primary/10 shadow-sm"
+                            : isDailyLocked
+                            ? "border-amber-500/30 bg-amber-500/5 cursor-not-allowed"
                             : isLocked
                             ? "border-border opacity-50 cursor-not-allowed"
                             : "border-border hover:border-primary/50 hover:bg-muted/50"
@@ -951,11 +1041,17 @@ export const CoursePlayerPage = () => {
                                 ? "bg-green-500 text-white"
                                 : isCurrent
                                 ? "bg-primary text-primary-foreground"
+                                : isDailyLocked
+                                ? "bg-amber-500/20 text-amber-600"
                                 : "bg-muted text-muted-foreground"
                             }`}
                           >
                             {isCompleted ? (
                               <CheckCircle2 className="h-5 w-5" />
+                            ) : isDailyLocked ? (
+                              <CalendarClock className="h-4 w-4" />
+                            ) : isLocked ? (
+                              <Lock className="h-4 w-4" />
                             ) : (
                               index + 1
                             )}
@@ -967,21 +1063,27 @@ export const CoursePlayerPage = () => {
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               <Clock className="h-3 w-3" />
                               <span>{module.duration} min</span>
-                              {isLocked && (
+                              {isDailyLocked && (
                                 <>
                                   <span>•</span>
-                                  <span className="text-yellow-600 dark:text-yellow-500">Zamčeno</span>
+                                  <span className="text-amber-600 dark:text-amber-500">Dostupne zitra</span>
+                                </>
+                              )}
+                              {isLocked && !isDailyLocked && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-yellow-600 dark:text-yellow-500">Zamceno</span>
                                 </>
                               )}
                               {isCompleted && (
                                 <>
                                   <span>•</span>
-                                  <span className="text-green-600 dark:text-green-500">Dokončeno</span>
+                                  <span className="text-green-600 dark:text-green-500">Dokonceno</span>
                                 </>
                               )}
                             </div>
                           </div>
-                          {isCurrent && (
+                          {isCurrent && !isLocked && (
                             <PlayCircle className="h-5 w-5 text-primary flex-shrink-0" />
                           )}
                         </div>
