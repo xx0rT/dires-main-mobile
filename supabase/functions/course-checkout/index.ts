@@ -137,9 +137,9 @@ Deno.serve(async (req: Request) => {
     formData.append("mode", "payment");
     formData.append(
       "success_url",
-      `${baseUrl}/courses?purchased=${courseId}`
+      `${baseUrl}/kurzy?purchased=${courseId}`
     );
-    formData.append("cancel_url", `${baseUrl}/courses`);
+    formData.append("cancel_url", `${baseUrl}/kurzy`);
     formData.append("client_reference_id", user.id);
     formData.append("metadata[userId]", user.id);
     formData.append("metadata[courseId]", courseId);

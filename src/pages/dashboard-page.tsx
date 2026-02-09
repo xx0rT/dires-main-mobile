@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { RiBookOpenLine, RiTimeLine, RiTrophyLine, RiArrowRightLine, RiCheckLine, RiBillLine, RiUserLine } from '@remixicon/react'
-import { mockCourses, mockDatabase } from '@/lib/mock-data'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
@@ -13,6 +12,7 @@ import { toast } from 'sonner'
 import { PhysioAnalyticsChart } from '@/components/dashboard/physio-analytics-chart'
 import { PhysioTodoList } from '@/components/dashboard/physio-todo-list'
 import { SubscriptionTimerCard } from '@/components/dashboard/subscription-timer-card'
+import { supabase } from '@/lib/supabase'
 
 interface Course {
   id: string
@@ -65,34 +65,63 @@ export default function DashboardPage() {
     if (!user) return
 
     try {
-      const enrollmentsData = mockDatabase.getEnrollments(user.id)
-        .sort((a, b) => new Date(b.enrolled_at).getTime() - new Date(a.enrolled_at).getTime())
+      const { data: enrollmentsData, error: enrollmentsError } = await supabase
+        .from('course_enrollments')
+        .select(`
+          id,
+          course_id,
+          enrolled_at,
+          completed,
+          completion_date,
+          courses!inner (
+            id,
+            title,
+            description,
+            thumbnail_url,
+            price,
+            order_index
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('enrolled_at', { ascending: false })
 
-      const enrollmentsWithCourses = enrollmentsData.map(enrollment => {
-        const course = mockCourses.find(c => c.id === enrollment.course_id)
-        return {
-          ...enrollment,
-          course: course || mockCourses[0]
+      if (enrollmentsError) {
+        console.error('Error fetching enrollments:', enrollmentsError)
+        return
+      }
+
+      const enrollmentsWithCourses = (enrollmentsData || []).map((enrollment: any) => ({
+        id: enrollment.id,
+        course_id: enrollment.course_id,
+        progress_percentage: enrollment.completed ? 100 : 0,
+        enrolled_at: enrollment.enrolled_at,
+        completed_at: enrollment.completion_date,
+        course: {
+          id: enrollment.courses?.id || '',
+          title: enrollment.courses?.title || '',
+          description: enrollment.courses?.description || '',
+          image_url: enrollment.courses?.thumbnail_url || '',
+          price: enrollment.courses?.price || 0,
+          order_index: enrollment.courses?.order_index || 0
         }
+      }))
+
+      setEnrollments(enrollmentsWithCourses as Enrollment[])
+
+      const { data: progressData } = await supabase
+        .from('user_course_progress')
+        .select('completed')
+        .eq('user_id', user.id)
+
+      const completedModulesCount = progressData?.filter((p) => p.completed).length || 0
+      const totalMinutes = completedModulesCount * 60
+
+      setStats({
+        completedCourses: enrollmentsData?.filter((e) => e.completed).length || 0,
+        inProgressCourses: enrollmentsData?.filter((e) => !e.completed).length || 0,
+        totalHoursSpent: Math.round(totalMinutes / 60),
+        completedModules: completedModulesCount
       })
-
-      const progressData = mockDatabase.getModuleProgress(user.id)
-
-      if (enrollmentsWithCourses) {
-        setEnrollments(enrollmentsWithCourses as Enrollment[])
-      }
-
-      if (progressData) {
-        const completedModulesCount = progressData.filter((p) => p.is_completed).length
-        const totalMinutes = completedModulesCount * 60
-
-        setStats({
-          completedCourses: enrollmentsData?.filter((e) => e.completed_at).length || 0,
-          inProgressCourses: enrollmentsData?.filter((e) => !e.completed_at).length || 0,
-          totalHoursSpent: Math.round(totalMinutes / 60),
-          completedModules: completedModulesCount
-        })
-      }
     } catch (error) {
       console.error('Error loading dashboard data:', error)
     } finally {
