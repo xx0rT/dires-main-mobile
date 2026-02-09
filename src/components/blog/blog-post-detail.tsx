@@ -74,8 +74,8 @@ const BlogPostDetail = ({ className }: BlogPostDetailProps) => {
   };
 
   return (
-    <section className={cn("py-20", className)}>
-      <div className="container">
+    <section className={cn("py-20 px-6 md:px-12 lg:px-20", className)}>
+      <div className="container max-w-6xl mx-auto">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -97,7 +97,7 @@ const BlogPostDetail = ({ className }: BlogPostDetailProps) => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <h1 className="mt-7 mb-6 max-w-3xl text-3xl font-semibold md:text-5xl">
+        <h1 className="mt-7 mb-6 max-w-3xl text-2xl font-semibold md:text-4xl">
           Jak získat maximální výsledky z fyzioterapie v roce 2025
         </h1>
         <div className="flex items-center gap-3 text-sm">

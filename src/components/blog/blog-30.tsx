@@ -44,9 +44,9 @@ interface Blog30Props {
 
 const Blog30 = ({ className }: Blog30Props) => {
   return (
-    <section className={cn("bg-background py-16", className)}>
-      <div className="container">
-        <h1 className="mb-8 max-w-lg font-sans text-4xl font-extrabold tracking-tight text-foreground md:text-6xl">
+    <section className={cn("bg-background py-16 px-6 md:px-12 lg:px-20", className)}>
+      <div className="container max-w-6xl mx-auto">
+        <h1 className="mb-8 max-w-lg font-sans text-3xl font-extrabold tracking-tight text-foreground md:text-5xl">
           Objevte naše články
         </h1>
 

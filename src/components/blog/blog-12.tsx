@@ -13,13 +13,13 @@ interface Blog12Props {
 
 const Blog12 = ({ className }: Blog12Props) => {
   return (
-    <section className={cn("py-16", className)}>
-      <div className="container">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 text-center">
+    <section className={cn("py-16 px-6 md:px-12 lg:px-20", className)}>
+      <div className="container max-w-6xl mx-auto">
+        <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
           <Badge variant="outline" className="gap-1 py-1">
             <FileText className="h-full w-4" /> Náš Blog
           </Badge>
-          <h1 className="text-4xl font-semibold text-balance">
+          <h1 className="text-3xl md:text-4xl font-semibold text-balance">
             Objevte nejnovější trendy ve fyzioterapii
           </h1>
           <p className="text-muted-foreground">
