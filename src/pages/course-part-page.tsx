@@ -6,13 +6,13 @@ import {
   Clock,
   PlayCircle,
   ArrowRight,
-  Trophy,
+  ArrowLeft,
   Lock,
   CalendarClock,
   Home,
-  ChevronDown,
+  BookOpen,
+  Trophy,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 import { Badge } from "@/components/ui/badge";
@@ -50,19 +50,19 @@ interface CourseLesson {
   duration: number;
 }
 
-export const CoursePlayerPage = () => {
-  const { courseId } = useParams<{ courseId: string }>();
+export default function CoursePartPage() {
+  const { courseId, partNumber } = useParams<{ courseId: string; partNumber: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const partIndex = (parseInt(partNumber || "1", 10) - 1);
+
   const [course, setCourse] = useState<Course | null>(null);
-  const [modules, setModules] = useState<CourseLesson[]>([]);
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [completedModules, setCompletedModules] = useState<Set<string>>(new Set());
+  const [lessons, setLessons] = useState<CourseLesson[]>([]);
+  const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
   const [completionDates, setCompletionDates] = useState<Map<string, string>>(new Map());
   const [loading, setLoading] = useState(true);
   const [isEnrolled, setIsEnrolled] = useState(false);
-  const [nextCourseId, setNextCourseId] = useState<string | null>(null);
   const [videoProgress, setVideoProgress] = useState(0);
   const [watchedTime, setWatchedTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
@@ -78,30 +78,28 @@ export const CoursePlayerPage = () => {
   const saveIntervalRef = useRef<any>(null);
   const lastUpdateTimeRef = useRef(Date.now());
   const hasInitializedRef = useRef(false);
-  const completedModulesRef = useRef<Set<string>>(new Set());
+  const completedLessonsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    completedModulesRef.current = completedModules;
-  }, [completedModules]);
+    completedLessonsRef.current = completedLessons;
+  }, [completedLessons]);
 
   useEffect(() => {
-    setActiveIndex(-1);
-    setModules([]);
+    setLessons([]);
     setCourse(null);
     setLoading(true);
-    setCompletedModules(new Set());
+    setCompletedLessons(new Set());
     setCompletionDates(new Map());
-    setNextCourseId(null);
     setVideoProgress(0);
     setWatchedTime(0);
     setVideoDuration(0);
     setActualWatchTime(0);
     setLastPosition(0);
-  }, [courseId]);
+  }, [courseId, partNumber]);
 
   useEffect(() => {
     if (user && courseId) loadCourseData();
-  }, [user, courseId]);
+  }, [user, courseId, partNumber]);
 
   useEffect(() => {
     if (!(window as any).YT) {
@@ -112,9 +110,11 @@ export const CoursePlayerPage = () => {
     }
   }, []);
 
+  const currentLesson = lessons[partIndex] || null;
+
   const saveWatchTime = async () => {
-    if (!user || !modules[activeIndex] || !playerRef.current) return;
-    const lessonId = modules[activeIndex].id;
+    if (!user || !currentLesson || !playerRef.current) return;
+    const lessonId = currentLesson.id;
     const currentWatchTime = watchTimeRef.current;
     if (currentWatchTime <= lastSavedTimeRef.current) return;
 
@@ -122,7 +122,7 @@ export const CoursePlayerPage = () => {
       const currentVideoPosition = Math.floor(
         playerRef.current.getCurrentTime ? playerRef.current.getCurrentTime() : 0
       );
-      const isCompleted = completedModulesRef.current.has(lessonId);
+      const isCompleted = completedLessonsRef.current.has(lessonId);
       const progressPct =
         videoDuration > 0
           ? Math.min(Math.round((currentVideoPosition / videoDuration) * 100), 100)
@@ -162,20 +162,18 @@ export const CoursePlayerPage = () => {
   };
 
   const loadModuleProgress = async () => {
-    if (!user || !modules[activeIndex]) return;
-    const lessonId = modules[activeIndex].id;
-
+    if (!user || !currentLesson) return;
     try {
       const { data } = await supabase
         .from("user_course_progress")
         .select("progress_percent, completed")
         .eq("user_id", user.id)
-        .eq("lesson_id", lessonId)
+        .eq("lesson_id", currentLesson.id)
         .maybeSingle();
 
       if (data) {
         const estimatedSeconds = Math.floor(
-          (data.progress_percent / 100) * (modules[activeIndex].duration * 60)
+          (data.progress_percent / 100) * (currentLesson.duration * 60)
         );
         watchTimeRef.current = estimatedSeconds;
         lastSavedTimeRef.current = estimatedSeconds;
@@ -193,7 +191,7 @@ export const CoursePlayerPage = () => {
   };
 
   useEffect(() => {
-    if (activeIndex < 0 || !modules[activeIndex]) return;
+    if (!currentLesson) return;
 
     isMountedRef.current = true;
     setVideoProgress(0);
@@ -227,18 +225,13 @@ export const CoursePlayerPage = () => {
       if (!isMountedRef.current) return;
       await cleanupPlayer();
 
-      const currentVideoUrl = modules[activeIndex]?.video_url;
-      if (!currentVideoUrl || !isMountedRef.current) return;
+      const videoUrl = currentLesson?.video_url;
+      if (!videoUrl || !isMountedRef.current) return;
 
-      const videoIdMatch = currentVideoUrl.match(/embed\/([^?]+)/);
+      const videoIdMatch = videoUrl.match(/embed\/([^?]+)/);
       const videoId = videoIdMatch ? videoIdMatch[1] : null;
 
-      if (
-        videoId &&
-        (window as any).YT?.Player &&
-        videoRef.current &&
-        isMountedRef.current
-      ) {
+      if (videoId && (window as any).YT?.Player && videoRef.current && isMountedRef.current) {
         const containerElement = videoRef.current;
         while (containerElement.firstChild) {
           containerElement.removeChild(containerElement.firstChild);
@@ -260,7 +253,11 @@ export const CoursePlayerPage = () => {
                   const duration = Math.floor(playerRef.current.getDuration());
                   if (isMountedRef.current) setVideoDuration(duration);
 
-                  if (!hasInitializedRef.current && lastPosition > 0 && lastPosition < duration - 10) {
+                  if (
+                    !hasInitializedRef.current &&
+                    lastPosition > 0 &&
+                    lastPosition < duration - 10
+                  ) {
                     playerRef.current.seekTo(lastPosition, true);
                     hasInitializedRef.current = true;
                   }
@@ -287,7 +284,8 @@ export const CoursePlayerPage = () => {
                           setActualWatchTime(watchTimeRef.current);
                         }
                         lastUpdateTimeRef.current = now;
-                        if (dur > 0) setVideoProgress(Math.min((currentTime / dur) * 100, 100));
+                        if (dur > 0)
+                          setVideoProgress(Math.min((currentTime / dur) * 100, 100));
                       }
                     } catch (_e) {}
                   }, 1000);
@@ -349,7 +347,7 @@ export const CoursePlayerPage = () => {
         }
       }
     };
-  }, [activeIndex, modules, user, courseId]);
+  }, [currentLesson, user, courseId]);
 
   const loadCourseData = async () => {
     try {
@@ -371,7 +369,7 @@ export const CoursePlayerPage = () => {
         .eq("course_id", courseId!)
         .order("order_index");
 
-      if (lessonsData) setModules(lessonsData);
+      if (lessonsData) setLessons(lessonsData);
 
       if (user) {
         const [{ data: enrollmentData }, { data: purchaseData }] = await Promise.all([
@@ -397,39 +395,16 @@ export const CoursePlayerPage = () => {
           .eq("course_id", courseId!);
 
         if (progressData) {
-          const completedSet = new Set(
-            progressData.filter((p) => p.completed).map((p) => p.lesson_id)
+          setCompletedLessons(
+            new Set(progressData.filter((p) => p.completed).map((p) => p.lesson_id))
           );
-          setCompletedModules(completedSet);
-
           const datesMap = new Map<string, string>();
           for (const p of progressData) {
             if (p.completed && p.completed_at) datesMap.set(p.lesson_id, p.completed_at);
           }
           setCompletionDates(datesMap);
-
-          if (lessonsData) {
-            const firstIncomplete = lessonsData.findIndex((l) => !completedSet.has(l.id));
-            setActiveIndex(firstIncomplete >= 0 ? firstIncomplete : lessonsData.length - 1);
-          }
-        } else if (lessonsData?.length) {
-          setActiveIndex(0);
         }
-      } else {
-        setIsEnrolled(false);
       }
-
-      const { data: nextCourseData } = await supabase
-        .from("courses")
-        .select("id")
-        .eq("published", true)
-        .eq("package_id", courseData.package_id)
-        .gt("order_index", courseData.order_index)
-        .order("order_index")
-        .limit(1)
-        .maybeSingle();
-
-      if (nextCourseData) setNextCourseId(nextCourseData.id);
     } catch (error) {
       console.error("Error loading course data:", error);
     } finally {
@@ -439,10 +414,11 @@ export const CoursePlayerPage = () => {
 
   const getLessonLockStatus = (index: number): "available" | "locked" | "daily_locked" => {
     if (index === 0) return "available";
-    if (completedModules.has(modules[index].id)) return "available";
+    if (!lessons[index]) return "locked";
+    if (completedLessons.has(lessons[index].id)) return "available";
 
-    const prevLesson = modules[index - 1];
-    if (!completedModules.has(prevLesson.id)) return "locked";
+    const prevLesson = lessons[index - 1];
+    if (!completedLessons.has(prevLesson.id)) return "locked";
 
     const prevCompletedAt = completionDates.get(prevLesson.id);
     if (!prevCompletedAt) return "available";
@@ -460,10 +436,8 @@ export const CoursePlayerPage = () => {
     return "available";
   };
 
-  const markModuleComplete = async (moduleId: string) => {
-    if (!user || completedModules.has(moduleId)) return;
-    const currentLesson = modules.find((m) => m.id === moduleId);
-    if (!currentLesson) return;
+  const markModuleComplete = async () => {
+    if (!user || !currentLesson || completedLessons.has(currentLesson.id)) return;
 
     try {
       await saveWatchTime();
@@ -473,7 +447,7 @@ export const CoursePlayerPage = () => {
         .from("user_course_progress")
         .select("id")
         .eq("user_id", user.id)
-        .eq("lesson_id", moduleId)
+        .eq("lesson_id", currentLesson.id)
         .maybeSingle();
 
       if (existing) {
@@ -491,7 +465,7 @@ export const CoursePlayerPage = () => {
         await supabase.from("user_course_progress").insert({
           user_id: user.id,
           course_id: courseId,
-          lesson_id: moduleId,
+          lesson_id: currentLesson.id,
           completed: true,
           completed_at: now,
           progress_percent: 100,
@@ -499,11 +473,10 @@ export const CoursePlayerPage = () => {
         });
       }
 
-      setCompletedModules((prev) => new Set([...prev, moduleId]));
-      setCompletionDates((prev) => new Map(prev).set(moduleId, now));
+      setCompletedLessons((prev) => new Set([...prev, currentLesson.id]));
+      setCompletionDates((prev) => new Map(prev).set(currentLesson.id, now));
 
-      const currentIdx = modules.findIndex((m) => m.id === moduleId);
-      const isLast = currentIdx === modules.length - 1;
+      const isLast = partIndex === lessons.length - 1;
 
       toast.success("Lekce dokoncena!", {
         description: isLast
@@ -543,17 +516,10 @@ export const CoursePlayerPage = () => {
         duration: 5000,
       });
 
-      setTimeout(() => navigate("/prehled/integrace"), 2000);
+      setTimeout(() => navigate(`/kurz/${courseId}`), 2000);
     } catch (error) {
       console.error("Error completing course:", error);
     }
-  };
-
-  const handleCardClick = (index: number) => {
-    const status = getLessonLockStatus(index);
-    if (status !== "available") return;
-    if (index === activeIndex) return;
-    setActiveIndex(index);
   };
 
   const formatTime = (seconds: number) => {
@@ -588,33 +554,65 @@ export const CoursePlayerPage = () => {
     );
   }
 
-  if (modules.length === 0) {
+  if (!currentLesson) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold">Zadne lekce</h1>
-          <p className="text-muted-foreground">Tento kurz zatim neobsahuje zadne lekce.</p>
+          <h1 className="text-2xl font-bold">Lekce nenalezena</h1>
+          <p className="text-muted-foreground">Tato cast kurzu neexistuje.</p>
+          <Button asChild variant="outline" className="mt-4">
+            <Link to={`/kurz/${courseId}`}>Zpet na kurz</Link>
+          </Button>
         </div>
       </div>
     );
   }
 
-  const courseProgress = (completedModules.size / modules.length) * 100;
-  const isCourseDone = courseProgress === 100;
-  const activeModule = activeIndex >= 0 ? modules[activeIndex] : null;
+  const lockStatus = getLessonLockStatus(partIndex);
+  if (lockStatus !== "available") {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center space-y-3">
+          {lockStatus === "daily_locked" ? (
+            <>
+              <CalendarClock className="h-12 w-12 text-amber-500 mx-auto" />
+              <h1 className="text-2xl font-bold">Lekce bude dostupna zitra</h1>
+              <p className="text-muted-foreground">Kazdy den se odemkne nova lekce.</p>
+            </>
+          ) : (
+            <>
+              <Lock className="h-12 w-12 text-muted-foreground mx-auto" />
+              <h1 className="text-2xl font-bold">Lekce je zamcena</h1>
+              <p className="text-muted-foreground">
+                Nejdrive dokoncete predchozi lekce.
+              </p>
+            </>
+          )}
+          <Button asChild variant="outline" className="mt-4">
+            <Link to={`/kurz/${courseId}`}>Zpet na kurz</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const isCompleted = completedLessons.has(currentLesson.id);
+  const courseProgress = (completedLessons.size / lessons.length) * 100;
   const totalSeconds =
-    activeModule
-      ? videoDuration > 0
-        ? videoDuration
-        : activeModule.duration * 60
-      : 0;
+    videoDuration > 0 ? videoDuration : currentLesson.duration * 60;
   const remainingSeconds = Math.max(0, totalSeconds - watchedTime);
+  const isLastPart = partIndex === lessons.length - 1;
+  const isFirstPart = partIndex === 0;
+
+  const nextPartStatus =
+    !isLastPart ? getLessonLockStatus(partIndex + 1) : null;
+  const canGoNext = nextPartStatus === "available";
 
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container max-w-4xl mx-auto py-4 px-4">
-          <Breadcrumb className="mb-3">
+        <div className="container max-w-5xl mx-auto py-4 px-4">
+          <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
@@ -631,216 +629,229 @@ export const CoursePlayerPage = () => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{course.title}</BreadcrumbPage>
+                <BreadcrumbLink asChild>
+                  <Link to={`/kurz/${courseId}`}>{course.title}</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Cast {partIndex + 1}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+        </div>
+      </div>
 
-          <div className="flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold truncate">{course.title}</h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {completedModules.size} z {modules.length} lekci dokonceno
-              </p>
+      <div className="container max-w-5xl mx-auto py-8 px-4 space-y-6">
+        <div className="rounded-xl border bg-card overflow-hidden shadow-sm">
+          <div className="bg-black aspect-video">
+            <div
+              ref={videoRef}
+              className="w-full h-full [&>div]:w-full [&>div]:h-full [&_iframe]:w-full [&_iframe]:h-full"
+            />
+          </div>
+
+          <div className="px-5 pt-3 pb-2 bg-muted/30 border-t">
+            <Progress value={videoProgress} className="h-1.5 mb-2" />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>{formatTime(watchedTime)}</span>
+              <span>-{formatTime(remainingSeconds)}</span>
             </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <Progress value={courseProgress} className="h-2 w-24" />
-              <span className="text-sm font-semibold tabular-nums">
-                {Math.round(courseProgress)}%
-              </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
+          <div className="space-y-6">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Badge variant="outline" className="text-xs">
+                  Cast {partIndex + 1} z {lessons.length}
+                </Badge>
+                <Badge variant="outline" className="text-xs gap-1">
+                  <Clock className="h-3 w-3" />
+                  {currentLesson.duration} min
+                </Badge>
+                {isCompleted && (
+                  <Badge className="bg-green-500/15 text-green-600 border-green-500/30 text-xs gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Dokonceno
+                  </Badge>
+                )}
+              </div>
+              <h1 className="text-2xl font-bold">{currentLesson.title}</h1>
+            </div>
+
+            {currentLesson.description && (
+              <div className="rounded-xl border bg-card p-5">
+                <div className="flex items-start gap-3">
+                  <BookOpen className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h2 className="font-semibold mb-2">O teto lekci</h2>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {currentLesson.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {course.description && (
+              <div className="rounded-xl border bg-card p-5">
+                <div className="flex items-start gap-3">
+                  <Trophy className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h2 className="font-semibold mb-2">O kurzu</h2>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {course.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!isCompleted && (
+              <Button onClick={markModuleComplete} size="lg" className="w-full sm:w-auto">
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Oznacit lekci jako dokoncene
+              </Button>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-xl border bg-card p-5">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <PlayCircle className="h-4 w-4 text-primary" />
+                Prehled
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Pokrok kurzu</p>
+                  <div className="flex items-center gap-2">
+                    <Progress value={courseProgress} className="h-2 flex-1" />
+                    <span className="text-xs font-semibold tabular-nums">
+                      {Math.round(courseProgress)}%
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {completedLessons.size} z {lessons.length} lekci
+                  </p>
+                </div>
+                <div className="border-t pt-3">
+                  <p className="text-xs text-muted-foreground mb-1">Sledovano v teto lekci</p>
+                  <p className="text-sm font-medium">{formatTime(actualWatchTime)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border bg-card p-5">
+              <h3 className="font-semibold mb-3">Navigace</h3>
+              <div className="space-y-2">
+                {!isFirstPart && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => navigate(`/kurz/${courseId}/cast/${partIndex}`)}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Cast {partIndex}: {lessons[partIndex - 1]?.title}
+                  </Button>
+                )}
+
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => navigate(`/kurz/${courseId}`)}
+                >
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Vsechny lekce
+                </Button>
+
+                {!isLastPart && (
+                  <Button
+                    variant={canGoNext ? "default" : "outline"}
+                    className={cn(
+                      "w-full justify-start",
+                      !canGoNext && "opacity-60"
+                    )}
+                    disabled={!canGoNext}
+                    onClick={() =>
+                      canGoNext && navigate(`/kurz/${courseId}/cast/${partIndex + 2}`)
+                    }
+                  >
+                    {nextPartStatus === "daily_locked" ? (
+                      <>
+                        <CalendarClock className="h-4 w-4 mr-2" />
+                        Cast {partIndex + 2} - dostupna zitra
+                      </>
+                    ) : nextPartStatus === "locked" ? (
+                      <>
+                        <Lock className="h-4 w-4 mr-2" />
+                        Cast {partIndex + 2} - zamceno
+                      </>
+                    ) : (
+                      <>
+                        <ArrowRight className="h-4 w-4 mr-2" />
+                        Cast {partIndex + 2}: {lessons[partIndex + 1]?.title}
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-xl border bg-card p-5">
+              <h3 className="font-semibold mb-3">Vsechny casti</h3>
+              <div className="space-y-1">
+                {lessons.map((lesson, idx) => {
+                  const status = getLessonLockStatus(idx);
+                  const done = completedLessons.has(lesson.id);
+                  const isCurrent = idx === partIndex;
+
+                  return (
+                    <button
+                      key={lesson.id}
+                      type="button"
+                      onClick={() =>
+                        status === "available" &&
+                        navigate(`/kurz/${courseId}/cast/${idx + 1}`)
+                      }
+                      disabled={status !== "available"}
+                      className={cn(
+                        "w-full flex items-center gap-2.5 p-2 rounded-lg text-left text-sm transition-colors",
+                        isCurrent && "bg-primary/10 text-primary font-medium",
+                        !isCurrent && status === "available" && "hover:bg-muted/50",
+                        status !== "available" && "opacity-40 cursor-not-allowed"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0",
+                          done
+                            ? "bg-green-500 text-white"
+                            : isCurrent
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground"
+                        )}
+                      >
+                        {done ? (
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                        ) : status === "locked" ? (
+                          <Lock className="h-3 w-3" />
+                        ) : status === "daily_locked" ? (
+                          <CalendarClock className="h-3 w-3" />
+                        ) : (
+                          idx + 1
+                        )}
+                      </div>
+                      <span className="truncate">{lesson.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div className="container max-w-4xl mx-auto py-8 px-4 space-y-4">
-        {isCourseDone && (
-          <div className="rounded-xl bg-green-500/10 border border-green-500/30 p-6 text-center mb-6">
-            <Trophy className="h-10 w-10 text-green-500 mx-auto mb-2" />
-            <h2 className="text-xl font-bold">Kurz dokoncen!</h2>
-            <p className="text-muted-foreground mt-1">
-              Gratulujeme k dokonceni vsech lekci.
-            </p>
-            {nextCourseId && (
-              <Button
-                onClick={() => navigate(`/kurz/${nextCourseId}`)}
-                className="mt-4"
-              >
-                Pokracovat na dalsi kurz
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        )}
-
-        {modules.map((lesson, index) => {
-          const lockStatus = getLessonLockStatus(index);
-          const isActive = index === activeIndex;
-          const isCompleted = completedModules.has(lesson.id);
-          const isDailyLocked = lockStatus === "daily_locked";
-          const isLocked = lockStatus === "locked";
-          const canOpen = lockStatus === "available";
-
-          return (
-            <div
-              key={lesson.id}
-              className={cn(
-                "rounded-xl border bg-card overflow-hidden transition-all duration-200",
-                isActive && canOpen && "ring-2 ring-primary/40 shadow-lg",
-                isActive && isDailyLocked && "ring-2 ring-amber-500/40 shadow-md",
-                !isActive && isCompleted && "border-green-500/20",
-                !isActive && isDailyLocked && "border-amber-500/20",
-                isLocked && "opacity-50"
-              )}
-            >
-              <button
-                type="button"
-                onClick={() => handleCardClick(index)}
-                disabled={!canOpen}
-                className={cn(
-                  "w-full flex items-center gap-4 p-4 text-left transition-colors",
-                  canOpen && !isActive && "hover:bg-muted/50 cursor-pointer",
-                  !canOpen && "cursor-not-allowed"
-                )}
-              >
-                <div
-                  className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0 transition-colors",
-                    isCompleted
-                      ? "bg-green-500 text-white"
-                      : isActive && canOpen
-                        ? "bg-primary text-primary-foreground"
-                        : isDailyLocked
-                          ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
-                          : isLocked
-                            ? "bg-muted text-muted-foreground"
-                            : "bg-muted text-foreground"
-                  )}
-                >
-                  {isCompleted ? (
-                    <CheckCircle2 className="h-5 w-5" />
-                  ) : isDailyLocked ? (
-                    <CalendarClock className="h-4 w-4" />
-                  ) : isLocked ? (
-                    <Lock className="h-4 w-4" />
-                  ) : (
-                    index + 1
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <p
-                    className={cn(
-                      "font-medium truncate",
-                      isActive && canOpen && "text-primary"
-                    )}
-                  >
-                    {lesson.title}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                    <Clock className="h-3 w-3 flex-shrink-0" />
-                    <span>{lesson.duration} min</span>
-                    <span className="text-muted-foreground/50">|</span>
-                    <span>Cast {index + 1} z {modules.length}</span>
-                  </div>
-                </div>
-
-                <div className="flex-shrink-0 flex items-center gap-2">
-                  {isCompleted && !isActive && (
-                    <Badge
-                      variant="outline"
-                      className="text-green-600 border-green-500/30 text-xs"
-                    >
-                      Dokonceno
-                    </Badge>
-                  )}
-                  {isDailyLocked && (
-                    <Badge
-                      variant="outline"
-                      className="text-amber-600 border-amber-500/30 text-xs gap-1"
-                    >
-                      <CalendarClock className="h-3 w-3" />
-                      Zitra
-                    </Badge>
-                  )}
-                  {canOpen && !isActive && !isCompleted && (
-                    <PlayCircle className="h-5 w-5 text-muted-foreground" />
-                  )}
-                  {isActive && canOpen && (
-                    <ChevronDown className="h-5 w-5 text-primary" />
-                  )}
-                </div>
-              </button>
-
-              <AnimatePresence initial={false}>
-                {isActive && canOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="overflow-hidden"
-                  >
-                    <div className="border-t">
-                      <div className="bg-black aspect-video">
-                        <div
-                          ref={videoRef}
-                          className="w-full h-full [&>div]:w-full [&>div]:h-full [&_iframe]:w-full [&_iframe]:h-full"
-                        />
-                      </div>
-
-                      <div className="px-4 pt-3 pb-2 bg-muted/30 border-t">
-                        <Progress value={videoProgress} className="h-1.5 mb-2" />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>{formatTime(watchedTime)}</span>
-                          <span>-{formatTime(remainingSeconds)}</span>
-                        </div>
-                      </div>
-
-                      <div className="p-4 border-t space-y-3">
-                        {lesson.description && (
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {lesson.description}
-                          </p>
-                        )}
-                        <div className="flex items-center justify-between">
-                          {!isCompleted ? (
-                            <Button
-                              onClick={() => markModuleComplete(lesson.id)}
-                              size="sm"
-                            >
-                              <CheckCircle2 className="h-4 w-4 mr-2" />
-                              Oznacit jako dokoncene
-                            </Button>
-                          ) : (
-                            <Badge className="bg-green-500/15 text-green-600 border-green-500/30">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Dokonceno
-                            </Badge>
-                          )}
-                          <span className="text-xs text-muted-foreground">
-                            Sledovano: {formatTime(actualWatchTime)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {isActive && isDailyLocked && (
-                <div className="border-t p-8 text-center bg-amber-500/5">
-                  <CalendarClock className="h-12 w-12 text-amber-500 mx-auto mb-3" />
-                  <p className="font-medium">Tato lekce bude dostupna zitra</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Kazdy den se odemkne nova lekce
-                  </p>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
     </div>
   );
-};
+}

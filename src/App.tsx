@@ -23,7 +23,8 @@ import SignUpPage from './pages/sign-up-page'
 import VerifyEmailPage from './pages/verify-email-page'
 import ForgotPasswordPage from './pages/forgot-password-page'
 import ResetPasswordPage from './pages/reset-password-page'
-import { CoursePlayerPage } from './pages/course-player-page'
+import CourseOverviewPage from './pages/course-overview-page'
+import CoursePartPage from './pages/course-part-page'
 import ScrollToTop from './components/layout/scroll-to-top'
 import AdminOverviewPage from './pages/admin/admin-overview-page'
 import AdminUsersPage from './pages/admin/admin-users-page'
@@ -62,7 +63,8 @@ export default function App() {
           <Route path="/overeni-emailu" element={<VerifyEmailPage />} />
           <Route path="/zapomenute-heslo" element={<ForgotPasswordPage />} />
           <Route path="/obnoveni-hesla" element={<ResetPasswordPage />} />
-          <Route path="/kurz/:courseId" element={<CoursePlayerPage />} />
+          <Route path="/kurz/:courseId" element={<CourseOverviewPage />} />
+          <Route path="/kurz/:courseId/cast/:partNumber" element={<CoursePartPage />} />
           <Route path="/prehled" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="analytika" element={<AnalyticsPage />} />
