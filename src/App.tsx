@@ -58,6 +58,7 @@ export default function App() {
             <Route path="blog/:slug" element={<BlogPostPage />} />
           </Route>
           <Route path="/potvrzeni-objednavky" element={<OrderConfirmationPage />} />
+          <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
           <Route path="/prihlaseni" element={<SignInPage />} />
           <Route path="/registrace" element={<SignUpPage />} />
           <Route path="/overeni-emailu" element={<VerifyEmailPage />} />
