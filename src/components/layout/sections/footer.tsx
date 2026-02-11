@@ -250,7 +250,7 @@ const Footer31 = ({ className }: Footer31Props) => {
               textAnchor="middle"
               dominantBaseline="middle"
               fill="currentColor"
-              className="text-[180px] font-bold tracking-tighter text-neutral-100"
+              className="text-[150px] font-bold tracking-tighter text-neutral-100"
               style={{ fontFamily: "inherit", opacity: 0.15 }}
             >
               DIRES
