@@ -47,7 +47,7 @@ const Footer31 = ({ className }: Footer31Props) => {
 
   return (
     <section
-      className={cn("mx-4 mt-24 mb-10 rounded-3xl bg-neutral-900 pt-24 sm:mx-6 lg:mx-8", className)}
+      className={cn("mx-4 mt-24 mb-8 rounded-3xl bg-neutral-900 pt-24 sm:mx-6 lg:mx-8", className)}
     >
       <div className="dark mx-auto max-w-7xl px-6 text-neutral-100 sm:px-10 lg:px-16">
         <div className="flex flex-col justify-between gap-12 lg:flex-row">
