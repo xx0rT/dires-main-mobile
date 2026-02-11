@@ -246,7 +246,7 @@ const Footer31 = ({ className }: Footer31Props) => {
           >
             <text
               x="50%"
-              y="45%"
+              y="55%"
               textAnchor="middle"
               dominantBaseline="middle"
               fill="currentColor"
