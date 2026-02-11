@@ -253,7 +253,7 @@ const Footer31 = ({ className }: Footer31Props) => {
               className="text-[150px] font-bold tracking-tighter text-neutral-100"
               style={{ fontFamily: "inherit", opacity: 0.15 }}
             >
-              DIRES
+              DIRES.CZ
             </text>
           </svg>
         </motion.div>
