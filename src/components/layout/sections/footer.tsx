@@ -47,9 +47,9 @@ const Footer31 = ({ className }: Footer31Props) => {
 
   return (
     <section
-      className={cn("mx-4 mt-24 mb-8 rounded-3xl bg-neutral-900 dark:bg-neutral-100 pt-24 sm:mx-6 lg:mx-8", className)}
+      className={cn("mx-4 mt-24 mb-8 rounded-3xl bg-neutral-900 dark:bg-neutral-800 pt-24 sm:mx-6 lg:mx-8", className)}
     >
-      <div className="mx-auto max-w-7xl px-6 text-neutral-100 dark:text-neutral-900 sm:px-10 lg:px-16">
+      <div className="mx-auto max-w-7xl px-6 text-neutral-100 dark:text-neutral-200 sm:px-10 lg:px-16">
         <div className="flex flex-col justify-between gap-12 lg:flex-row">
           <div className="flex flex-col gap-8">
             <p className="relative text-4xl font-medium tracking-tight lg:text-5xl">
@@ -59,15 +59,16 @@ const Footer31 = ({ className }: Footer31Props) => {
               <p>Podpora : </p>
               <a
                 href={`mailto:${site.mailSupport}`}
-                className="transition-colors hover:text-foreground/60"
+                className="transition-colors hover:text-neutral-400"
               >
                 {site.mailSupport}
               </a>
             </div>
           </div>
-          <div className="grid w-full max-w-xs grid-cols-2 gap-10 text-sm font-light lg:text-base">
-            <div>
-              <h4 className="mb-4 text-xs font-semibold uppercase tracking-widest text-foreground/40">
+          <div className="hidden h-auto w-px bg-neutral-700 dark:bg-neutral-600 lg:block" />
+          <div className="grid w-full max-w-xs grid-cols-[1fr_auto_1fr] gap-0 text-sm font-light lg:text-base">
+            <div className="pr-5">
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-widest text-neutral-500">
                 Navigace
               </h4>
               <ul className="space-y-2">
@@ -75,7 +76,7 @@ const Footer31 = ({ className }: Footer31Props) => {
                   <li key={item.label}>
                     <Link
                       to={item.href}
-                      className="tracking-tight text-foreground transition-colors hover:text-foreground/30"
+                      className="tracking-tight text-neutral-300 transition-colors hover:text-white dark:text-neutral-300 dark:hover:text-white"
                     >
                       {item.label}
                     </Link>
@@ -83,8 +84,9 @@ const Footer31 = ({ className }: Footer31Props) => {
                 ))}
               </ul>
             </div>
-            <div>
-              <h4 className="mb-4 text-xs font-semibold uppercase tracking-widest text-foreground/40">
+            <div className="w-px bg-neutral-700 dark:bg-neutral-600" />
+            <div className="pl-5">
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-widest text-neutral-500">
                 Socialni site
               </h4>
               <ul className="space-y-2">
@@ -94,10 +96,10 @@ const Footer31 = ({ className }: Footer31Props) => {
                       href={item.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex items-center gap-1 tracking-tight text-foreground transition-colors hover:text-foreground/30"
+                      className="group flex items-center gap-1 tracking-tight text-neutral-300 transition-colors hover:text-white dark:text-neutral-300 dark:hover:text-white"
                     >
                       {item.label}{" "}
-                      <ArrowUpRight className="size-3.5 text-foreground group-hover:text-muted-foreground/50" />
+                      <ArrowUpRight className="size-3.5 text-neutral-400 group-hover:text-neutral-500" />
                     </a>
                   </li>
                 ))}
@@ -106,15 +108,15 @@ const Footer31 = ({ className }: Footer31Props) => {
           </div>
         </div>
 
-        <div className="my-12 h-px w-full bg-foreground/10" />
+        <div className="my-12 h-px w-full bg-neutral-700 dark:bg-neutral-600" />
 
-        <div className="grid gap-10 lg:grid-cols-[1fr_auto]">
+        <div className="grid gap-10 lg:grid-cols-[1fr_auto_auto]">
           <div className="space-y-4">
-            <h4 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-foreground/40">
+            <h4 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-neutral-500">
               <MapPin className="size-4" />
               Kde nas najdete
             </h4>
-            <div className="overflow-hidden rounded-xl border border-foreground/10">
+            <div className="overflow-hidden rounded-xl border border-neutral-700 dark:border-neutral-600">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1522.394269715919!2d14.403041690252623!3d50.079700516325545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470b95f56143f73b%3A0xe9fa458148e639c7!2sDires%20fyzio!5e0!3m2!1sen!2scz!4v1770755195968!5m2!1sen!2scz"
                 className="aspect-[21/9] w-full"
@@ -127,38 +129,42 @@ const Footer31 = ({ className }: Footer31Props) => {
             </div>
           </div>
 
+          <div className="hidden w-px bg-neutral-700 dark:bg-neutral-600 lg:block" />
+
           <div className="flex flex-col justify-between gap-8 lg:w-72">
             <div className="space-y-5">
-              <h4 className="text-xs font-semibold uppercase tracking-widest text-foreground/40">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
                 Kontakt
               </h4>
               <div className="space-y-4 text-sm font-light">
                 <div className="flex items-start gap-3">
-                  <MapPin className="mt-0.5 size-4 shrink-0 text-foreground/50" />
+                  <MapPin className="mt-0.5 size-4 shrink-0 text-neutral-500" />
                   <span>Praha, Ceska republika</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Mail className="mt-0.5 size-4 shrink-0 text-foreground/50" />
+                  <Mail className="mt-0.5 size-4 shrink-0 text-neutral-500" />
                   <a
                     href={`mailto:${site.mailSupport}`}
-                    className="transition-colors hover:text-foreground/60"
+                    className="transition-colors hover:text-neutral-400"
                   >
                     {site.mailSupport}
                   </a>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Phone className="mt-0.5 size-4 shrink-0 text-foreground/50" />
+                  <Phone className="mt-0.5 size-4 shrink-0 text-neutral-500" />
                   <span>+420 123 456 789</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Clock className="mt-0.5 size-4 shrink-0 text-foreground/50" />
+                  <Clock className="mt-0.5 size-4 shrink-0 text-neutral-500" />
                   <span>Po-Pa: 8:00 - 18:00</span>
                 </div>
               </div>
             </div>
 
+            <div className="h-px w-full bg-neutral-700 dark:bg-neutral-600" />
+
             <div className="space-y-3">
-              <h4 className="text-xs font-semibold uppercase tracking-widest text-foreground/40">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
                 Pravni
               </h4>
               <ul className="space-y-2 text-sm font-light">
@@ -166,7 +172,7 @@ const Footer31 = ({ className }: Footer31Props) => {
                   <li key={item.label}>
                     <Link
                       to={item.href}
-                      className="tracking-tight text-foreground transition-colors hover:text-foreground/30"
+                      className="tracking-tight text-neutral-300 transition-colors hover:text-white dark:text-neutral-300 dark:hover:text-white"
                     >
                       {item.label}
                     </Link>
@@ -177,27 +183,27 @@ const Footer31 = ({ className }: Footer31Props) => {
           </div>
         </div>
 
-        <div className="my-12 h-px w-full bg-foreground/10" />
+        <div className="my-12 h-px w-full bg-neutral-700 dark:bg-neutral-600" />
 
         <div className="flex flex-col justify-between gap-10 lg:flex-row lg:items-end">
           <div className="flex w-full max-w-md flex-col gap-3">
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-foreground/40">
+            <h4 className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
               Newsletter
             </h4>
-            <p className="text-sm font-light text-foreground/60">
+            <p className="text-sm font-light text-neutral-400">
               Prihlaste se k odberu novinek a ziskejte informace o novych
               kurzech.
             </p>
             <form
               onSubmit={handleSubmit}
-              className="flex w-full items-end border-b border-b-foreground/10"
+              className="flex w-full items-end border-b border-b-neutral-700 dark:border-b-neutral-600"
             >
               <Input
                 type="email"
                 placeholder="Vas email*"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="rounded-none border-0 !bg-transparent p-0 uppercase shadow-none placeholder:text-foreground/20 focus-visible:ring-0 lg:text-base"
+                className="rounded-none border-0 !bg-transparent p-0 uppercase shadow-none placeholder:text-neutral-600 focus-visible:ring-0 lg:text-base"
               />
               <Button type="submit" variant="ghost" size="sm">
                 <ArrowRight />
@@ -205,23 +211,24 @@ const Footer31 = ({ className }: Footer31Props) => {
             </form>
           </div>
           <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center lg:items-end">
-            <p className="text-sm font-light text-foreground/50">
+            <p className="text-sm font-light text-neutral-500">
               &copy; {new Date().getFullYear()} {site.name}. Vsechna prava
               vyhrazena.
             </p>
-            <div className="flex items-center gap-2 text-sm font-light text-foreground/50">
+            <div className="h-4 w-px bg-neutral-700 dark:bg-neutral-600 hidden sm:block" />
+            <div className="flex items-center gap-2 text-sm font-light text-neutral-500">
               <span>Vytvoreno s laskou od</span>
               <Link
                 target="_blank"
                 to="https://xx0rt.github.io/Tr0xx/"
-                className="inline-flex items-center gap-1 font-medium text-foreground/70 transition-colors hover:text-foreground"
+                className="inline-flex items-center gap-1 font-medium text-neutral-400 transition-colors hover:text-white"
               >
                 <img
                   src="/logos/logo-website-world-wide-web-svg-png-icon-download-10.png"
                   alt="Troxx"
                   width={16}
                   height={16}
-                  className="inline-block invert dark:invert-0"
+                  className="inline-block invert"
                 />
                 Troxx
               </Link>
@@ -250,7 +257,7 @@ const Footer31 = ({ className }: Footer31Props) => {
               textAnchor="middle"
               dominantBaseline="middle"
               fill="currentColor"
-              className="text-[150px] font-bold tracking-tighter text-neutral-100 dark:text-neutral-900"
+              className="text-[150px] font-bold tracking-tighter text-neutral-100 dark:text-neutral-600"
               style={{ fontFamily: "inherit", opacity: 0.15 }}
             >
               <a href="#">DIRES.CZ</a>
