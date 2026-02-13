@@ -114,7 +114,7 @@ export const ContactSection = () => {
                     </div>
                 </div>
 
-                <Card className="bg-sky-50/60 dark:bg-sky-950/20 border-sky-200/60 dark:border-sky-800/30">
+                <Card className="bg-muted/60 border-sky-200/60 dark:border-sky-800/30">
                     <CardContent className="p-4">
                         <Form {...form}>
                             <form

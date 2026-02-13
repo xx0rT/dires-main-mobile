@@ -169,9 +169,9 @@ const Pricing20 = ({ className }: Pricing20Props) => {
               key={index}
               className={cn(
                 "flex flex-col justify-between p-6 relative",
-                index === 0 && "bg-gradient-to-r from-background to-sky-50/30 dark:to-sky-950/10",
-                index === 1 && "bg-sky-50/30 dark:bg-sky-950/10",
-                index === 2 && "bg-gradient-to-l from-background to-sky-50/30 dark:to-sky-950/10"
+                index === 0 && "bg-gradient-to-r from-background to-muted/30",
+                index === 1 && "bg-muted/30",
+                index === 2 && "bg-gradient-to-l from-background to-muted/30"
               )}
             >
               <div className="space-y-2 border-b pb-6">

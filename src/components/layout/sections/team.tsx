@@ -50,7 +50,7 @@ const Team3 = ({
     return (
       <section
         className={cn(
-          "bg-gradient-to-b from-background to-sky-50/30 dark:to-sky-950/10 py-24 lg:py-32",
+          "bg-gradient-to-b from-background to-muted/20 py-24 lg:py-32",
           className,
         )}
       >
@@ -66,7 +66,7 @@ const Team3 = ({
   return (
     <section
       className={cn(
-        "bg-gradient-to-b from-background to-sky-50/30 dark:to-sky-950/10 py-24 lg:py-32",
+        "bg-gradient-to-b from-background to-muted/20 py-24 lg:py-32",
         className,
       )}
     >

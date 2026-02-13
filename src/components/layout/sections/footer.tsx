@@ -128,7 +128,7 @@ const FooterSection = () => {
     TRAVEL_MODES.find((m) => m.id === activeMode)?.src ?? DEFAULT_MAP_SRC;
 
   return (
-    <footer className="mx-3 mt-16 mb-4 overflow-hidden rounded-2xl bg-sky-50/70 dark:bg-sky-950/20 sm:mx-5 lg:mx-6">
+    <footer className="mx-3 mt-16 mb-4 overflow-hidden rounded-2xl bg-muted/60 sm:mx-5 lg:mx-6">
       <motion.div
         className="mx-auto max-w-7xl px-5 pt-10 pb-6 sm:px-8 lg:px-12"
         variants={stagger}
