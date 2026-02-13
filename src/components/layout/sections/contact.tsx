@@ -57,7 +57,7 @@ export const ContactSection = () => {
             <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 <div className="md:text-right md:pr-8">
                     <div className="mb-4">
-                        <h2 className="mb-2 text-lg text-primary tracking-wider">
+                        <h2 className="mb-2 text-lg text-sky-600 dark:text-sky-400 tracking-wider">
                             Kontakt
                         </h2>
 
@@ -114,7 +114,7 @@ export const ContactSection = () => {
                     </div>
                 </div>
 
-                <Card className="bg-muted/60">
+                <Card className="bg-sky-50/60 dark:bg-sky-950/20 border-sky-200/60 dark:border-sky-800/30">
                     <CardContent className="p-4">
                         <Form {...form}>
                             <form

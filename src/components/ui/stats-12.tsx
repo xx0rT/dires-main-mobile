@@ -65,7 +65,7 @@ const Stats12 = ({ className }: Stats12Props) => {
             </p>
             <Button
               variant="secondary"
-              className="text-md group mt-8 flex w-fit items-center justify-center gap-2 rounded-full px-6 py-1 tracking-tight shadow-none"
+              className="text-md group mt-8 flex w-fit items-center justify-center gap-2 rounded-full bg-sky-100 hover:bg-sky-200 dark:bg-sky-900/30 dark:hover:bg-sky-800/40 text-sky-700 dark:text-sky-300 px-6 py-1 tracking-tight shadow-none"
             >
               <span>Začněte S Námi</span>
               <ArrowRight className="size-4 -rotate-45 transition-all ease-out group-hover:ml-3 group-hover:rotate-0" />
@@ -90,7 +90,7 @@ const Stats12 = ({ className }: Stats12Props) => {
               <p className="text-sm lg:text-base">Absolventů za poslední rok</p>
               <Button
                 variant="secondary"
-                className="text-sm group flex w-fit items-center justify-center gap-2 rounded-full px-4 py-1 tracking-tight shadow-none transition-all duration-300 ease-out active:scale-95"
+                className="text-sm group flex w-fit items-center justify-center gap-2 rounded-full bg-sky-100 hover:bg-sky-200 dark:bg-sky-900/30 dark:hover:bg-sky-800/40 text-sky-700 dark:text-sky-300 px-4 py-1 tracking-tight shadow-none transition-all duration-300 ease-out active:scale-95"
                 onClick={() => setShowMonthlyStats(!showMonthlyStats)}
               >
                 <span>Měsíční Statistiky</span>

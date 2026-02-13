@@ -244,7 +244,7 @@ const Faq12 = ({ className }: Faq12Props) => {
     >
       <div className="container max-w-4xl mx-auto">
         <div className="flex flex-col items-center justify-center gap-14">
-          <div className="flex flex-col gap-4 border-b-2 pb-6 text-center max-w-3xl mx-auto">
+          <div className="flex flex-col gap-4 border-b-2 border-sky-200/60 dark:border-sky-800/30 pb-6 text-center max-w-3xl mx-auto">
             <h3 className="text-3xl font-light tracking-tight lg:text-6xl">
               Často kladené otázky
             </h3>
@@ -263,7 +263,7 @@ const Faq12 = ({ className }: Faq12Props) => {
                 onClick={() => handleCategoryClick(category)}
                 className={`justify-start text-left text-xl transition-colors ${
                   activeCategory === category
-                    ? "font-semibold"
+                    ? "font-semibold text-sky-700 dark:text-sky-400"
                     : "font-normal hover:opacity-75"
                 }`}
               >
@@ -307,7 +307,7 @@ const Faq12 = ({ className }: Faq12Props) => {
                       <AccordionItem
                         key={i}
                         value={`${category}-${i}`}
-                        className="border-b border-muted last:border-0"
+                        className="border-b border-sky-100 dark:border-sky-900/30 last:border-0"
                       >
                         <AccordionTrigger className="text-base font-medium hover:no-underline">
                           {item.question}

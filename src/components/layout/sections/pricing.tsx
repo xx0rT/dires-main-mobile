@@ -142,8 +142,8 @@ const Pricing20 = ({ className }: Pricing20Props) => {
 
   return (
     <section id="pricing" className={cn("py-32", className)}>
-      <div className="border-y">
-        <div className="container mx-auto flex flex-col gap-6 border-x py-4 max-lg:border-x lg:py-8">
+      <div className="border-y border-sky-200/60 dark:border-sky-800/30">
+        <div className="container mx-auto flex flex-col gap-6 border-x border-sky-200/60 dark:border-sky-800/30 py-4 max-lg:border-x lg:py-8">
           <div className="flex flex-col items-center text-center">
             <Badge
               variant="outline"
@@ -163,15 +163,15 @@ const Pricing20 = ({ className }: Pricing20Props) => {
       </div>
 
       <div className="container mx-auto mt-10 lg:mt-14">
-        <section className="grid border max-lg:divide-y lg:grid-cols-3 lg:divide-x">
+        <section className="grid border border-sky-200/60 dark:border-sky-800/30 max-lg:divide-y max-lg:divide-sky-200/60 dark:max-lg:divide-sky-800/30 lg:grid-cols-3 lg:divide-x lg:divide-sky-200/60 dark:lg:divide-sky-800/30">
           {pricingPlans.map((plan, index) => (
             <div
               key={index}
               className={cn(
                 "flex flex-col justify-between p-6 relative",
-                index === 0 && "bg-gradient-to-r from-background to-muted/30",
-                index === 1 && "bg-muted/30",
-                index === 2 && "bg-gradient-to-l from-background to-muted/30"
+                index === 0 && "bg-gradient-to-r from-background to-sky-50/30 dark:to-sky-950/10",
+                index === 1 && "bg-sky-50/30 dark:bg-sky-950/10",
+                index === 2 && "bg-gradient-to-l from-background to-sky-50/30 dark:to-sky-950/10"
               )}
             >
               <div className="space-y-2 border-b pb-6">
@@ -222,8 +222,8 @@ const Pricing20 = ({ className }: Pricing20Props) => {
         </section>
       </div>
 
-      <div className="mt-12 h-8 w-full border-y md:h-12 lg:h-[112px]">
-        <div className="container mx-auto h-full w-full border-x"></div>
+      <div className="mt-12 h-8 w-full border-y border-sky-200/60 dark:border-sky-800/30 md:h-12 lg:h-[112px]">
+        <div className="container mx-auto h-full w-full border-x border-sky-200/60 dark:border-sky-800/30"></div>
       </div>
     </section>
   );

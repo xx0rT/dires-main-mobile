@@ -31,7 +31,7 @@ export const HeroSection = () => {
                 className="absolute inset-0 z-0"
                 style={{
                     background:
-                        "radial-gradient(125% 125% at 50% 90%, var(--background) 40%, var(--primary) 100%)",
+                        "radial-gradient(125% 125% at 50% 90%, var(--background) 40%, #7dd3fc 100%)",
                 }}
             />
             <div className="container relative z-10 mx-auto w-full px-4 flex-1 flex flex-col pt-4">
@@ -51,7 +51,7 @@ export const HeroSection = () => {
                     <div className="font-bold text-4xl md:text-5xl lg:text-6xl">
                         <h1>
                             Staňte se{" "}
-                            <span className="bg-gradient-to-r from-[#2563eb] to-primary bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-sky-600 to-sky-400 bg-clip-text text-transparent">
                                 Certifikovaným Fyzioterapeutem
                             </span>
                         </h1>
@@ -93,7 +93,7 @@ export const HeroSection = () => {
                 <div className="group relative lg:scale-115" data-aos="fade-left" data-aos-delay="200">
                     {/* Enhanced animated glow effect */}
                     <div className="absolute inset-0 -z-10">
-                        <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[75%] w-[85%] animate-pulse bg-gradient-to-r from-primary/30 via-blue-400/30 to-primary/30 blur-3xl" />
+                        <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[75%] w-[85%] animate-pulse bg-gradient-to-r from-sky-400/30 via-sky-300/30 to-sky-400/30 blur-3xl" />
                     </div>
 
                     {/* Browser Window Container */}
@@ -147,8 +147,8 @@ export const HeroSection = () => {
                     </div>
 
                     {/* Decorative elements */}
-                    <div className="-right-8 -bottom-8 absolute -z-10 size-32 rounded-full bg-primary/30 blur-3xl lg:size-40" />
-                    <div className="-top-8 -left-8 absolute -z-10 size-28 rounded-full bg-primary/30 blur-3xl lg:size-36" />
+                    <div className="-right-8 -bottom-8 absolute -z-10 size-32 rounded-full bg-sky-400/30 blur-3xl lg:size-40" />
+                    <div className="-top-8 -left-8 absolute -z-10 size-28 rounded-full bg-sky-400/30 blur-3xl lg:size-36" />
                 </div>
             </div>
 

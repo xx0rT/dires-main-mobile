@@ -17,7 +17,7 @@ export default function HomePage() {
         <HeroSection />
       </div>
 
-      <div className="bg-muted/70 transition-colors duration-700">
+      <div className="bg-sky-50/50 dark:bg-sky-950/10 transition-colors duration-700">
         <BenefitsSection />
       </div>
 
@@ -33,7 +33,7 @@ export default function HomePage() {
         <ServicesSection />
       </div>
 
-      <div className="bg-muted/70 transition-colors duration-700">
+      <div className="bg-sky-50/50 dark:bg-sky-950/10 transition-colors duration-700">
         <Feature283 />
       </div>
 
@@ -45,7 +45,7 @@ export default function HomePage() {
         <BlogShowcaseSection />
       </div>
 
-      <div className="bg-muted/70 transition-colors duration-700">
+      <div className="bg-sky-50/50 dark:bg-sky-950/10 transition-colors duration-700">
         <PricingSection />
       </div>
 
@@ -53,7 +53,7 @@ export default function HomePage() {
         <FAQSection />
       </div>
 
-      <div className="bg-muted/70 transition-colors duration-700">
+      <div className="bg-sky-50/50 dark:bg-sky-950/10 transition-colors duration-700">
         <ContactSection />
       </div>
     </>

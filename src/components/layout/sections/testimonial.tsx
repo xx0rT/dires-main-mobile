@@ -107,7 +107,7 @@ const DATA: DataItem[] = [
 ];
 
 const TestimonialCard = ({ testimonial }: { testimonial: DataItem }) => (
-  <Card className="relative mb-5 break-inside-avoid rounded-xl p-5 shadow-sm">
+  <Card className="relative mb-5 break-inside-avoid rounded-xl p-5 shadow-sm border-sky-100 dark:border-sky-900/30">
     <div className="flex items-center gap-4">
       <Avatar className="h-10 w-10 rounded-full ring-1 ring-muted">
         <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
@@ -115,7 +115,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: DataItem }) => (
       <div>
         <div className="flex items-center gap-2">
           <p className="text-sm font-medium">{testimonial.name}</p>
-          <BadgeCheck className="h-4 w-4 fill-cyan-400 stroke-white" />
+          <BadgeCheck className="h-4 w-4 fill-sky-400 stroke-white" />
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           @{testimonial.username}
@@ -127,7 +127,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: DataItem }) => (
       </div>
     </div>
 
-    <div className="my-4 border-t border-dashed border-border" />
+    <div className="my-4 border-t border-dashed border-sky-200/60 dark:border-sky-800/30" />
 
     <div className="text-sm text-foreground">
       <q>{testimonial.content}</q>
@@ -207,7 +207,7 @@ const TestimonialSection = ({ className }: TestimonialSectionProps) => {
           </div>
         </div>
 
-        <div className="relative mt-14 w-full max-w-7xl mx-auto px-4 after:absolute after:inset-x-0 after:-bottom-2 after:h-96 after:bg-linear-to-t after:from-background sm:px-8 md:px-16 lg:px-32">
+        <div className="relative mt-14 w-full max-w-7xl mx-auto px-4 after:absolute after:inset-x-0 after:-bottom-2 after:h-96 after:bg-gradient-to-t after:from-background sm:px-8 md:px-16 lg:px-32">
           <div className="columns-1 gap-5 md:columns-2 lg:columns-3">
             {reorderedData.map((testimonial) => (
               <TestimonialCard key={testimonial.id} testimonial={testimonial} />

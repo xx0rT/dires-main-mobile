@@ -50,7 +50,7 @@ const Team3 = ({
     return (
       <section
         className={cn(
-          "bg-gradient-to-b from-background to-muted/20 py-24 lg:py-32",
+          "bg-gradient-to-b from-background to-sky-50/30 dark:to-sky-950/10 py-24 lg:py-32",
           className,
         )}
       >
@@ -66,7 +66,7 @@ const Team3 = ({
   return (
     <section
       className={cn(
-        "bg-gradient-to-b from-background to-muted/20 py-24 lg:py-32",
+        "bg-gradient-to-b from-background to-sky-50/30 dark:to-sky-950/10 py-24 lg:py-32",
         className,
       )}
     >
@@ -85,13 +85,13 @@ const Team3 = ({
             <div
               key={member.id}
               onClick={() => navigate(`/tym/${member.slug}`)}
-              className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border/50 bg-card p-8 transition-all duration-300 hover:-translate-y-2 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/10"
+              className="group relative cursor-pointer overflow-hidden rounded-2xl border border-sky-100 dark:border-sky-900/30 bg-card p-8 transition-all duration-300 hover:-translate-y-2 hover:border-sky-300 dark:hover:border-sky-700 hover:shadow-2xl hover:shadow-sky-200/30 dark:hover:shadow-sky-900/20"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-gradient-to-br from-sky-100/40 dark:from-sky-900/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
               <div className="relative flex flex-col items-center text-center">
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-primary/10 blur-xl transition-all duration-300 group-hover:blur-2xl" />
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-sky-300/20 to-sky-200/10 blur-xl transition-all duration-300 group-hover:blur-2xl" />
                   <Avatar className="relative size-24 shadow-lg ring-4 ring-background transition-all duration-300 group-hover:ring-primary/20 lg:size-28">
                     <AvatarImage src={member.avatar_url} className="object-cover" />
                     <AvatarFallback className="bg-gradient-to-br from-primary/10 to-primary/5 text-xl font-semibold">
