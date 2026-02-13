@@ -94,7 +94,8 @@ export function BlogShowcaseSection({ className }: BlogShowcaseSectionProps) {
 
   return (
     <section className={cn("py-32", className)}>
-      <div className="container">
+      <div className="mx-4 sm:mx-6 lg:mx-10 rounded-2xl bg-sky-50/80 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-900/30 px-5 sm:px-8 lg:px-14 py-16">
+        <div className="mx-auto max-w-7xl">
         <div className="mb-10 grid grid-cols-[minmax(18.75rem,1fr)] items-start justify-start gap-2.5 md:mb-20 lg:mb-24 lg:grid-cols-[minmax(18.75rem,1fr)_minmax(12.5rem,28.125rem)] lg:gap-20">
           <h1 className="text-6xl leading-[1.22] font-bold md:text-[5rem] md:font-semibold lg:text-[7.5rem]">
             Blog
@@ -186,6 +187,7 @@ export function BlogShowcaseSection({ className }: BlogShowcaseSectionProps) {
           >
             Zobrazit více článků
           </Button>
+        </div>
         </div>
       </div>
     </section>
