@@ -420,6 +420,7 @@ interface SidebarPanelProps {
 function isItemActive(pathname: string, itemPath: string): boolean {
   if (pathname === itemPath) return true;
   if (pathname === "/prehled" && itemPath === "/prehled") return true;
+  if (itemPath !== "/prehled" && pathname.startsWith(itemPath + "/")) return true;
   return false;
 }
 
@@ -950,7 +951,7 @@ const navigationData: NavigationConfig = {
   railIcons: [
     { moduleId: "home", label: "Domů", icon: Home, defaultPath: "/prehled" },
     { moduleId: "analytics", label: "Statistiky", icon: BarChart3, defaultPath: "/prehled/analytika" },
-    { moduleId: "integrations", label: "Kurzy", icon: BookOpen, defaultPath: "/prehled/integrace" },
+    { moduleId: "integrations", label: "Kurzy", icon: BookOpen, defaultPath: "/prehled/moje-kurzy" },
     { moduleId: "billing", label: "Platby", icon: CreditCard, defaultPath: "/prehled/fakturace" },
   ] as RailIconConfig[],
   modules: [
@@ -989,13 +990,13 @@ const navigationData: NavigationConfig = {
       id: "integrations",
       label: "Kurzy",
       icon: BookOpen,
-      defaultPath: "/prehled/integrace",
+      defaultPath: "/prehled/moje-kurzy",
       sections: [
         {
           id: "main",
           items: [
-            { id: "all-courses", label: "Všechny Kurzy", icon: BookOpen, path: "/prehled/integrace" },
-            { id: "my-courses", label: "Moje Kurzy", icon: Users, path: "/prehled/integrace" },
+            { id: "my-courses", label: "Moje Kurzy", icon: BookOpen, path: "/prehled/moje-kurzy" },
+            { id: "all-courses", label: "Prohlizet Kurzy", icon: Users, path: "/prehled/integrace" },
           ],
         },
       ],
@@ -1046,7 +1047,7 @@ export function ApplicationShell({
     const path = location.pathname;
     if (path === "/prehled") return "home";
     if (path.startsWith("/prehled/analytika")) return "analytics";
-    if (path.startsWith("/prehled/integrace")) return "integrations";
+    if (path.startsWith("/prehled/integrace") || path.startsWith("/prehled/moje-kurzy")) return "integrations";
     if (path.startsWith("/prehled/fakturace")) return "billing";
     return "home";
   };

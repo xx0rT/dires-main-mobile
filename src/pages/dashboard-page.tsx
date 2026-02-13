@@ -258,7 +258,7 @@ export default function DashboardPage() {
                   </CardDescription>
                 </div>
                 <Button asChild variant="outline" size="sm">
-                  <Link to="/prehled/integrace">
+                  <Link to="/prehled/moje-kurzy">
                     Zobrazit vše
                     <RiArrowRightLine className="ml-2 h-4 w-4" />
                   </Link>
@@ -304,7 +304,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <Button size="sm" asChild className="w-full sm:w-auto">
-                      <Link to="/prehled/integrace">
+                      <Link to="/prehled/moje-kurzy">
                         Pokračovat
                       </Link>
                     </Button>
@@ -334,7 +334,7 @@ export default function DashboardPage() {
                   Zapište se do svého prvního kurzu a začněte svou vzdělávací cestu
                 </p>
                 <Button asChild size="lg">
-                  <Link to="/prehled/integrace">
+                  <Link to="/prehled/moje-kurzy">
                     Prohlédnout Kurzy
                   </Link>
                 </Button>
@@ -359,7 +359,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <Button asChild variant="outline" className="w-full justify-start">
-                <Link to="/prehled/integrace">
+                <Link to="/prehled/moje-kurzy">
                   <RiBookOpenLine className="mr-2 h-4 w-4" />
                   Prohlížet Kurzy
                 </Link>

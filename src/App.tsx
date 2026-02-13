@@ -17,6 +17,8 @@ import AnalyticsPage from './pages/analytics-page'
 import ApiPage from './pages/api-page'
 import BillingPage from './pages/billing-page'
 import IntegrationsPage from './pages/integrations-page'
+import MyCoursesPage from './pages/my-courses-page'
+import MyCourseDetailPage from './pages/my-course-detail-page'
 import SettingsPage from './pages/settings-page'
 import SignInPage from './pages/sign-in-page'
 import SignUpPage from './pages/sign-up-page'
@@ -72,6 +74,8 @@ export default function App() {
             <Route path="api" element={<ApiPage />} />
             <Route path="fakturace" element={<BillingPage />} />
             <Route path="integrace" element={<IntegrationsPage />} />
+            <Route path="moje-kurzy" element={<MyCoursesPage />} />
+            <Route path="moje-kurzy/:courseId" element={<MyCourseDetailPage />} />
             <Route path="nastaveni" element={<SettingsPage />} />
           </Route>
           <Route path="/admin" element={<AdminLayout />}>
