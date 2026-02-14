@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
@@ -441,7 +441,6 @@ const CourseShowcase = ({ className, courses }: CourseShowcaseProps) => {
   const [expanded, setExpanded] = useState(false)
   const [layout, setLayout] = useState<LayoutMode>('grid')
   const hasMore = courses.length > INITIAL_VISIBLE
-  const toggleRef = useRef<HTMLDivElement>(null)
 
   const gridClass = {
     large: 'grid-cols-1 md:grid-cols-2',
@@ -451,39 +450,8 @@ const CourseShowcase = ({ className, courses }: CourseShowcaseProps) => {
 
   const gapClass = layout === 'list' ? 'gap-3' : 'gap-6'
 
-  const getScrollParent = (el: HTMLElement): HTMLElement | null => {
-    let parent = el.parentElement
-    while (parent) {
-      const style = getComputedStyle(parent)
-      if (style.overflowY === 'auto' || style.overflowY === 'scroll') return parent
-      parent = parent.parentElement
-    }
-    return null
-  }
-
   const handleToggle = useCallback(() => {
-    const el = toggleRef.current
-    if (!el) {
-      setExpanded(v => !v)
-      return
-    }
-
-    const scrollParent = getScrollParent(el)
-    const rect = el.getBoundingClientRect()
-
     setExpanded(v => !v)
-
-    requestAnimationFrame(() => {
-      const newRect = el.getBoundingClientRect()
-      const delta = newRect.top - rect.top
-      if (Math.abs(delta) > 1) {
-        if (scrollParent) {
-          scrollParent.scrollTop += delta
-        } else {
-          window.scrollBy(0, delta)
-        }
-      }
-    })
   }, [])
 
   return (
@@ -530,80 +498,32 @@ const CourseShowcase = ({ className, courses }: CourseShowcaseProps) => {
         </div>
       </div>
 
-      <motion.div
-        layout
-        className={cn('grid', gapClass, gridClass)}
-        transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      >
-        {courses.slice(0, INITIAL_VISIBLE).map((course) => (
-          <motion.div
-            key={course.title}
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="h-full"
-          >
-            <RenderCourseCard course={course} layout={layout} />
-          </motion.div>
-        ))}
-      </motion.div>
-
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: 'auto',
-              opacity: 1,
-              transition: {
-                height: { type: 'spring', stiffness: 250, damping: 30, mass: 0.8 },
-                opacity: { duration: 0.3, delay: 0.05 },
-              },
-            }}
-            exit={{
-              height: 0,
-              opacity: 0,
-              transition: {
-                height: { type: 'spring', stiffness: 300, damping: 35, mass: 0.8 },
-                opacity: { duration: 0.2 },
-              },
-            }}
-            className="overflow-hidden"
-          >
-            <div className={cn('grid pt-6', gapClass, gridClass)}>
-              {courses.slice(INITIAL_VISIBLE).map((course, idx) => (
-                <motion.div
-                  key={course.title}
-                  initial={{ opacity: 0, y: 40, scale: 0.92 }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    transition: {
-                      duration: 0.45,
-                      delay: idx * 0.1,
-                      ease: [0.25, 0.1, 0.25, 1],
-                    },
-                  }}
-                  exit={{
-                    opacity: 0,
-                    y: 20,
-                    scale: 0.95,
-                    transition: { duration: 0.2, delay: idx * 0.03 },
-                  }}
-                  className="h-full"
-                >
-                  <RenderCourseCard course={course} layout={layout} />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={layout}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: 'easeInOut' }}
+        >
+          <div className={cn('grid', gapClass, gridClass)}>
+            {courses.slice(0, expanded ? courses.length : INITIAL_VISIBLE).map((course, idx) => (
+              <motion.div
+                key={course.title}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.04, ease: 'easeOut' }}
+                className="h-full"
+              >
+                <RenderCourseCard course={course} layout={layout} />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </AnimatePresence>
 
       {hasMore && (
-        <div ref={toggleRef} className="mt-8 flex justify-center">
+        <div className="mt-8 flex justify-center">
           <Button
             variant="outline"
             size="lg"
