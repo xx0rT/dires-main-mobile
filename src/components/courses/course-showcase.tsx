@@ -506,19 +506,43 @@ const CourseShowcase = ({ className, courses }: CourseShowcaseProps) => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeInOut' }}
         >
-          <div className={cn('grid', gapClass, gridClass)}>
-            {courses.slice(0, expanded ? courses.length : INITIAL_VISIBLE).map((course, idx) => (
+          <motion.div
+            className={cn('grid', gapClass, gridClass)}
+            layout
+            transition={{ layout: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } }}
+          >
+            {courses.slice(0, INITIAL_VISIBLE).map((course, idx) => (
               <motion.div
                 key={course.title}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: idx * 0.04, ease: 'easeOut' }}
+                layout
                 className="h-full"
               >
                 <RenderCourseCard course={course} layout={layout} />
               </motion.div>
             ))}
-          </div>
+            <AnimatePresence initial={false}>
+              {expanded && courses.slice(INITIAL_VISIBLE).map((course, idx) => (
+                <motion.div
+                  key={course.title}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{
+                    duration: 0.35,
+                    delay: idx * 0.06,
+                    ease: [0.25, 0.1, 0.25, 1],
+                  }}
+                  layout
+                  className="h-full"
+                >
+                  <RenderCourseCard course={course} layout={layout} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         </motion.div>
       </AnimatePresence>
 
