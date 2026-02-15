@@ -5,7 +5,6 @@ import {
   ArrowUpRight,
   Award,
   MapPin,
-  ShieldCheck,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Badge } from '@/components/ui/badge'
@@ -104,19 +103,6 @@ function TeamMemberCard({ member, idx }: { member: TeamMember; idx: number }) {
           </div>
 
           <div className="mt-auto pt-4">
-            <div className="overflow-hidden transition-all duration-500">
-              <div className="max-h-0 opacity-0 transition-all duration-500 group-hover:max-h-24 group-hover:opacity-100">
-                <div className="mb-3 space-y-1.5">
-                  {member.specializations.slice(2).map((spec) => (
-                    <div key={spec} className="flex items-center gap-1.5 text-[11px] text-neutral-500 dark:text-neutral-400">
-                      <ShieldCheck className="size-3 text-emerald-500" />
-                      {spec}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
             <div className="flex items-center justify-between border-t border-neutral-100 pt-4 dark:border-neutral-800">
               <div className="flex items-baseline gap-1">
                 <span className="text-lg font-bold text-neutral-900 dark:text-neutral-100">

@@ -28,18 +28,18 @@ const CoursesHero = ({ className }: CoursesHeroProps) => {
             alt="Fyzioterapie kurzy"
             className="size-full max-h-[550px] object-cover grayscale-100 transition-all duration-300 group-hover:grayscale-50"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
           <div className="absolute inset-0 z-10 flex flex-col justify-between p-8">
-            <Badge className="w-fit border border-background/20 bg-background/15 backdrop-blur-sm">
+            <Badge className="w-fit border border-white/20 bg-white/15 text-white backdrop-blur-sm">
               <Sparkles className="size-4" />
               Doporuceny balicek
             </Badge>
             <div className="flex flex-col gap-4">
-              <h2 className="text-xl font-medium text-background">
+              <h2 className="text-xl font-medium text-white">
                 Kompletni kurzy fyzioterapie pro vasi praxi
               </h2>
               <div className="flex items-center gap-2">
-                <time className="text-sm text-background/80">
+                <time className="text-sm text-white/80">
                   Nove aktualizovano
                 </time>
                 <div className="flex items-center -space-x-2">
@@ -49,7 +49,7 @@ const CoursesHero = ({ className }: CoursesHeroProps) => {
                   <Avatar className="size-6 border border-primary">
                     <AvatarImage src="https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=100" />
                   </Avatar>
-                  <span className="z-10 grid size-6 place-items-center rounded-full border border-primary bg-primary/90 text-xs text-background backdrop-blur-sm">
+                  <span className="z-10 grid size-6 place-items-center rounded-full border border-primary bg-primary/90 text-xs text-white backdrop-blur-sm">
                     +5
                   </span>
                 </div>
@@ -67,17 +67,17 @@ const CoursesHero = ({ className }: CoursesHeroProps) => {
               alt="Rehabilitace"
               className="size-full max-h-[267px] object-cover grayscale-100 transition-all duration-300 group-hover:grayscale-50"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
             <div className="absolute inset-0 z-10 flex flex-col justify-between p-8">
-              <Badge className="w-fit border border-background/20 bg-background/15 backdrop-blur-sm">
+              <Badge className="w-fit border border-white/20 bg-white/15 text-white backdrop-blur-sm">
                 Populární
               </Badge>
               <div className="flex flex-col gap-4">
-                <h2 className="text-xl font-medium text-background">
+                <h2 className="text-xl font-medium text-white">
                   Rehabilitacni techniky pro kazdy den
                 </h2>
                 <div className="flex items-center gap-2">
-                  <time className="text-sm text-background/80">
+                  <time className="text-sm text-white/80">
                     Nejnovejsi
                   </time>
                   <Avatar className="size-6 border border-primary">
@@ -96,17 +96,17 @@ const CoursesHero = ({ className }: CoursesHeroProps) => {
               alt="Pokrocile techniky"
               className="size-full max-h-[267px] object-cover grayscale-100 transition-all duration-300 group-hover:grayscale-50"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
             <div className="absolute inset-0 z-10 flex flex-col justify-between p-8">
-              <Badge className="w-fit border border-background/20 bg-background/15 backdrop-blur-sm">
+              <Badge className="w-fit border border-white/20 bg-white/15 text-white backdrop-blur-sm">
                 Pokrocile
               </Badge>
               <div className="flex flex-col gap-4">
-                <h2 className="text-xl font-medium text-background">
+                <h2 className="text-xl font-medium text-white">
                   Pokrocile fyzioterapeuticke postupy a metody
                 </h2>
                 <div className="flex items-center gap-2">
-                  <time className="text-sm text-background/80">
+                  <time className="text-sm text-white/80">
                     Aktualizovano
                   </time>
                   <Avatar className="size-6 border border-primary">
