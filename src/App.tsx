@@ -38,6 +38,7 @@ import AdminUsersPage from './pages/admin/admin-users-page'
 import AdminBlogsPage from './pages/admin/admin-blogs-page'
 import AdminBlogEditorPage from './pages/admin/admin-blog-editor-page'
 import AdminCoursesPage from './pages/admin/admin-courses-page'
+import AdminCourseEditorPage from './pages/admin/admin-course-editor-page'
 import AdminInvoicesPage from './pages/admin/admin-invoices-page'
 import AdminSubscriptionsPage from './pages/admin/admin-subscriptions-page'
 import AdminPromoCodesPage from './pages/admin/admin-promo-codes-page'
@@ -94,6 +95,7 @@ export default function App() {
             <Route path="blogs" element={<AdminBlogsPage />} />
             <Route path="blogs/:id" element={<AdminBlogEditorPage />} />
             <Route path="courses" element={<AdminCoursesPage />} />
+            <Route path="courses/:id" element={<AdminCourseEditorPage />} />
             <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
             <Route path="promo-codes" element={<AdminPromoCodesPage />} />
             <Route path="invoices" element={<AdminInvoicesPage />} />

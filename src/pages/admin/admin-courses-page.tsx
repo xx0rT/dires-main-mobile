@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   BookOpen,
   Eye,
   EyeOff,
+  Pencil,
   Plus,
   Search,
   Trash2,
@@ -63,6 +65,7 @@ function getProfile(profiles: Enrollment['profiles']): { email: string; full_nam
 }
 
 export default function AdminCoursesPage() {
+  const navigate = useNavigate()
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -172,6 +175,19 @@ export default function AdminCoursesPage() {
     )
   }
 
+  const deleteCourse = async (course: Course, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!confirm(`Opravdu chcete smazat kurz "${course.title}"?`)) return
+
+    const { error } = await supabase.from('courses').delete().eq('id', course.id)
+    if (error) {
+      toast.error('Nepodarilo se smazat kurz')
+      return
+    }
+    toast.success('Kurz smazan')
+    setCourses((prev) => prev.filter((c) => c.id !== course.id))
+  }
+
   const filtered = courses.filter((c) =>
     c.title.toLowerCase().includes(search.toLowerCase()) ||
     c.instructor?.toLowerCase().includes(search.toLowerCase()) ||
@@ -198,13 +214,19 @@ export default function AdminCoursesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-          Sprava kurzu
-        </h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          {courses.length} kurzu v systemu
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+            Sprava kurzu
+          </h1>
+          <p className="mt-1 text-sm text-neutral-500">
+            {courses.length} kurzu v systemu
+          </p>
+        </div>
+        <Button onClick={() => navigate('/admin/courses/new')}>
+          <Plus className="mr-2 size-4" />
+          Novy kurz
+        </Button>
       </div>
 
       <div className="relative max-w-sm">
@@ -229,24 +251,45 @@ export default function AdminCoursesPage() {
                 <CardTitle className="text-sm font-medium leading-tight">
                   {course.title}
                 </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 shrink-0 gap-1 px-2"
-                  onClick={(e) => togglePublished(course, e)}
-                >
-                  {course.published ? (
-                    <>
-                      <Eye className="size-3 text-green-600" />
-                      <span className="text-[10px] text-green-600">Aktivni</span>
-                    </>
-                  ) : (
-                    <>
-                      <EyeOff className="size-3 text-neutral-400" />
-                      <span className="text-[10px] text-neutral-400">Skryty</span>
-                    </>
-                  )}
-                </Button>
+                <div className="flex shrink-0 items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-7"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      navigate(`/admin/courses/${course.id}`)
+                    }}
+                  >
+                    <Pencil className="size-3.5 text-muted-foreground" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 gap-1 px-2"
+                    onClick={(e) => togglePublished(course, e)}
+                  >
+                    {course.published ? (
+                      <>
+                        <Eye className="size-3 text-green-600" />
+                        <span className="text-[10px] text-green-600">Aktivni</span>
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff className="size-3 text-neutral-400" />
+                        <span className="text-[10px] text-neutral-400">Skryty</span>
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-7 text-red-500 hover:text-red-600"
+                    onClick={(e) => deleteCourse(course, e)}
+                  >
+                    <Trash2 className="size-3.5" />
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -303,6 +346,17 @@ export default function AdminCoursesPage() {
           </DialogHeader>
           {selectedCourse && (
             <div className="space-y-6">
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate(`/admin/courses/${selectedCourse.id}`)}
+                >
+                  <Pencil className="mr-1 size-4" />
+                  Upravit kurz
+                </Button>
+              </div>
+
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-lg border p-3 dark:border-neutral-700">
                   <p className="text-xs text-neutral-500">Studenti</p>
