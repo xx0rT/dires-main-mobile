@@ -130,7 +130,7 @@ const FooterSection = () => {
   return (
     <footer className="mx-3 mt-16 mb-4 overflow-hidden rounded-2xl bg-muted/60 sm:mx-5 lg:mx-6">
       <motion.div
-        className="mx-auto max-w-7xl px-5 pt-10 pb-6 sm:px-8 lg:px-12"
+        className="mx-auto px-5 pt-10 pb-6 sm:px-8 lg:px-12 xl:px-16 2xl:px-20"
         variants={stagger}
         initial="hidden"
         whileInView="visible"
