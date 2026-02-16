@@ -87,12 +87,12 @@ const ProductCard = ({ product }: { product: ProductData }) => {
               </span>
             )}
             <span className="text-2xl font-bold tracking-tight">
-              {product.price.toLocaleString("cs-CZ")}
+              {(product.price.sale ?? product.price.regular).toLocaleString("cs-CZ")}
             </span>
             <span className="text-sm text-muted-foreground">Kc</span>
-            {product.originalPrice && (
+            {product.price.sale && (
               <span className="text-sm text-muted-foreground line-through">
-                {product.originalPrice.toLocaleString("cs-CZ")} Kc
+                {product.price.regular.toLocaleString("cs-CZ")} Kc
               </span>
             )}
           </div>
