@@ -23,7 +23,7 @@ import {
   type ProductImage,
 } from "@/lib/products-data";
 import { useCart, type CartItem } from "@/lib/cart-context";
-import { AddedToCartDialog } from "@/components/shop/added-to-cart-dialog";
+import { ShoppingCartSheet } from "@/components/shop/shopping-cart-sheet";
 
 import {
   Accordion,
@@ -137,8 +137,7 @@ export default function ProductDetailPage() {
 function ProductDetail({ product }: { product: ProductData }) {
   const navigate = useNavigate();
   const { addItem } = useCart();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [addedItem, setAddedItem] = useState<CartItem | null>(null);
+  const [cartSheetOpen, setCartSheetOpen] = useState(false);
 
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
@@ -197,8 +196,7 @@ function ProductDetail({ product }: { product: ProductData }) {
       currency,
     };
     addItem(cartItem, qty);
-    setAddedItem({ ...cartItem, quantity: qty });
-    setDialogOpen(true);
+    setCartSheetOpen(true);
   };
 
   const handleBuyNow = () => {
@@ -367,10 +365,9 @@ function ProductDetail({ product }: { product: ProductData }) {
         <ProductDetailSections slug={product.slug} />
       </div>
 
-      <AddedToCartDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        item={addedItem}
+      <ShoppingCartSheet
+        open={cartSheetOpen}
+        onOpenChange={setCartSheetOpen}
       />
     </section>
   );
