@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Building2, ShoppingCart, Trash } from "lucide-react";
-import { useCallback } from "react";
+import { Building2, Check, Loader2, ShoppingCart, Tag, Trash, X } from "lucide-react";
+import { useCallback, useState } from "react";
 import {
   Controller,
   FormProvider,
@@ -38,6 +38,12 @@ const PAYMENT_METHODS = {
 } as const;
 
 type PaymentMethod = keyof typeof PAYMENT_METHODS;
+
+interface AppliedPromo {
+  code: string;
+  discountType: "percentage" | "fixed";
+  discountValue: number;
+}
 
 const CreditCardPayment = z.object({
   method: z.literal(PAYMENT_METHODS.creditCard),
@@ -111,9 +117,18 @@ function formatCZK(price: number) {
   }).format(price);
 }
 
+function calcDiscount(subtotal: number, promo: AppliedPromo | null): number {
+  if (!promo) return 0;
+  if (promo.discountType === "percentage") {
+    return Math.round(subtotal * (promo.discountValue / 100));
+  }
+  return Math.min(promo.discountValue, subtotal);
+}
+
 export default function CartPage() {
   const { items, removeItem, updateQuantity, subtotal, itemCount } = useCart();
   const navigate = useNavigate();
+  const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
 
   const defaultProducts = items.map((item) => ({
     slug: item.slug,
@@ -138,7 +153,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <section className="py-32">
-        <div className="container mx-auto max-w-lg text-center">
+        <div className="mx-auto max-w-lg px-4 text-center">
           <div className="mx-auto mb-6 flex size-16 items-center justify-center rounded-full bg-muted">
             <ShoppingCart className="size-8 text-muted-foreground" />
           </div>
@@ -155,11 +170,11 @@ export default function CartPage() {
   }
 
   return (
-    <section className="py-32">
-      <div className="container">
-        <div className="mb-10">
-          <Link to="/">
-            <img src="/logo.svg" alt="Logo" className="h-8" />
+    <section className="py-16 md:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 text-center">
+          <Link to="/" className="inline-block">
+            <img src="/logo.svg" alt="Logo" className="mx-auto h-8" />
           </Link>
           <h1 className="mt-6 text-3xl font-bold tracking-tight md:text-4xl">
             Pokladna
@@ -214,13 +229,19 @@ export default function CartPage() {
               </div>
 
               <div className="lg:col-span-2">
-                <div className="sticky top-8">
+                <div className="sticky top-8 space-y-4">
                   <OrderSummary
                     form={form}
                     removeItem={removeItem}
                     updateQuantity={updateQuantity}
                     subtotal={subtotal}
                     itemCount={itemCount}
+                    appliedPromo={appliedPromo}
+                  />
+                  <PromoCodeInput
+                    appliedPromo={appliedPromo}
+                    onApply={setAppliedPromo}
+                    onRemove={() => setAppliedPromo(null)}
                   />
                 </div>
               </div>
@@ -229,6 +250,140 @@ export default function CartPage() {
         </FormProvider>
       </div>
     </section>
+  );
+}
+
+function PromoCodeInput({
+  appliedPromo,
+  onApply,
+  onRemove,
+}: {
+  appliedPromo: AppliedPromo | null;
+  onApply: (promo: AppliedPromo) => void;
+  onRemove: () => void;
+}) {
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleApply = async () => {
+    const trimmed = code.trim();
+    if (!trimmed) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/validate-shop-promo`;
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code: trimmed }),
+      });
+
+      const data = await res.json();
+
+      if (data.valid && data.promo) {
+        onApply({
+          code: data.promo.code,
+          discountType: data.promo.discountType,
+          discountValue: data.promo.discountValue,
+        });
+        setCode("");
+        setError("");
+      } else {
+        setError(data.message || "Neplatny promo kod");
+      }
+    } catch {
+      setError("Chyba pri overovani kodu");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (appliedPromo) {
+    return (
+      <Card className="shadow-none">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex size-8 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                <Check className="size-4 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">
+                  Promo kod:{" "}
+                  <span className="font-mono">{appliedPromo.code}</span>
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Sleva{" "}
+                  {appliedPromo.discountType === "percentage"
+                    ? `${appliedPromo.discountValue}%`
+                    : formatCZK(appliedPromo.discountValue)}
+                </p>
+              </div>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={onRemove}
+            >
+              <X className="size-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="shadow-none">
+      <CardContent className="pt-6">
+        <div className="flex items-center gap-2 mb-3">
+          <Tag className="size-4 text-muted-foreground" />
+          <p className="text-sm font-medium">Mate promo kod?</p>
+        </div>
+        <div className="flex gap-2">
+          <Input
+            value={code}
+            onChange={(e) => {
+              setCode(e.target.value.toUpperCase());
+              if (error) setError("");
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleApply();
+              }
+            }}
+            placeholder="Zadejte kod"
+            className="font-mono uppercase"
+            disabled={loading}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleApply}
+            disabled={loading || !code.trim()}
+            className="shrink-0"
+          >
+            {loading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              "Pouzit"
+            )}
+          </Button>
+        </div>
+        {error && (
+          <p className="mt-2 text-xs text-destructive">{error}</p>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -691,17 +846,20 @@ interface OrderSummaryProps {
   updateQuantity: (slug: string, quantity: number) => void;
   subtotal: number;
   itemCount: number;
+  appliedPromo: AppliedPromo | null;
 }
 
-function OrderSummary({ form, removeItem, updateQuantity, subtotal, itemCount }: OrderSummaryProps) {
+function OrderSummary({ form, removeItem, updateQuantity, subtotal, itemCount, appliedPromo }: OrderSummaryProps) {
   const { items } = useCart();
   const { fields, remove, update } = useFieldArray({
     control: form.control,
     name: "products",
   });
 
-  const shipping = subtotal >= 3600 ? 0 : 149;
-  const total = subtotal + shipping;
+  const discount = calcDiscount(subtotal, appliedPromo);
+  const afterDiscount = subtotal - discount;
+  const shipping = afterDiscount >= 3600 ? 0 : 149;
+  const total = afterDiscount + shipping;
 
   const handleRemove = useCallback(
     (index: number, slug: string) => {
@@ -752,6 +910,14 @@ function OrderSummary({ form, removeItem, updateQuantity, subtotal, itemCount }:
             <span className="text-muted-foreground">Mezisoucet</span>
             <span>{formatCZK(subtotal)}</span>
           </div>
+          {discount > 0 && (
+            <div className="flex justify-between text-sm">
+              <span className="text-emerald-600">
+                Sleva ({appliedPromo?.code})
+              </span>
+              <span className="text-emerald-600">-{formatCZK(discount)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Doprava</span>
             <span>
