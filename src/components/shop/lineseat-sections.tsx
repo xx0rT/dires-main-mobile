@@ -1,56 +1,170 @@
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import {
-  Armchair,
-  Car,
-  HeartPulse,
-  ShieldCheck,
-  Sparkles,
-  Wind,
-} from "lucide-react";
+import { Armchair, Car, HeartPulse, Wind } from "lucide-react";
 
-const BENEFITS = [
+import type { BentoItem } from "@/components/ui/bento-features";
+import { BentoFeatures } from "@/components/ui/bento-features";
+import type { ScrollFeature, ScrollTestimonial } from "@/components/ui/scroll-features";
+import { ScrollFeatures } from "@/components/ui/scroll-features";
+import type { TabbedFeature } from "@/components/ui/tabbed-features";
+import { TabbedFeatures } from "@/components/ui/tabbed-features";
+import { Separator } from "@/components/ui/separator";
+
+const SCROLL_FEATURES: ScrollFeature[] = [
   {
-    icon: HeartPulse,
     title: "Kombinace pruznych a pevnych materialu",
-    description: "Napomaha k aktivnimu sedu a spravnemu drzeni tela.",
+    subtitle: "Napomaha k aktivnimu sedu a spravnemu drzeni tela.",
+    statistics: { value: "2x", label: "Lepsi drzeni tela oproti bezne zidli" },
+    visual:
+      "https://images.pexels.com/photos/4498136/pexels-photo-4498136.jpeg?auto=compress&cs=tinysrgb&w=1280",
   },
   {
-    icon: Wind,
     title: "Aktivni sed umoznuje lepe dychat",
-    description:
-      "Spravna pozice panve a patere otevira prostor pro volne dychani.",
+    subtitle: "Spravna pozice panve a patere otevira prostor pro volne dychani.",
+    statistics: { value: "40%", label: "Zlepseni kapacity plic pri spravnem sedu" },
+    visual:
+      "https://images.pexels.com/photos/4397840/pexels-photo-4397840.jpeg?auto=compress&cs=tinysrgb&w=1280",
   },
   {
-    icon: ShieldCheck,
     title: "Opora pro panev",
-    description:
-      "Tvar lineseat poskytuje oporu pro panev, to navadi ke snadnejsimu projeni s hrudnikem.",
+    subtitle:
+      "Tvar lineseat poskytuje oporu pro panev, to navadi ke snadnejsimu propojeni s hrudnikem.",
+    statistics: { value: "85%", label: "Uzivatelu hlasi zlepseni do 14 dnu" },
+    visual:
+      "https://images.pexels.com/photos/6454128/pexels-photo-6454128.jpeg?auto=compress&cs=tinysrgb&w=1280",
   },
   {
-    icon: Sparkles,
     title: "Aktivace brisnich svalu",
-    description:
-      "Behem sedu dochazi k aktivaci brisnich svalu a lepsi stabilite.",
+    subtitle: "Behem sedu dochazi k aktivaci brisnich svalu a lepsi stabilite.",
+    statistics: { value: "3x", label: "Vetsi aktivace core svalu nez na bezne zidli" },
+    visual:
+      "https://images.pexels.com/photos/7710086/pexels-photo-7710086.jpeg?auto=compress&cs=tinysrgb&w=1280",
   },
 ];
 
-const USE_CASES = [
+const SCROLL_TESTIMONIAL: ScrollTestimonial = {
+  quote:
+    "Po dvou tydnech pouzivani lineseat jsem prestala mit bolesti zad pri dlouhem sezeni v kancelari.",
+  author: "Jana K.",
+  designation: "kancelarska pracovnice",
+};
+
+const BENTO_ITEMS: BentoItem[] = [
   {
-    title: "V aute i v kancelari",
-    description:
-      "Lineseat bere s sebou vsude, at sidite v aute, v kancelari, u stolu nebo na cestach. Jediny sedak, ktery opravdu funguje.",
-    icon: Car,
-    image:
-      "https://images.pexels.com/photos/7710086/pexels-photo-7710086.jpeg?auto=compress&cs=tinysrgb&w=800",
+    title: (
+      <>
+        V aute i v
+        <br />
+        kancelari
+      </>
+    ),
+    description: [
+      "Lineseat bere s sebou vsude. At sidite v aute, v kancelari, u stolu nebo na cestach.",
+      "Jediny sedak, ktery opravdu funguje - navrzeny fyzioterapeuty s 20letou zkusenosti.",
+    ],
+    image: {
+      src: "https://images.pexels.com/photos/7710086/pexels-photo-7710086.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Lineseat v aute",
+    },
+    imagePosition: "content",
+    className:
+      "flex flex-col pl-6 py-6 overflow-hidden md:col-span-3 md:flex-row gap-6 md:gap-12",
+    headerClassName: "flex-2 p-0 md:flex-1",
+    contentClassName:
+      "relative w-full self-start p-0 overflow-hidden rounded-l-xl border md:flex-1",
   },
   {
     title: "Vyzkousejte lineseat",
-    description:
-      "Prijdte si osobne vyzkouset lineseat do Dires Fyzio v Praze. Nasi fyzioterapeuti vam poradi s nastavenim.",
+    description: [
+      "Prijdte si osobne vyzkouset do Dires Fyzio v Praze.",
+      "Nasi fyzioterapeuti vam poradi s nastavenim a vyberem.",
+    ],
+    image: {
+      src: "https://images.pexels.com/photos/6454128/pexels-photo-6454128.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Showroom Dires Fyzio",
+      className: "aspect-[2/1.1] rounded-xl",
+    },
+    className: "md:col-span-2 flex flex-col justify-center",
+    contentClassName: "flex items-center justify-center",
+    imagePosition: "content",
+  },
+  {
+    title: "Vyvoj s fyzioterapeuty",
+    description: [
+      "Lineseat vznikl ve spolupraci s prednimi ceskymi fyzioterapeuty a ortopedy.",
+    ],
+    image: {
+      src: "https://images.pexels.com/photos/4397840/pexels-photo-4397840.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Vyvoj lineseat",
+      className: "aspect-2/1 rounded-xl flex-1 self-center mb-6",
+    },
+    className: "md:col-span-2",
+    headerClassName: "h-full",
+    imagePosition: "header",
+  },
+  {
+    title: "Materialy a kvalita",
+    description: [
+      "Vysokokvalitni pena s tvarovou pameti, protiskluzova spodni strana a pratelny potah na zip.",
+    ],
+    image: {
+      src: "https://images.pexels.com/photos/4498136/pexels-photo-4498136.jpeg?auto=compress&cs=tinysrgb&w=800",
+      alt: "Lineseat detail materialu",
+    },
+    imagePosition: "content",
+    className: "overflow-hidden md:col-span-3",
+    headerClassName: "",
+    contentClassName:
+      "relative aspect-[2/1.25] mt-4 p-0 ml-8 w-full md:max-w-[400px] lg:max-w-[500px] overflow-hidden md:mx-auto rounded-t-xl",
+  },
+];
+
+const TABBED_FEATURES: TabbedFeature[] = [
+  {
+    title: "Sezeni v aute",
+    description: "Ergonomicka podpora pri dlouhe jizde.",
+    icon: Car,
+    content: {
+      title: "Pohodlna jizda bez bolesti zad.",
+      description:
+        "Lineseat se dokonale prisedi na sedadlo v aute. Podporuje spravne drzeni panve a snizuje unavu pri dlouhych cestach. Snadne nasazeni i sundani.",
+      image:
+        "https://images.pexels.com/photos/7710086/pexels-photo-7710086.jpeg?auto=compress&cs=tinysrgb&w=1280",
+    },
+  },
+  {
+    title: "Kancelarska prace",
+    description: "Cely den u stolu bez nasledku.",
     icon: Armchair,
-    image:
-      "https://images.pexels.com/photos/6454128/pexels-photo-6454128.jpeg?auto=compress&cs=tinysrgb&w=800",
+    content: {
+      title: "Aktivni sed po celou pracovni dobu.",
+      description:
+        "Premiste lineseat na kancelarskou zidli a okamzite pocitite rozdil. Vase panev se nakloni do spravne pozice a pater se narovna prirozene.",
+      image:
+        "https://images.pexels.com/photos/6454128/pexels-photo-6454128.jpeg?auto=compress&cs=tinysrgb&w=1280",
+    },
+  },
+  {
+    title: "Rehabilitace",
+    description: "Podpora lecby a prevence.",
+    icon: HeartPulse,
+    content: {
+      title: "Doporuceno fyzioterapeuty pro rehabilitaci.",
+      description:
+        "Lineseat je casto doporucovan pri bolestech zad, po operacich patere nebo pri prevenci problemu s drzenim tela. Jemne aktivuje spravne svalove skupiny.",
+      image:
+        "https://images.pexels.com/photos/4397840/pexels-photo-4397840.jpeg?auto=compress&cs=tinysrgb&w=1280",
+    },
+  },
+  {
+    title: "Cestovani",
+    description: "Kompaktni a lehky, vzdy po ruce.",
+    icon: Wind,
+    content: {
+      title: "Vezmete si ho kamkoli s sebou.",
+      description:
+        "Lineseat je lehky a snadno prenosny. Pouzijte ho ve vlaku, v letadle nebo v hotelu. Nikdy nemusite sedet spatne.",
+      image:
+        "https://images.pexels.com/photos/4498136/pexels-photo-4498136.jpeg?auto=compress&cs=tinysrgb&w=1280",
+    },
   },
 ];
 
@@ -74,78 +188,26 @@ const INSTRUCTIONS = [
   },
 ];
 
-export function LineseatBenefits() {
+export function LineseatScrollShowcase() {
   return (
-    <section className="py-16 md:py-24">
-      <div className="mx-auto max-w-3xl text-center">
-        <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-          Ctyri duvody
-        </p>
-        <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-          proc sedet na lineseat
-        </h2>
-      </div>
-
-      <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2">
-        {BENEFITS.map((b) => (
-          <div
-            key={b.title}
-            className="group rounded-2xl border bg-card p-8 transition-shadow hover:shadow-md"
-          >
-            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-foreground/5 transition-colors group-hover:bg-foreground/10">
-              <b.icon className="h-6 w-6 text-foreground/70" />
-            </div>
-            <h3 className="text-lg font-semibold">{b.title}</h3>
-            <p className="mt-2 leading-relaxed text-muted-foreground">
-              {b.description}
-            </p>
-          </div>
-        ))}
-      </div>
-    </section>
+    <ScrollFeatures
+      features={SCROLL_FEATURES}
+      testimonial={SCROLL_TESTIMONIAL}
+    />
   );
 }
 
-export function LineseatUseCases() {
+export function LineseatBentoGrid() {
+  return <BentoFeatures label="PROC LINESEAT?" items={BENTO_ITEMS} />;
+}
+
+export function LineseatTabs() {
   return (
-    <section className="py-16 md:py-24">
-      <div className="flex flex-col gap-10">
-        {USE_CASES.map((uc, index) => (
-          <div
-            key={uc.title}
-            className="group overflow-hidden rounded-3xl border bg-card transition-shadow hover:shadow-lg"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              <div
-                className={`flex flex-col justify-center gap-5 p-8 md:p-12 ${index % 2 === 1 ? "md:order-2" : ""}`}
-              >
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-foreground/5">
-                  <uc.icon className="h-5 w-5 text-foreground/70" />
-                </div>
-                <h3 className="text-2xl font-bold tracking-tight">
-                  {uc.title}
-                </h3>
-                <p className="leading-relaxed text-muted-foreground">
-                  {uc.description}
-                </p>
-                <Button className="w-fit" size="sm">
-                  Zjistit vice
-                </Button>
-              </div>
-              <div
-                className={`aspect-[4/3] overflow-hidden md:aspect-auto ${index % 2 === 1 ? "md:order-1" : ""}`}
-              >
-                <img
-                  src={uc.image}
-                  alt={uc.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
+    <TabbedFeatures
+      heading="Kde vsude lineseat pouzijete"
+      subheading="Lineseat je postaven na navycich, ktere delaji z dobreho sezeni kazdodenni rutinu - bez namah, bez bolesti."
+      features={TABBED_FEATURES}
+    />
   );
 }
 

@@ -55,9 +55,10 @@ import {
   FyziotreninkChapters,
 } from "@/components/shop/fyziotrenink-sections";
 import {
-  LineseatBenefits,
+  LineseatBentoGrid,
   LineseatInstructions,
-  LineseatUseCases,
+  LineseatScrollShowcase,
+  LineseatTabs,
 } from "@/components/shop/lineseat-sections";
 
 interface DetailImage {
@@ -332,8 +333,9 @@ function ProductDetailSections({ slug }: { slug: string }) {
     case "lineseat":
       return (
         <>
-          <LineseatBenefits />
-          <LineseatUseCases />
+          <LineseatScrollShowcase />
+          <LineseatBentoGrid />
+          <LineseatTabs />
           <LineseatInstructions />
         </>
       );
