@@ -129,32 +129,35 @@ export const PRODUCTS: ProductData[] = [
     name: "Correctfoot",
     subtitle: "Balancni desticka",
     description: "Balancni desticka pro trenink koncetin.",
-    image:
-      "https://images.pexels.com/photos/4498606/pexels-photo-4498606.jpeg?auto=compress&cs=tinysrgb&w=800",
+    image: "/postup-prvni.jpg",
     images: [
       {
-        src: "https://images.pexels.com/photos/4498606/pexels-photo-4498606.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        thumbnail:
-          "https://images.pexels.com/photos/4498606/pexels-photo-4498606.jpeg?auto=compress&cs=tinysrgb&w=200",
-        alt: "Correctfoot balancni desticka",
-        width: 1280,
-        height: 853,
+        src: "/postup-prvni.jpg",
+        thumbnail: "/postup-prvni.jpg",
+        alt: "Correctfoot - cviceni v sede, bocni pohled",
+        width: 960,
+        height: 1280,
       },
       {
-        src: "https://images.pexels.com/photos/3822906/pexels-photo-3822906.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        thumbnail:
-          "https://images.pexels.com/photos/3822906/pexels-photo-3822906.jpeg?auto=compress&cs=tinysrgb&w=200",
-        alt: "Correctfoot v pouziti",
-        width: 1280,
-        height: 853,
+        src: "/postup-druhy.jpg",
+        thumbnail: "/postup-druhy.jpg",
+        alt: "Correctfoot - cviceni v sede, pohled zepredu",
+        width: 960,
+        height: 1280,
       },
       {
-        src: "https://images.pexels.com/photos/3984340/pexels-photo-3984340.jpeg?auto=compress&cs=tinysrgb&w=1280",
-        thumbnail:
-          "https://images.pexels.com/photos/3984340/pexels-photo-3984340.jpeg?auto=compress&cs=tinysrgb&w=200",
-        alt: "Correctfoot detail",
-        width: 1280,
-        height: 853,
+        src: "/postup-treti.jpg",
+        thumbnail: "/postup-treti.jpg",
+        alt: "Correctfoot - cviceni ve stoji",
+        width: 960,
+        height: 1280,
+      },
+      {
+        src: "/postup-ctvrty.jpg",
+        thumbnail: "/postup-ctvrty.jpg",
+        alt: "Correctfoot - pokrocile cviceni na BOSU",
+        width: 960,
+        height: 1280,
       },
     ],
     price: {

@@ -51,6 +51,17 @@ interface DetailImage {
 }
 
 function toDetailImage(img: ProductImage): DetailImage {
+  const isExternal = img.src.startsWith("http");
+  if (!isExternal) {
+    return {
+      src: img.src,
+      srcset: "",
+      sizes: "",
+      alt: img.alt,
+      width: img.width,
+      height: img.height,
+    };
+  }
   const baseUrl = img.src.replace(/&w=\d+/, "");
   return {
     src: `${baseUrl}&w=2400`,
