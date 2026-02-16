@@ -451,11 +451,12 @@ function ProductImages({
                     data-cropped="true"
                   >
                     <img
-                      srcSet={img.srcset}
+                      src={img.src}
+                      srcSet={img.srcset || undefined}
                       alt={img.alt}
                       width={img.width}
                       height={img.height}
-                      sizes={img.sizes}
+                      sizes={img.sizes || undefined}
                       className="block size-full object-cover object-center"
                     />
                   </a>
