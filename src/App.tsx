@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from 'sonner'
 import { AuthProvider } from './lib/auth-context'
+import { CartProvider } from './lib/cart-context'
 import MarketingLayout from './layouts/marketing-layout'
 import DashboardLayout from './layouts/dashboard-layout'
 import AdminLayout from './layouts/admin-layout'
@@ -51,6 +52,7 @@ export default function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthProvider>
+        <CartProvider>
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<MarketingLayout />}>
@@ -102,6 +104,7 @@ export default function App() {
           </Route>
         </Routes>
         <Toaster />
+        </CartProvider>
       </AuthProvider>
     </ThemeProvider>
   )

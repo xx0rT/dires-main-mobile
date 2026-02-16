@@ -22,6 +22,8 @@ import {
   type ProductData,
   type ProductImage,
 } from "@/lib/products-data";
+import { useCart, type CartItem } from "@/lib/cart-context";
+import { AddedToCartDialog } from "@/components/shop/added-to-cart-dialog";
 
 import {
   Accordion,
@@ -134,6 +136,9 @@ export default function ProductDetailPage() {
 
 function ProductDetail({ product }: { product: ProductData }) {
   const navigate = useNavigate();
+  const { addItem } = useCart();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [addedItem, setAddedItem] = useState<CartItem | null>(null);
 
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
@@ -180,8 +185,35 @@ function ProductDetail({ product }: { product: ProductData }) {
     content: a.content.list || a.content.text || "",
   }));
 
-  const onSubmit = (data: FormType) => {
-    console.log(data);
+  const handleAddToCart = (quantity?: number) => {
+    const qty = quantity ?? (Number(form.getValues("quantity")) || 1);
+    const cartItem: Omit<CartItem, "quantity"> = {
+      slug: product.slug,
+      name: product.name,
+      subtitle: product.subtitle,
+      image: product.image,
+      price: sale ?? regular,
+      originalPrice: sale ? regular : undefined,
+      currency,
+    };
+    addItem(cartItem, qty);
+    setAddedItem({ ...cartItem, quantity: qty });
+    setDialogOpen(true);
+  };
+
+  const handleBuyNow = () => {
+    const qty = Number(form.getValues("quantity")) || 1;
+    const cartItem: Omit<CartItem, "quantity"> = {
+      slug: product.slug,
+      name: product.name,
+      subtitle: product.subtitle,
+      image: product.image,
+      price: sale ?? regular,
+      originalPrice: sale ? regular : undefined,
+      currency,
+    };
+    addItem(cartItem, qty);
+    navigate("/kosik");
   };
 
   return (
@@ -231,10 +263,7 @@ function ProductDetail({ product }: { product: ProductData }) {
                 </p>
               )}
 
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex w-full flex-col gap-7"
-              >
+              <div className="flex w-full flex-col gap-7">
                 <div className="flex flex-wrap items-center justify-start gap-4">
                   <Controller
                     control={form.control}
@@ -250,13 +279,20 @@ function ProductDetail({ product }: { product: ProductData }) {
                       variant="secondary"
                       className="w-full"
                       ref={cartButtonRef}
+                      type="button"
+                      onClick={() => handleAddToCart()}
                     >
                       Pridat do kosiku
                     </Button>
                   </div>
                 </div>
                 <div className="flex w-full shrink-0 basis-full flex-col gap-6">
-                  <Button className="w-full" size="lg">
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    type="button"
+                    onClick={handleBuyNow}
+                  >
                     Koupit nyni
                   </Button>
                 </div>
@@ -298,14 +334,20 @@ function ProductDetail({ product }: { product: ProductData }) {
                           )}
                         />
                         <div className="flex-1 md:flex-none">
-                          <Button className="w-full">Pridat do kosiku</Button>
+                          <Button
+                            className="w-full"
+                            type="button"
+                            onClick={() => handleAddToCart()}
+                          >
+                            Pridat do kosiku
+                          </Button>
                         </div>
                       </div>
                     </div>
                   </div>,
                   document.body,
                 )}
-              </form>
+              </div>
 
               <div className="flex flex-col gap-4">
                 {product.services.map((s, i) => (
@@ -324,6 +366,12 @@ function ProductDetail({ product }: { product: ProductData }) {
 
         <ProductDetailSections slug={product.slug} />
       </div>
+
+      <AddedToCartDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        item={addedItem}
+      />
     </section>
   );
 }
