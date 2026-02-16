@@ -5,7 +5,6 @@ import {
   ChevronRight,
   Clock,
   GraduationCap,
-  HandHeart,
   HelpCircle,
   Info,
   LayoutGrid,
@@ -16,7 +15,6 @@ import {
   Star,
   ShoppingBag,
   Tag,
-  Trophy,
   Users,
   X,
   Zap,
@@ -186,55 +184,9 @@ const NAVIGATION: MenuItem[] = [
     },
   },
   {
-    title: "Sluzby",
+    title: "Obchod",
     id: 2,
-    featuredLinks: [
-      {
-        label: "Nasi odbornici",
-        icon: Users,
-        description: "Seznamte se s nasim tymem a objednejte konzultaci",
-        background:
-          "https://images.pexels.com/photos/4506105/pexels-photo-4506105.jpeg?auto=compress&cs=tinysrgb&w=800",
-        url: "/tym",
-      },
-      {
-        label: "Certifikace",
-        icon: GraduationCap,
-        description: "Mezinarodne uznavane certifikaty pro fyzioterapeuty",
-        background:
-          "https://images.pexels.com/photos/7176026/pexels-photo-7176026.jpeg?auto=compress&cs=tinysrgb&w=800",
-        url: "/kurzy",
-      },
-    ],
-    links: [
-      {
-        label: "Individualni konzultace",
-        icon: HandHeart,
-        description:
-          "Osobni poradenstvi s nasimi odborniky pro vas profesni rust",
-        url: "/tym",
-      },
-      {
-        label: "Skupinove workshopy",
-        icon: LayoutGrid,
-        description: "Prakticke workshopy v malych skupinach pod odbornym vedenim",
-        url: "/tym",
-      },
-      {
-        label: "Firemni skoleni",
-        icon: Trophy,
-        description:
-          "Skoleni na miru pro kliniky a zdravotnicka zarizeni",
-        url: "/tym",
-      },
-      {
-        label: "Online vzdelavani",
-        icon: BookOpen,
-        description:
-          "Pristup ke studijnim materialam kdykoliv a odkudkoliv",
-        url: "/kurzy",
-      },
-    ],
+    url: "/obchod",
   },
   {
     title: "Kurzy",
