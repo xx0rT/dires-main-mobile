@@ -1,4 +1,6 @@
+import { useScroll, useMotionValueEvent } from "framer-motion";
 import { Armchair, Car, HeartPulse, Wind } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 import type { BentoItem } from "@/components/ui/bento-features";
 import { BentoFeatures } from "@/components/ui/bento-features";
@@ -203,6 +205,171 @@ export function LineseatTabs() {
       subheading="Lineseat je postaven na navycich, ktere delaji z dobreho sezeni kazdodenni rutinu - bez namah, bez bolesti."
       features={TABBED_FEATURES}
     />
+  );
+}
+
+const VIDEO_STEPS = [
+  {
+    step: "01",
+    title: "Umistete na sedadlo",
+    description:
+      "Polozte lineseat na libovolne sedadlo. Protiskluzova spodni strana ho udrzuje na miste bez jakehokoli upevneni – funguje v aute, kancelari i doma.",
+  },
+  {
+    step: "02",
+    title: "Sednte si prirozene",
+    description:
+      "Jakmile si sednete, lineseat prirozene navede vasi panev do optimalni polohy. Zadna nastaveni, zadna namaha – spravne drzeni nastava automaticky.",
+  },
+  {
+    step: "03",
+    title: "Uzivejte aktivni sed",
+    description:
+      "Vase telo se rychle prisposobi. Pocitite uvolneni v zadech a lepsi dychani uz behem prvnich minut. Pravidelnym pouzivanim predchazite chronicke bolesti zad.",
+  },
+];
+
+export function LineseatVideoTutorial() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [activeStep, setActiveStep] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.pause();
+    const onLoaded = () => setVideoDuration(video.duration);
+    video.addEventListener("loadedmetadata", onLoaded);
+    if (video.readyState >= 1) setVideoDuration(video.duration);
+    return () => video.removeEventListener("loadedmetadata", onLoaded);
+  }, []);
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (videoRef.current && videoDuration > 0) {
+      videoRef.current.currentTime = latest * videoDuration;
+    }
+    if (latest < 0.33) setActiveStep(0);
+    else if (latest < 0.66) setActiveStep(1);
+    else setActiveStep(2);
+  });
+
+  return (
+    <section className="relative">
+      <div ref={containerRef} className="relative h-[300vh]">
+        <div className="sticky top-0 h-screen overflow-hidden bg-black">
+          <div className="grid h-full grid-cols-1 lg:grid-cols-2">
+            <div className="relative h-1/2 lg:h-full">
+              <video
+                ref={videoRef}
+                src="/New-Rajden1.mp4"
+                muted
+                playsInline
+                preload="auto"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 lg:block hidden" />
+            </div>
+
+            <div className="flex h-1/2 flex-col justify-center px-8 py-8 lg:h-full lg:px-16 lg:py-0">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/40">
+                Navod k pouziti
+              </p>
+              <h2 className="mb-10 text-2xl font-semibold tracking-tight text-white lg:text-4xl">
+                Jak pouzivat lineseat
+              </h2>
+
+              <div className="flex flex-col gap-0">
+                {VIDEO_STEPS.map((s, i) => {
+                  const isActive = i === activeStep;
+                  return (
+                    <div
+                      key={s.step}
+                      className="group relative flex gap-6 pb-8 last:pb-0"
+                    >
+                      <div className="flex flex-col items-center">
+                        <div
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-sm font-bold transition-all duration-500"
+                          style={{
+                            borderColor: isActive
+                              ? "rgba(255,255,255,0.9)"
+                              : "rgba(255,255,255,0.15)",
+                            backgroundColor: isActive
+                              ? "white"
+                              : "transparent",
+                            color: isActive ? "black" : "rgba(255,255,255,0.3)",
+                          }}
+                        >
+                          {s.step}
+                        </div>
+                        {i < VIDEO_STEPS.length - 1 && (
+                          <div
+                            className="mt-2 w-px flex-1 transition-all duration-700"
+                            style={{
+                              backgroundColor:
+                                i < activeStep
+                                  ? "rgba(255,255,255,0.6)"
+                                  : "rgba(255,255,255,0.1)",
+                            }}
+                          />
+                        )}
+                      </div>
+
+                      <div
+                        className="flex flex-col gap-1.5 pt-1.5 transition-all duration-500"
+                        style={{ opacity: isActive ? 1 : 0.25 }}
+                      >
+                        <h3
+                          className="text-base font-semibold text-white lg:text-lg"
+                          style={{
+                            transform: isActive
+                              ? "translateX(0)"
+                              : "translateX(-6px)",
+                            transition: "transform 0.5s ease",
+                          }}
+                        >
+                          {s.title}
+                        </h3>
+                        <p
+                          className="max-w-sm text-sm leading-relaxed text-white/60 lg:text-base"
+                          style={{
+                            maxHeight: isActive ? "8rem" : "0",
+                            overflow: "hidden",
+                            transition: "max-height 0.5s ease",
+                          }}
+                        >
+                          {s.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-10 flex gap-2">
+                {VIDEO_STEPS.map((_, i) => (
+                  <div
+                    key={`dot-${i}`}
+                    className="h-0.5 flex-1 rounded-full transition-all duration-500"
+                    style={{
+                      backgroundColor:
+                        i <= activeStep
+                          ? "rgba(255,255,255,0.9)"
+                          : "rgba(255,255,255,0.15)",
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 

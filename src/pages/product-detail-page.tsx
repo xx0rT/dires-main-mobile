@@ -61,6 +61,7 @@ import {
   LineseatInstructions,
   LineseatScrollShowcase,
   LineseatTabs,
+  LineseatVideoTutorial,
 } from "@/components/shop/lineseat-sections";
 
 interface DetailImage {
@@ -381,6 +382,7 @@ function ProductDetailSections({ slug }: { slug: string }) {
           <LineseatScrollShowcase />
           <LineseatBentoGrid />
           <LineseatTabs />
+          <LineseatVideoTutorial />
           <LineseatInstructions />
         </>
       );
