@@ -26,28 +26,59 @@ export default function HomePage() {
           src="/pattern.png"
           alt=""
           aria-hidden="true"
-          className="absolute -left-20 top-1/2 -translate-y-1/2 h-[120%] w-auto opacity-[0.06] pointer-events-none select-none object-contain dark:opacity-[0.04] dark:invert"
+          className="absolute -left-20 top-1/2 -translate-y-1/2 h-[130%] w-auto opacity-[0.06] pointer-events-none select-none object-contain dark:opacity-[0.04] dark:invert"
         />
         <FeaturesSection />
       </div>
 
-      <div className="bg-background transition-colors duration-700">
+      <div className="relative overflow-hidden bg-background transition-colors duration-700">
+        <img
+          src="/rameno.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute -right-16 top-0 h-full w-auto opacity-[0.1] pointer-events-none select-none object-contain dark:opacity-[0.05]"
+        />
         <TestimonialSection />
       </div>
 
-      <div className="bg-background transition-colors duration-700">
+      <div className="relative overflow-hidden bg-muted/50 transition-colors duration-700">
+        <img
+          src="/pattern_(kopie).png"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none select-none object-cover dark:opacity-[0.03]"
+          style={{ maskImage: "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)" }}
+        />
         <ServicesSection />
       </div>
 
-      <div className="bg-muted/70 transition-colors duration-700">
+      <div className="relative overflow-hidden bg-muted/70 transition-colors duration-700">
+        <img
+          src="/lýtko.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute -left-12 top-1/2 -translate-y-1/2 h-[110%] w-auto opacity-[0.09] pointer-events-none select-none object-contain dark:opacity-[0.05]"
+        />
         <Feature283 />
       </div>
 
-      <div className="bg-background transition-colors duration-700">
+      <div className="relative overflow-hidden bg-background transition-colors duration-700">
+        <img
+          src="/pattern.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute -right-20 top-1/2 -translate-y-1/2 h-[120%] w-auto opacity-[0.05] pointer-events-none select-none object-contain dark:opacity-[0.03] dark:invert"
+        />
         <TeamSection />
       </div>
 
-      <div className="bg-background transition-colors duration-700">
+      <div className="relative overflow-hidden bg-muted/40 transition-colors duration-700">
+        <img
+          src="/rameno.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute -right-10 bottom-0 h-[90%] w-auto opacity-[0.09] pointer-events-none select-none object-contain dark:opacity-[0.05]"
+        />
         <BlogShowcaseSection />
       </div>
 
@@ -61,11 +92,30 @@ export default function HomePage() {
         <PricingSection />
       </div>
 
-      <div className="bg-background transition-colors duration-700">
+      <div className="relative overflow-hidden bg-background transition-colors duration-700">
+        <img
+          src="/pattern_(kopie).png"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none select-none object-cover dark:opacity-[0.03]"
+          style={{ maskImage: "linear-gradient(to right, black 0%, transparent 50%)", WebkitMaskImage: "linear-gradient(to right, black 0%, transparent 50%)" }}
+        />
         <FAQSection />
       </div>
 
-      <div className="bg-muted/70 transition-colors duration-700">
+      <div className="relative overflow-hidden bg-muted/70 transition-colors duration-700">
+        <img
+          src="/lýtko.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-[110%] w-auto opacity-[0.08] pointer-events-none select-none object-contain dark:opacity-[0.04]"
+        />
+        <img
+          src="/rameno.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute right-0 top-1/2 -translate-y-1/2 h-[110%] w-auto opacity-[0.08] pointer-events-none select-none object-contain dark:opacity-[0.04]"
+        />
         <ContactSection />
       </div>
     </>
