@@ -22,7 +22,7 @@ export default function HomePage() {
           src="/pattern.png"
           alt=""
           aria-hidden="true"
-          className="absolute -bottom-10 -right-16 h-72 w-auto opacity-[0.05] pointer-events-none select-none object-contain dark:opacity-[0.03] dark:invert"
+          className="absolute -bottom-10 -right-16 h-96 w-auto opacity-[0.12] pointer-events-none select-none object-contain dark:opacity-[0.07] dark:invert"
         />
         <BenefitsSection />
       </div>
@@ -56,7 +56,7 @@ export default function HomePage() {
           src="/lýtko.png"
           alt=""
           aria-hidden="true"
-          className="absolute -right-8 top-0 h-full w-auto opacity-[0.06] pointer-events-none select-none object-contain dark:opacity-[0.03]"
+          className="absolute -right-8 top-0 h-full w-auto opacity-[0.14] pointer-events-none select-none object-contain dark:opacity-[0.07]"
         />
         <PricingSection />
       </div>
