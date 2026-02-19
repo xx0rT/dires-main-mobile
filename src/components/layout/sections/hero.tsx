@@ -25,7 +25,7 @@ export const HeroSection = () => {
     }
 
     return (
-        <section className="relative min-h-screen w-full pb-0 flex flex-col -mt-20 pt-20">
+        <section className="relative min-h-screen w-full pb-0 flex flex-col -mt-20 pt-20 overflow-hidden">
             <PatternPlaceholder />
             <div
                 className="absolute inset-0 z-0"
@@ -33,6 +33,12 @@ export const HeroSection = () => {
                     background:
                         "radial-gradient(125% 125% at 50% 90%, var(--background) 40%, #7dd3fc 100%)",
                 }}
+            />
+            <img
+                src="/rameno.png"
+                alt=""
+                aria-hidden="true"
+                className="absolute right-0 top-8 h-[90%] w-auto opacity-[0.07] pointer-events-none select-none object-contain z-0 dark:opacity-[0.04]"
             />
             <div className="container relative z-10 mx-auto w-full px-4 flex-1 flex flex-col pt-4">
                 <div className="grid gap-8 py-16 md:grid-cols-2 md:items-center md:gap-10 lg:grid-cols-[0.8fr,1.2fr] lg:gap-16 xl:gap-20 xl:py-20 flex-1">

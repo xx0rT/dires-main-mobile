@@ -209,9 +209,9 @@ const FooterSection = () => {
             <div>
               <Link to="/" className="inline-block">
                 <img
-                  src="/logo.svg"
+                  src="/Dires.png"
                   alt={site.name}
-                  className="h-7 dark:invert"
+                  className="h-10 dark:invert"
                 />
               </Link>
               <p className="mt-2 max-w-xs text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">

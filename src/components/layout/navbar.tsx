@@ -363,8 +363,8 @@ const Navbar10 = ({ className }: Navbar10Props) => {
                 src={site.logo}
                 alt={site.name}
                 className={cn(
-                  "inline-block transition-all duration-500",
-                  isScrolled ? "size-5" : "size-7",
+                  "inline-block transition-all duration-500 dark:invert",
+                  isScrolled ? "size-6" : "size-8",
                 )}
               />
               <span

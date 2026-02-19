@@ -17,7 +17,13 @@ export default function HomePage() {
         <HeroSection />
       </div>
 
-      <div className="bg-muted/70 transition-colors duration-700">
+      <div className="relative overflow-hidden bg-muted/70 transition-colors duration-700">
+        <img
+          src="/pattern.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute -bottom-10 -right-16 h-72 w-auto opacity-[0.05] pointer-events-none select-none object-contain dark:opacity-[0.03] dark:invert"
+        />
         <BenefitsSection />
       </div>
 
@@ -45,7 +51,13 @@ export default function HomePage() {
         <BlogShowcaseSection />
       </div>
 
-      <div className="bg-muted/70 transition-colors duration-700">
+      <div className="relative overflow-hidden bg-muted/70 transition-colors duration-700">
+        <img
+          src="/lýtko.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute -right-8 top-0 h-full w-auto opacity-[0.06] pointer-events-none select-none object-contain dark:opacity-[0.03]"
+        />
         <PricingSection />
       </div>
 

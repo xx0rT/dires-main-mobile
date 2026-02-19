@@ -5,7 +5,7 @@ export const site = {
   description: "Profesionální fyzioterapeutické kurzy od certifikovaných českých odborníků",
   url: site_url,
   ogImage: `${site_url}/og.jpg`,
-  logo: "/logo.svg",
+  logo: "/Dires.png",
   mailSupport: "info@dires.cz",
   mailFrom: import.meta.env.VITE_MAIL_FROM || "noreply@dires.cz",
   links: {

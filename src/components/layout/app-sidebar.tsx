@@ -50,9 +50,9 @@ function SidebarLogo() {
         <img
           src={site.logo}
           alt={site.name}
-          width={30}
-          height={30}
-          className="transition-transform duration-300 ease-out group-data-[collapsible=icon]:scale-110"
+          width={36}
+          height={36}
+          className="transition-transform duration-300 ease-out dark:invert group-data-[collapsible=icon]:scale-110"
         />
         <span className="group-data-[collapsible=icon]:-ml-2 truncate font-bold text-lg transition-[margin,opacity,transform,width] duration-300 ease-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:scale-95 group-data-[collapsible=icon]:opacity-0">
           {site.name}
