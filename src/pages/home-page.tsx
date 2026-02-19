@@ -17,17 +17,17 @@ export default function HomePage() {
         <HeroSection />
       </div>
 
-      <div className="relative overflow-hidden bg-muted/70 transition-colors duration-700">
+      <div className="bg-muted/70 transition-colors duration-700">
+        <BenefitsSection />
+      </div>
+
+      <div className="relative overflow-hidden bg-background transition-colors duration-700">
         <img
           src="/pattern.png"
           alt=""
           aria-hidden="true"
-          className="absolute -bottom-10 -right-16 h-96 w-auto opacity-[0.12] pointer-events-none select-none object-contain dark:opacity-[0.07] dark:invert"
+          className="absolute -left-20 top-1/2 -translate-y-1/2 h-[120%] w-auto opacity-[0.06] pointer-events-none select-none object-contain dark:opacity-[0.04] dark:invert"
         />
-        <BenefitsSection />
-      </div>
-
-      <div className="bg-background transition-colors duration-700">
         <FeaturesSection />
       </div>
 

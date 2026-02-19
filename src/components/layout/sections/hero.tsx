@@ -38,7 +38,13 @@ export const HeroSection = () => {
                 src="/rameno.png"
                 alt=""
                 aria-hidden="true"
-                className="absolute right-0 top-8 h-[90%] w-auto opacity-[0.15] pointer-events-none select-none object-contain z-0 dark:opacity-[0.08]"
+                className="absolute left-0 top-8 h-[88%] w-auto opacity-[0.18] pointer-events-none select-none object-contain z-0 dark:opacity-[0.09]"
+            />
+            <img
+                src="/pattern_(kopie).png"
+                alt=""
+                aria-hidden="true"
+                className="absolute right-0 top-0 h-full w-[55%] opacity-[0.08] pointer-events-none select-none object-cover object-left z-0 dark:opacity-[0.05]"
             />
             <div className="container relative z-10 mx-auto w-full px-4 flex-1 flex flex-col pt-4">
                 <div className="grid gap-8 py-16 md:grid-cols-2 md:items-center md:gap-10 lg:grid-cols-[0.8fr,1.2fr] lg:gap-16 xl:gap-20 xl:py-20 flex-1">
