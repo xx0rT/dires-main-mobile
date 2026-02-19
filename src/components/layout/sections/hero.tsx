@@ -35,12 +35,6 @@ export const HeroSection = () => {
                 }}
             />
             <img
-                src="/rameno.png"
-                alt=""
-                aria-hidden="true"
-                className="absolute left-0 top-8 h-[88%] w-auto opacity-[0.25] pointer-events-none select-none object-contain z-0 dark:opacity-[0.15] mix-blend-multiply"
-            />
-            <img
                 src="/pattern_(kopie).png"
                 alt=""
                 aria-hidden="true"

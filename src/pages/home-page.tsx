@@ -33,13 +33,7 @@ export default function HomePage() {
         <FeaturesSection />
       </div>
 
-      <div className="relative overflow-hidden bg-background transition-colors duration-700">
-        <img
-          src="/rameno.png"
-          alt=""
-          aria-hidden="true"
-          className={`${decorClass} -right-16 top-0 h-full w-auto opacity-[0.18] dark:opacity-[0.1]`}
-        />
+      <div className="bg-background transition-colors duration-700">
         <TestimonialSection />
       </div>
 
@@ -54,13 +48,7 @@ export default function HomePage() {
         <ServicesSection />
       </div>
 
-      <div className="relative overflow-hidden bg-muted/70 transition-colors duration-700">
-        <img
-          src="/lýtko.png"
-          alt=""
-          aria-hidden="true"
-          className={`${decorClass} -left-12 top-1/2 -translate-y-1/2 h-[110%] w-auto opacity-[0.18] dark:opacity-[0.1]`}
-        />
+      <div className="bg-muted/70 transition-colors duration-700">
         <Feature283 />
       </div>
 
@@ -74,13 +62,7 @@ export default function HomePage() {
         <TeamSection />
       </div>
 
-      <div className="relative overflow-hidden bg-muted/40 transition-colors duration-700">
-        <img
-          src="/rameno.png"
-          alt=""
-          aria-hidden="true"
-          className={`${decorClass} -right-10 bottom-0 h-[90%] w-auto opacity-[0.18] dark:opacity-[0.09]`}
-        />
+      <div className="bg-muted/40 transition-colors duration-700">
         <BlogShowcaseSection />
       </div>
 
@@ -105,19 +87,7 @@ export default function HomePage() {
         <FAQSection />
       </div>
 
-      <div className="relative overflow-hidden bg-muted/70 transition-colors duration-700">
-        <img
-          src="/lýtko.png"
-          alt=""
-          aria-hidden="true"
-          className={`${decorClass} left-0 top-1/2 -translate-y-1/2 h-[110%] w-auto opacity-[0.16] dark:opacity-[0.08]`}
-        />
-        <img
-          src="/rameno.png"
-          alt=""
-          aria-hidden="true"
-          className={`${decorClass} right-0 top-1/2 -translate-y-1/2 h-[110%] w-auto opacity-[0.16] dark:opacity-[0.08]`}
-        />
+      <div className="bg-muted/70 transition-colors duration-700">
         <ContactSection />
       </div>
     </>
