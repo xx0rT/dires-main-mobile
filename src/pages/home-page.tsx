@@ -42,8 +42,7 @@ export default function HomePage() {
           src="/pattern_(kopie).png"
           alt=""
           aria-hidden="true"
-          className={`${decorClass} inset-0 w-full h-full object-cover opacity-[0.1] dark:opacity-[0.06]`}
-          style={{ maskImage: "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)" }}
+          className={`${decorClass} -right-20 top-1/2 -translate-y-1/2 h-[120%] w-auto opacity-[0.12] dark:opacity-[0.07]`}
         />
         <ServicesSection />
       </div>
@@ -57,7 +56,7 @@ export default function HomePage() {
           src="/pattern.png"
           alt=""
           aria-hidden="true"
-          className={`${decorClass} -right-20 top-1/2 -translate-y-1/2 h-[120%] w-auto opacity-[0.1] dark:opacity-[0.06]`}
+          className={`${decorClass} -left-20 top-1/2 -translate-y-1/2 h-[120%] w-auto opacity-[0.1] dark:opacity-[0.06]`}
         />
         <TeamSection />
       </div>

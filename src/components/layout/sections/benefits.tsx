@@ -9,16 +9,10 @@ export const BenefitsSection = () => {
   return (
     <section id="benefits" className="relative py-32">
       <img
-        src="/lýtko.png"
-        alt=""
-        aria-hidden="true"
-        className="absolute left-0 top-0 h-full w-auto max-w-xs opacity-[0.2] pointer-events-none select-none object-contain dark:opacity-[0.12] mix-blend-multiply"
-      />
-      <img
         src="/rameno.png"
         alt=""
         aria-hidden="true"
-        className="absolute right-0 bottom-0 h-full w-auto max-w-xs opacity-[0.2] pointer-events-none select-none object-contain dark:opacity-[0.12] mix-blend-multiply"
+        className="absolute right-0 top-1/2 -translate-y-1/2 h-[110%] w-auto opacity-[0.2] pointer-events-none select-none object-contain dark:opacity-[0.12] mix-blend-multiply"
       />
       <div className="container flex flex-col items-center justify-center mx-auto">
         <div className="flex max-w-4xl mx-auto w-full justify-center">
