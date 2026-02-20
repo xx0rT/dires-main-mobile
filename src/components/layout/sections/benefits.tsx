@@ -1,108 +1,90 @@
-"use client";
+import { useRef } from "react"
+import { motion, useInView } from "motion/react"
 
-import { motion, MotionValue, useScroll, useTransform } from "motion/react";
-import { ComponentPropsWithoutRef, FC, ReactNode, useRef } from "react";
-
-import { cn } from "@/lib/utils";
+const stats = [
+  { value: "500+", label: "Absolventů kurzu" },
+  { value: "12+", label: "Let zkušeností" },
+  { value: "98%", label: "Spokojenost studentů" },
+  { value: "30+", label: "Odborných modulů" },
+]
 
 export const BenefitsSection = () => {
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { once: true, margin: "-80px" })
+
   return (
-    <section id="benefits" className="relative py-32">
+    <section id="about" className="relative py-24 lg:py-32 overflow-hidden">
       <img
         src="/rameno.png"
         alt=""
         aria-hidden="true"
         className="absolute right-0 top-1/2 -translate-y-1/2 h-[110%] w-auto opacity-[0.2] pointer-events-none select-none object-contain dark:opacity-[0.12] mix-blend-multiply"
       />
-      <div className="container flex flex-col items-center justify-center mx-auto">
-        <div className="flex max-w-4xl mx-auto w-full justify-center">
-          <TextReveal
-            title=" { Dires Fyzio }"
-            className="items-center justify-center text-center"
-          >
-            Získáš systematické know-how, které používají profesionálové, naučíš se správně vyšetřovat pohybový aparát, rozpoznat skutečné příčiny potíží a zvolit účinnou terapii na míru každému klientovi. Kurz je navržen tak, aby byl srozumitelný i pro úplné začátečníky, ale zároveň přínosný i pro trenéry, maséry a zdravotnické pracovníky, kteří chtějí rozšířit své dovednosti.
-          </TextReveal>
+
+      <div className="container mx-auto px-4" ref={ref}>
+        <div className="grid md:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div>
+            <motion.p
+              className="text-sky-600 dark:text-sky-400 font-semibold uppercase tracking-[0.16em] text-sm mb-4"
+              initial={{ opacity: 0, y: 16 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5 }}
+            >
+              O nás
+            </motion.p>
+
+            <motion.h2
+              className="text-4xl md:text-5xl font-bold leading-[1.1] mb-6"
+              initial={{ opacity: 0, y: 24 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.08 }}
+            >
+              Dires Fyzio —{" "}
+              <span className="bg-gradient-to-r from-sky-600 to-sky-400 bg-clip-text text-transparent">
+                vzdělávání na nejvyšší úrovni
+              </span>
+            </motion.h2>
+
+            <motion.p
+              className="text-muted-foreground text-lg leading-relaxed mb-5"
+              initial={{ opacity: 0, y: 16 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.16 }}
+            >
+              Získáš systematické know-how, které používají profesionálové. Naučíš se správně vyšetřovat pohybový aparát, rozpoznat skutečné příčiny potíží a zvolit účinnou terapii na míru každému klientovi.
+            </motion.p>
+
+            <motion.p
+              className="text-muted-foreground text-lg leading-relaxed"
+              initial={{ opacity: 0, y: 16 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.24 }}
+            >
+              Kurz je navržen tak, aby byl srozumitelný i pro úplné začátečníky, ale zároveň přínosný i pro trenéry, maséry a zdravotnické pracovníky, kteří chtějí rozšířit své dovednosti.
+            </motion.p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-5">
+            {stats.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                className="rounded-2xl border border-sky-100 dark:border-sky-900/40 bg-card p-8 text-center shadow-sm hover:shadow-md hover:border-sky-300 dark:hover:border-sky-700 transition-all duration-300"
+                initial={{ opacity: 0, y: 28, scale: 0.94 }}
+                animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+                transition={{ duration: 0.5, delay: 0.18 + i * 0.1 }}
+                whileHover={{ y: -4 }}
+              >
+                <p className="text-4xl font-bold bg-gradient-to-br from-sky-600 to-sky-400 bg-clip-text text-transparent mb-2">
+                  {stat.value}
+                </p>
+                <p className="text-muted-foreground text-sm font-medium leading-snug">
+                  {stat.label}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
-  );
-};
-
-// Below is the modified component from Magic UI
-// Original source: https://magicui.design/docs/components/text-reveal
-// Modified to follow our coding standards and design system
-// We respect copyright and attribution to the original creators
-
-interface TextRevealProps extends ComponentPropsWithoutRef<"div"> {
-  children: string;
-  title?: string;
-  maxWidth?: string;
+  )
 }
-
-const TextReveal: FC<TextRevealProps> = ({
-  children,
-  title,
-  className,
-  maxWidth,
-}) => {
-  const targetRef = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start start", "end start"],
-  });
-
-  const words = children.split(" ");
-
-  return (
-    <div
-      ref={targetRef}
-      className={cn("relative z-0 h-[300vh] mx-auto", className)}
-      style={{ maxWidth: maxWidth || "56rem" }}
-    >
-      <div className="sticky top-0 mx-auto flex h-screen items-center justify-center bg-transparent px-[1rem] py-[5rem]">
-        <div className="flex flex-col justify-center items-center w-full">
-          <span className="text-center text-lg font-medium tracking-tight text-foreground">
-            {title}
-          </span>
-          <span
-            className={cn(
-              "flex flex-wrap justify-center p-5 text-2xl font-semibold text-black/20 md:p-8 md:text-3xl lg:p-10 lg:text-4xl xl:text-5xl dark:text-white/20",
-              className,
-            )}
-          >
-            {words.map((word, i) => {
-              const start = i / words.length;
-              const end = start + 1 / words.length;
-              return (
-                <Word key={i} progress={scrollYProgress} range={[start, end]}>
-                  {word}
-                </Word>
-              );
-            })}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-interface WordProps {
-  children: ReactNode;
-  progress: MotionValue<number>;
-  range: [number, number];
-}
-
-const Word: FC<WordProps> = ({ children, progress, range }) => {
-  const opacity = useTransform(progress, range, [0, 1]);
-  return (
-    <span className="xl:lg-3 relative mx-1 lg:mx-1.5">
-      <span className="absolute opacity-30">{children}</span>
-      <motion.span
-        style={{ opacity: opacity }}
-        className="text-black dark:text-white"
-      >
-        {children}
-      </motion.span>
-    </span>
-  );
-};
