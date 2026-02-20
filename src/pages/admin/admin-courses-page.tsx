@@ -2,8 +2,11 @@ import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   BookOpen,
+  ChevronDown,
+  ChevronRight,
   Eye,
   EyeOff,
+  Package,
   Pencil,
   Plus,
   Search,
@@ -31,6 +34,13 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 
+interface CoursePackage {
+  id: string
+  title: string
+  description: string
+  order_index: number
+}
+
 interface Course {
   id: string
   title: string
@@ -41,6 +51,8 @@ interface Course {
   published: boolean
   students_count: number
   lessons_count: number
+  package_id: string | null
+  order_index: number
 }
 
 interface Profile {
@@ -55,20 +67,28 @@ interface Enrollment {
   course_id: string
   enrolled_at: string
   completed: boolean
-  profiles: { email: string; full_name: string | null }[] | { email: string; full_name: string | null } | null
 }
 
-function getProfile(profiles: Enrollment['profiles']): { email: string; full_name: string | null } | null {
-  if (!profiles) return null
-  if (Array.isArray(profiles)) return profiles[0] || null
-  return profiles
+const levelLabels: Record<string, string> = {
+  beginner: 'Zacatecnik',
+  intermediate: 'Pokrocily',
+  advanced: 'Expert',
 }
+
+const formatCZK = (amount: number) =>
+  new Intl.NumberFormat('cs-CZ', {
+    style: 'currency',
+    currency: 'CZK',
+    maximumFractionDigits: 0,
+  }).format(amount)
 
 export default function AdminCoursesPage() {
   const navigate = useNavigate()
+  const [packages, setPackages] = useState<CoursePackage[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [expandedPackages, setExpandedPackages] = useState<Set<string>>(new Set())
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [allProfiles, setAllProfiles] = useState<Profile[]>([])
@@ -76,18 +96,28 @@ export default function AdminCoursesPage() {
   const [selectedUserId, setSelectedUserId] = useState('')
   const [detailLoading, setDetailLoading] = useState(false)
 
-  const fetchCourses = useCallback(async () => {
-    const { data } = await supabase
-      .from('courses')
-      .select('id, title, instructor, category, level, price, published, students_count, lessons_count')
-      .order('created_at', { ascending: false })
-    setCourses(data ?? [])
+  const fetchData = useCallback(async () => {
+    const [{ data: pkgData }, { data: courseData }] = await Promise.all([
+      supabase
+        .from('course_packages')
+        .select('id, title, description, order_index')
+        .order('order_index'),
+      supabase
+        .from('courses')
+        .select('id, title, instructor, category, level, price, published, students_count, lessons_count, package_id, order_index')
+        .order('order_index'),
+    ])
+    setPackages(pkgData ?? [])
+    setCourses(courseData ?? [])
+    if (pkgData) {
+      setExpandedPackages(new Set(pkgData.map(p => p.id)))
+    }
     setLoading(false)
   }, [])
 
   useEffect(() => {
-    fetchCourses()
-  }, [fetchCourses])
+    fetchData()
+  }, [fetchData])
 
   const openCourseDetail = async (course: Course) => {
     setSelectedCourse(course)
@@ -95,7 +125,7 @@ export default function AdminCoursesPage() {
     const [{ data: enrollData }, { data: profilesData }] = await Promise.all([
       supabase
         .from('course_enrollments')
-        .select('id, user_id, course_id, enrolled_at, completed, profiles:user_id(email, full_name)')
+        .select('id, user_id, course_id, enrolled_at, completed')
         .eq('course_id', course.id)
         .order('enrolled_at', { ascending: false }),
       supabase.from('profiles').select('id, email, full_name'),
@@ -104,6 +134,10 @@ export default function AdminCoursesPage() {
     setAllProfiles(profilesData ?? [])
     setDetailLoading(false)
   }
+
+  const profileMap = new Map<string, Profile>()
+  for (const p of allProfiles) profileMap.set(p.id, p)
+  const getProfile = (userId: string): Profile | null => profileMap.get(userId) ?? null
 
   const enrollUser = async () => {
     if (!selectedCourse || !selectedUserId) return
@@ -188,21 +222,27 @@ export default function AdminCoursesPage() {
     setCourses((prev) => prev.filter((c) => c.id !== course.id))
   }
 
-  const filtered = courses.filter((c) =>
+  const togglePackage = (pkgId: string) => {
+    setExpandedPackages(prev => {
+      const next = new Set(prev)
+      if (next.has(pkgId)) next.delete(pkgId)
+      else next.add(pkgId)
+      return next
+    })
+  }
+
+  const filteredCourses = courses.filter((c) =>
     c.title.toLowerCase().includes(search.toLowerCase()) ||
     c.instructor?.toLowerCase().includes(search.toLowerCase()) ||
     c.category?.toLowerCase().includes(search.toLowerCase())
   )
 
-  const levelLabels: Record<string, string> = {
-    beginner: 'Zacatecnik',
-    intermediate: 'Pokrocily',
-    advanced: 'Expert',
-  }
-
   const unenrolledProfiles = allProfiles.filter(
     (p) => !enrollments.some((e) => e.user_id === p.id)
   )
+
+  const totalStudents = courses.reduce((sum, c) => sum + c.students_count, 0)
+  const publishedCount = courses.filter(c => c.published).length
 
   if (loading) {
     return (
@@ -220,13 +260,55 @@ export default function AdminCoursesPage() {
             Sprava kurzu
           </h1>
           <p className="mt-1 text-sm text-neutral-500">
-            {courses.length} kurzu v systemu
+            {packages.length} balicku, {courses.length} kurzu celkem
           </p>
         </div>
         <Button onClick={() => navigate('/admin/courses/new')}>
           <Plus className="mr-2 size-4" />
           Novy kurz
         </Button>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40">
+                <Package className="size-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{packages.length}</p>
+                <p className="text-xs text-neutral-500">Balicku</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/40">
+                <BookOpen className="size-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{publishedCount}/{courses.length}</p>
+                <p className="text-xs text-neutral-500">Publikovanych kurzu</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40">
+                <Users className="size-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{totalStudents}</p>
+                <p className="text-xs text-neutral-500">Studentu celkem</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="relative max-w-sm">
@@ -239,100 +321,178 @@ export default function AdminCoursesPage() {
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((course) => (
-          <Card
-            key={course.id}
-            className="cursor-pointer transition-shadow hover:shadow-md"
-            onClick={() => openCourseDetail(course)}
-          >
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-sm font-medium leading-tight">
-                  {course.title}
-                </CardTitle>
-                <div className="flex shrink-0 items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-7"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      navigate(`/admin/courses/${course.id}`)
-                    }}
-                  >
-                    <Pencil className="size-3.5 text-muted-foreground" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 gap-1 px-2"
-                    onClick={(e) => togglePublished(course, e)}
-                  >
-                    {course.published ? (
-                      <>
-                        <Eye className="size-3 text-green-600" />
-                        <span className="text-[10px] text-green-600">Aktivni</span>
-                      </>
+      <div className="space-y-4">
+        {packages.map((pkg) => {
+          const pkgCourses = filteredCourses.filter(c => c.package_id === pkg.id)
+          if (search && pkgCourses.length === 0) return null
+          const isExpanded = expandedPackages.has(pkg.id)
+          const totalPrice = pkgCourses.reduce((sum, c) => sum + Number(c.price), 0)
+          const totalLessons = pkgCourses.reduce((sum, c) => sum + c.lessons_count, 0)
+
+          return (
+            <Card key={pkg.id}>
+              <CardHeader
+                className="cursor-pointer pb-3"
+                onClick={() => togglePackage(pkg.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {isExpanded ? (
+                      <ChevronDown className="size-5 text-neutral-400" />
                     ) : (
-                      <>
-                        <EyeOff className="size-3 text-neutral-400" />
-                        <span className="text-[10px] text-neutral-400">Skryty</span>
-                      </>
+                      <ChevronRight className="size-5 text-neutral-400" />
                     )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-7 text-red-500 hover:text-red-600"
-                    onClick={(e) => deleteCourse(course, e)}
-                  >
-                    <Trash2 className="size-3.5" />
-                  </Button>
+                    <div>
+                      <CardTitle className="text-base">{pkg.title}</CardTitle>
+                      <p className="mt-0.5 text-xs text-neutral-500">
+                        {pkgCourses.length} kurzu | {totalLessons} lekci | {formatCZK(totalPrice)} celkem
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="text-xs">
+                    {pkgCourses.filter(c => c.published).length}/{pkgCourses.length} aktivnich
+                  </Badge>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {course.instructor && (
-                  <p className="text-xs text-neutral-500">Lektor: {course.instructor}</p>
-                )}
-                <div className="flex flex-wrap items-center gap-2">
-                  {course.level && (
-                    <Badge variant="outline" className="text-[10px]">
-                      {levelLabels[course.level] || course.level}
-                    </Badge>
-                  )}
-                  {course.category && (
-                    <Badge variant="outline" className="text-[10px]">
-                      {course.category}
-                    </Badge>
-                  )}
+              </CardHeader>
+              {isExpanded && (
+                <CardContent className="pt-0">
+                  <div className="space-y-2">
+                    {pkgCourses.map((course) => (
+                      <div
+                        key={course.id}
+                        className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800/50"
+                      >
+                        <div
+                          className="flex-1 cursor-pointer"
+                          onClick={() => openCourseDetail(course)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                              {course.title}
+                            </p>
+                            {course.level && (
+                              <Badge variant="outline" className="text-[10px]">
+                                {levelLabels[course.level] || course.level}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="mt-1 flex items-center gap-3 text-xs text-neutral-500">
+                            {course.instructor && <span>{course.instructor}</span>}
+                            <span>{course.lessons_count} lekci</span>
+                            <span>{course.students_count} studentu</span>
+                            <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                              {formatCZK(Number(course.price))}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-7"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              navigate(`/admin/courses/${course.id}`)
+                            }}
+                          >
+                            <Pencil className="size-3.5 text-muted-foreground" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 gap-1 px-2"
+                            onClick={(e) => togglePublished(course, e)}
+                          >
+                            {course.published ? (
+                              <>
+                                <Eye className="size-3 text-green-600" />
+                                <span className="text-[10px] text-green-600">Aktivni</span>
+                              </>
+                            ) : (
+                              <>
+                                <EyeOff className="size-3 text-neutral-400" />
+                                <span className="text-[10px] text-neutral-400">Skryty</span>
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-7 text-red-500 hover:text-red-600"
+                            onClick={(e) => deleteCourse(course, e)}
+                          >
+                            <Trash2 className="size-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {pkgCourses.length === 0 && (
+                      <p className="py-4 text-center text-sm text-neutral-500">
+                        Zadne kurzy v tomto balicku
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+          )
+        })}
+
+        {(() => {
+          const orphanCourses = filteredCourses.filter(c => !c.package_id)
+          if (orphanCourses.length === 0) return null
+          return (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base text-neutral-500">Kurzy bez balicku</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2">
+                  {orphanCourses.map((course) => (
+                    <div
+                      key={course.id}
+                      className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800/50"
+                    >
+                      <div
+                        className="flex-1 cursor-pointer"
+                        onClick={() => openCourseDetail(course)}
+                      >
+                        <p className="text-sm font-medium">{course.title}</p>
+                        <p className="mt-1 text-xs text-neutral-500">
+                          {formatCZK(Number(course.price))} | {course.lessons_count} lekci
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate(`/admin/courses/${course.id}`)
+                          }}
+                        >
+                          <Pencil className="size-3.5 text-muted-foreground" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7 text-red-500 hover:text-red-600"
+                          onClick={(e) => deleteCourse(course, e)}
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center justify-between pt-1 text-xs text-neutral-500">
-                  <span className="flex items-center gap-1">
-                    <Users className="size-3" />
-                    {course.students_count} studentu
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <BookOpen className="size-3" />
-                    {course.lessons_count} lekci
-                  </span>
-                  <span className="font-medium text-neutral-900 dark:text-neutral-100">
-                    {new Intl.NumberFormat('cs-CZ', {
-                      style: 'currency',
-                      currency: 'CZK',
-                      maximumFractionDigits: 0,
-                    }).format(Number(course.price))}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          )
+        })()}
       </div>
 
-      {filtered.length === 0 && (
+      {filteredCourses.length === 0 && (
         <div className="py-12 text-center text-neutral-500">Zadne kurzy nenalezeny</div>
       )}
 
@@ -368,13 +528,7 @@ export default function AdminCoursesPage() {
                 </div>
                 <div className="rounded-lg border p-3 dark:border-neutral-700">
                   <p className="text-xs text-neutral-500">Cena</p>
-                  <p className="text-lg font-bold">
-                    {new Intl.NumberFormat('cs-CZ', {
-                      style: 'currency',
-                      currency: 'CZK',
-                      maximumFractionDigits: 0,
-                    }).format(Number(selectedCourse.price))}
-                  </p>
+                  <p className="text-lg font-bold">{formatCZK(Number(selectedCourse.price))}</p>
                 </div>
               </div>
 
@@ -398,38 +552,41 @@ export default function AdminCoursesPage() {
                   <p className="text-sm text-neutral-500">Zadni zapsani uzivatele</p>
                 ) : (
                   <div className="space-y-2">
-                    {enrollments.map((e) => (
-                      <div
-                        key={e.id}
-                        className="flex items-center justify-between rounded-lg border p-3 dark:border-neutral-700"
-                      >
-                        <div>
-                          <p className="text-sm font-medium">
-                            {getProfile(e.profiles)?.full_name || getProfile(e.profiles)?.email || 'Neznamy'}
-                          </p>
-                          <p className="text-xs text-neutral-500">
-                            {getProfile(e.profiles)?.email} | Zapsano: {new Date(e.enrolled_at).toLocaleDateString('cs-CZ')}
-                          </p>
+                    {enrollments.map((e) => {
+                      const prof = getProfile(e.user_id)
+                      return (
+                        <div
+                          key={e.id}
+                          className="flex items-center justify-between rounded-lg border p-3 dark:border-neutral-700"
+                        >
+                          <div>
+                            <p className="text-sm font-medium">
+                              {prof?.full_name || prof?.email || 'Neznamy'}
+                            </p>
+                            <p className="text-xs text-neutral-500">
+                              {prof?.email} | Zapsano: {new Date(e.enrolled_at).toLocaleDateString('cs-CZ')}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleCompletion(e)}
+                            >
+                              {e.completed ? 'Zrusit dokonceni' : 'Oznacit dokonceno'}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8 text-red-500 hover:text-red-600"
+                              onClick={() => removeEnrollment(e.id)}
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleCompletion(e)}
-                          >
-                            {e.completed ? 'Zrusit dokonceni' : 'Oznacit dokonceno'}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8 text-red-500 hover:text-red-600"
-                            onClick={() => removeEnrollment(e.id)}
-                          >
-                            <Trash2 className="size-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </div>

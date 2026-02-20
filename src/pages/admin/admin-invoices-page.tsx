@@ -6,9 +6,15 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-interface JoinedProfile {
+interface Profile {
+  id: string
   email: string
   full_name: string | null
+}
+
+interface CourseInfo {
+  id: string
+  title: string
 }
 
 interface CoursePurchase {
@@ -18,8 +24,6 @@ interface CoursePurchase {
   amount_paid: number
   purchased_at: string
   stripe_payment_intent_id: string | null
-  profiles: JoinedProfile[] | JoinedProfile | null
-  courses: { title: string }[] | { title: string } | null
 }
 
 interface Order {
@@ -29,19 +33,6 @@ interface Order {
   total: number
   stripe_payment_intent_id: string | null
   created_at: string
-  profiles: JoinedProfile[] | JoinedProfile | null
-}
-
-function getJoinedProfile(p: JoinedProfile[] | JoinedProfile | null): JoinedProfile | null {
-  if (!p) return null
-  if (Array.isArray(p)) return p[0] || null
-  return p
-}
-
-function getJoinedCourse(c: { title: string }[] | { title: string } | null): string {
-  if (!c) return '-'
-  if (Array.isArray(c)) return c[0]?.title || '-'
-  return c.title
 }
 
 const formatCZK = (amount: number) =>
@@ -54,43 +45,58 @@ const formatCZK = (amount: number) =>
 export default function AdminInvoicesPage() {
   const [purchases, setPurchases] = useState<CoursePurchase[]>([])
   const [orders, setOrders] = useState<Order[]>([])
+  const [profiles, setProfiles] = useState<Profile[]>([])
+  const [coursesList, setCoursesList] = useState<CourseInfo[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('purchases')
 
   useEffect(() => {
     const fetchData = async () => {
-      const [{ data: purchasesData }, { data: ordersData }] = await Promise.all([
+      const [{ data: purchasesData }, { data: ordersData }, { data: profilesData }, { data: coursesData }] = await Promise.all([
         supabase
           .from('course_purchases')
-          .select('id, user_id, course_id, amount_paid, purchased_at, stripe_payment_intent_id, profiles:user_id(email, full_name), courses:course_id(title)')
+          .select('id, user_id, course_id, amount_paid, purchased_at, stripe_payment_intent_id')
           .order('purchased_at', { ascending: false }),
         supabase
           .from('orders')
-          .select('id, user_id, status, total, stripe_payment_intent_id, created_at, profiles:user_id(email, full_name)')
+          .select('id, user_id, status, total, stripe_payment_intent_id, created_at')
           .order('created_at', { ascending: false }),
+        supabase.from('profiles').select('id, email, full_name'),
+        supabase.from('courses').select('id, title'),
       ])
       setPurchases((purchasesData as CoursePurchase[]) ?? [])
       setOrders((ordersData as Order[]) ?? [])
+      setProfiles(profilesData ?? [])
+      setCoursesList(coursesData ?? [])
       setLoading(false)
     }
     fetchData()
   }, [])
 
+  const profileMap = new Map<string, Profile>()
+  for (const p of profiles) profileMap.set(p.id, p)
+
+  const courseMap = new Map<string, string>()
+  for (const c of coursesList) courseMap.set(c.id, c.title)
+
+  const getProfile = (userId: string): Profile | null => profileMap.get(userId) ?? null
+  const getCourseTitle = (courseId: string): string => courseMap.get(courseId) ?? '-'
+
   const filteredPurchases = purchases.filter((p) => {
     const q = search.toLowerCase()
-    const prof = getJoinedProfile(p.profiles)
+    const prof = getProfile(p.user_id)
     return (
       prof?.email?.toLowerCase().includes(q) ||
       prof?.full_name?.toLowerCase().includes(q) ||
-      getJoinedCourse(p.courses).toLowerCase().includes(q) ||
+      getCourseTitle(p.course_id).toLowerCase().includes(q) ||
       p.stripe_payment_intent_id?.toLowerCase().includes(q)
     )
   })
 
   const filteredOrders = orders.filter((o) => {
     const q = search.toLowerCase()
-    const prof = getJoinedProfile(o.profiles)
+    const prof = getProfile(o.user_id)
     return (
       prof?.email?.toLowerCase().includes(q) ||
       prof?.full_name?.toLowerCase().includes(q) ||
@@ -203,13 +209,13 @@ export default function AdminInvoicesPage() {
                         <td className="px-4 py-3">
                           <div>
                             <p className="font-medium text-neutral-900 dark:text-neutral-100">
-                              {getJoinedProfile(p.profiles)?.full_name || getJoinedProfile(p.profiles)?.email?.split('@')[0] || '-'}
+                              {getProfile(p.user_id)?.full_name || getProfile(p.user_id)?.email?.split('@')[0] || '-'}
                             </p>
-                            <p className="text-xs text-neutral-500">{getJoinedProfile(p.profiles)?.email}</p>
+                            <p className="text-xs text-neutral-500">{getProfile(p.user_id)?.email}</p>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-neutral-700 dark:text-neutral-300">
-                          {getJoinedCourse(p.courses)}
+                          {getCourseTitle(p.course_id)}
                         </td>
                         <td className="px-4 py-3 font-medium">{formatCZK(Number(p.amount_paid))}</td>
                         <td className="px-4 py-3 text-neutral-500">
@@ -263,9 +269,9 @@ export default function AdminInvoicesPage() {
                         <td className="px-4 py-3">
                           <div>
                             <p className="font-medium text-neutral-900 dark:text-neutral-100">
-                              {getJoinedProfile(o.profiles)?.full_name || getJoinedProfile(o.profiles)?.email?.split('@')[0] || '-'}
+                              {getProfile(o.user_id)?.full_name || getProfile(o.user_id)?.email?.split('@')[0] || '-'}
                             </p>
-                            <p className="text-xs text-neutral-500">{getJoinedProfile(o.profiles)?.email}</p>
+                            <p className="text-xs text-neutral-500">{getProfile(o.user_id)?.email}</p>
                           </div>
                         </td>
                         <td className="px-4 py-3">{orderStatusBadge(o.status)}</td>

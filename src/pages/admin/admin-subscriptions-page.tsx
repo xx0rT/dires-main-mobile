@@ -41,19 +41,12 @@ interface Subscription {
   current_period_end: string | null
   cancel_at_period_end: boolean
   created_at: string
-  profiles: { email: string; full_name: string | null }[] | { email: string; full_name: string | null } | null
 }
 
 interface Profile {
   id: string
   email: string
   full_name: string | null
-}
-
-function getProfile(p: Subscription['profiles']): { email: string; full_name: string | null } | null {
-  if (!p) return null
-  if (Array.isArray(p)) return p[0] || null
-  return p
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: typeof CheckCircle2 }> = {
@@ -82,11 +75,16 @@ export default function AdminSubscriptionsPage() {
   const [grantPlanType, setGrantPlanType] = useState('monthly')
   const [granting, setGranting] = useState(false)
 
+  const profileMap = new Map<string, Profile>()
+  for (const p of allProfiles) profileMap.set(p.id, p)
+
+  const getProfile = (userId: string): Profile | null => profileMap.get(userId) ?? null
+
   const fetchData = useCallback(async () => {
     const [{ data: subsData }, { data: profilesData }] = await Promise.all([
       supabase
         .from('subscriptions')
-        .select('*, profiles:user_id(email, full_name)')
+        .select('*')
         .order('created_at', { ascending: false }),
       supabase.from('profiles').select('id, email, full_name'),
     ])
@@ -180,7 +178,7 @@ export default function AdminSubscriptionsPage() {
   const filtered = subscriptions
     .filter((s) => {
       const q = search.toLowerCase()
-      const prof = getProfile(s.profiles)
+      const prof = getProfile(s.user_id)
       const matchesSearch =
         prof?.email?.toLowerCase().includes(q) ||
         prof?.full_name?.toLowerCase().includes(q) ||
@@ -307,7 +305,7 @@ export default function AdminSubscriptionsPage() {
               </thead>
               <tbody>
                 {filtered.map((sub) => {
-                  const prof = getProfile(sub.profiles)
+                  const prof = getProfile(sub.user_id)
                   const config = statusConfig[sub.status]
                   return (
                     <tr
