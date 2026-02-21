@@ -76,19 +76,20 @@ export const HeroSection = () => {
   }
 
   return (
-    <section className="relative py-16 pt-32 lg:py-32 lg:pt-40">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+    <section className="relative -mt-20 flex min-h-svh flex-col justify-center overflow-hidden bg-gradient-to-b from-muted/60 via-background to-background pb-12 pt-24">
+      <div className="pointer-events-none absolute inset-0">
         <img
           src="/pattern.png"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full select-none object-cover opacity-[0.07] mix-blend-multiply dark:opacity-[0.04]"
         />
+        <div className="absolute -top-32 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />
       </div>
 
       <div className="container relative z-10">
-        <div className="flex flex-col gap-12">
-          <div className="flex flex-col items-center gap-6 text-center">
+        <div className="flex flex-col gap-10">
+          <div className="flex flex-col items-center gap-5 text-center">
             {tooltipItems.length > 0 && (
               <Badge
                 variant="outline"
