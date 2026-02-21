@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { AnimatedTooltip } from "@/components/magicui/animated-tooltip"
 import { supabase } from "@/lib/supabase"
@@ -29,7 +28,7 @@ const cards: HeroCard[] = [
   {
     title: "Rezervace v DIRES",
     description:
-      "Objednejte se na osobni konzultaci nebo terapii. Nas tym je pripraveny vam pomoci s individualnim pristupem.",
+      "Objednejte se na osobni konzultaci nebo terapii. Nas tym zkusenych fyzioterapeutu je pripraveny vam pomoci s individualnim pristupem zamerenym na vase specificke potreby a cile. Vybirejte z siroke nabidky terminu.",
     image: "/MG_0170-1024x683-1.jpg.webp",
     imageAlt: "Fyzioterapie v DIRES",
     href: "#contact",
@@ -38,7 +37,7 @@ const cards: HeroCard[] = [
   {
     title: "Prozkoumejte kurzy",
     description:
-      "Online vzdelavani v oblasti fyzioterapie. Profesionalni kurzy, certifikace a nastroje pro vase karierni rust.",
+      "Online vzdelavani v oblasti fyzioterapie. Profesionalni kurzy, certifikace a nastroje pro vase karierni rust. Ucte se vlastnim tempem odkudkoliv s pristupem k videum, materialum a interaktivnim testum od prednich odborniku.",
     image: "https://images.pexels.com/photos/5473182/pexels-photo-5473182.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     imageAlt: "Online kurzy fyzioterapie",
     href: "/kurzy",
@@ -76,7 +75,7 @@ export const HeroSection = () => {
   }
 
   return (
-    <section className="relative -mt-20 flex min-h-svh flex-col justify-center overflow-hidden bg-gradient-to-b from-muted/60 via-background to-background pb-12 pt-24">
+    <section className="relative -mt-20 flex min-h-svh flex-col justify-center overflow-hidden bg-background pb-12 pt-24">
       <div className="pointer-events-none absolute inset-0">
         <img
           src="/pattern.png"
@@ -84,30 +83,26 @@ export const HeroSection = () => {
           aria-hidden="true"
           className="absolute inset-0 h-full w-full select-none object-cover opacity-[0.07] mix-blend-multiply dark:opacity-[0.04]"
         />
-        <div className="absolute -top-32 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />
+        <div className="absolute top-1/3 left-1/2 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/10 blur-[150px] dark:bg-blue-500/15" />
       </div>
 
       <div className="container relative z-10">
         <div className="flex flex-col gap-10">
           <div className="flex flex-col items-center gap-5 text-center">
-            {tooltipItems.length > 0 && (
-              <Badge
-                variant="outline"
-                className="rounded-full border-border/50 bg-background/80 px-4 py-2 text-sm"
-              >
-                <span className="relative z-50 flex items-center justify-center [&>div:nth-child(1)]:-rotate-3 [&>div:nth-child(2)]:rotate-2 [&>div:nth-child(3)]:-rotate-1 [&>div]:transition-transform [&>div]:duration-300 [&>div:hover]:rotate-0">
-                  <AnimatedTooltip items={tooltipItems} />
-                </span>
-                <span className="ml-2 font-medium text-foreground/90">
-                  Nas tym
-                </span>
-              </Badge>
-            )}
-
-            <div className="flex max-w-4xl flex-col gap-4">
+            <div className="flex max-w-4xl flex-col items-center gap-4">
               <h1 className="text-4xl font-medium tracking-tight text-balance md:text-5xl lg:text-6xl">
                 Profesionalni vzdelavani v oblasti fyzioterapie
               </h1>
+              {tooltipItems.length > 0 && (
+                <div className="flex items-center gap-3 rounded-full border border-border/50 bg-background/80 px-4 py-2 backdrop-blur-sm">
+                  <span className="relative z-50 flex items-center justify-center [&>div:nth-child(1)]:-rotate-3 [&>div:nth-child(2)]:rotate-2 [&>div:nth-child(3)]:-rotate-1 [&>div]:transition-transform [&>div]:duration-300 [&>div:hover]:rotate-0">
+                    <AnimatedTooltip items={tooltipItems} />
+                  </span>
+                  <span className="text-sm font-medium text-foreground/90">
+                    Nas tym
+                  </span>
+                </div>
+              )}
               <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg">
                 Od myslenky k realizaci — pripravujeme ucelene kurzy,
                 certifikace a nastroje pro fyzioterapeuty vsech urovni.
@@ -129,7 +124,7 @@ export const HeroSection = () => {
           </div>
 
           <div
-            className="hide-scrollbar flex gap-4 overflow-x-auto pb-4 md:overflow-visible md:pb-0"
+            className="hide-scrollbar mx-auto flex w-full max-w-5xl gap-4 overflow-x-auto pb-4 md:overflow-visible md:pb-0"
             role="list"
           >
             {cards.map((card, index) => {
