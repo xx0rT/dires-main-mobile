@@ -44,8 +44,10 @@ export const ContactSection = () => {
 
   return (
     <section id="contact" className={cn("bg-muted/50 py-32")}>
-      <div className="container">
-        <span className="text-xs text-muted-foreground">KONTAKT /</span>
+      <div className="container mx-auto max-w-5xl">
+        <div className="text-center">
+          <span className="text-xs text-muted-foreground">KONTAKT /</span>
+        </div>
         <div className="mt-8 grid grid-cols-1 gap-8 md:gap-10 lg:grid-cols-2 lg:grid-rows-[min-content_1fr]">
           <h2 className="order-1 text-4xl font-medium tracking-tight md:order-none md:text-5xl">
             Spojte se s nami
@@ -227,7 +229,7 @@ export const ContactSection = () => {
             </div>
           </div>
         </div>
-        <div className="mt-16 grid gap-8 md:gap-12 lg:w-1/2 lg:grid-cols-2">
+        <div className="mx-auto mt-16 grid gap-8 md:gap-12 lg:w-1/2 lg:grid-cols-2">
           <div>
             <h3 className="mb-1.5 font-bold">FAQ</h3>
             <p className="text-sm text-muted-foreground">
