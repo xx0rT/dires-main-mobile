@@ -1,255 +1,255 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Building2, Clock, Mail, Phone } from "lucide-react"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { Check } from "lucide-react"
+import { Controller, useForm } from "react-hook-form"
+
+import { cn } from "@/lib/utils"
+import { site } from "@/config/site"
+
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage
-} from "@/components/ui/form"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select"
-import { site } from "@/config/site"
 import { Textarea } from "@/components/ui/textarea"
 
-const formSchema = z.object({
-    firstName: z.string().min(2).max(255),
-    lastName: z.string().min(2).max(255),
-    email: z.string().email(),
-    subject: z.string().min(2).max(255),
-    message: z.string()
-})
+interface FormValues {
+  firstName: string
+  lastName: string
+  email: string
+  subject: string
+  message: string
+  referrer: string
+}
 
 export const ContactSection = () => {
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            firstName: "",
-            lastName: "",
-            email: "",
-            subject: "Manuální Terapie",
-            message: ""
-        }
-    })
+  const form = useForm<FormValues>({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      subject: "",
+      message: "",
+      referrer: "",
+    },
+  })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        const { firstName, lastName, email, subject, message } = values
-        console.log(values)
+  const onSubmit = (data: FormValues) => {
+    const mailToLink = `mailto:${site.mailSupport}?subject=${data.subject}&body=Dobry den, jmenuji se ${data.firstName} ${data.lastName}, muj email je ${data.email}. %0D%0A${data.message}`
+    window.location.href = mailToLink
+  }
 
-        const mailToLink = `mailto:${site.mailSupport}?subject=${subject}&body=Hello I am ${firstName} ${lastName}, my Email is ${email}. %0D%0A${message}`
-
-        window.location.href = mailToLink
-    }
-
-    return (
-        <section id="contact" className="container mx-auto px-4 py-16 sm:py-20">
-            <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                <div className="md:text-right md:pr-8">
-                    <div className="mb-4">
-                        <h2 className="mb-2 text-lg text-sky-600 dark:text-sky-400 tracking-wider">
-                            Kontakt
-                        </h2>
-
-                        <h2 className="font-bold text-3xl md:text-4xl">
-                            Spojte Se S Námi
-                        </h2>
-                    </div>
-                    <p className="mb-8 text-muted-foreground md:ml-auto md:w-5/6">
-                        Připraveni posunout svou fyzioterapeutickou kariéru? Kontaktujte nás pro informace o kurzech,
-                        detaily přihlášení nebo pro domluvení prohlídky zařízení. Jsme tu, abychom vám pomohli uspět.
-                    </p>
-
-                    <div className="flex flex-col gap-4">
-                        <div>
-                            <div className="mb-1 flex gap-2 md:justify-end">
-                                <Building2 />
-                                <div className="font-bold">Najděte nás</div>
-                            </div>
-
-                            <div>
-                                Karlovo náměstí 13, Praha 2, 120 00
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="mb-1 flex gap-2 md:justify-end">
-                                <Phone />
-                                <div className="font-bold">Zavolejte nám</div>
-                            </div>
-
-                            <div>+420 224 915 765</div>
-                        </div>
-
-                        <div>
-                            <div className="mb-1 flex gap-2 md:justify-end">
-                                <Mail />
-                                <div className="font-bold">Napište nám</div>
-                            </div>
-
-                            <div>{site.mailSupport}</div>
-                        </div>
-
-                        <div>
-                            <div className="flex gap-2 md:justify-end">
-                                <Clock />
-                                <div className="font-bold">Navštivte nás</div>
-                            </div>
-
-                            <div>
-                                <div>Pondělí - Pátek</div>
-                                <div>9:00 - 18:00 CET</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <Card className="bg-muted/60 border-sky-200/60 dark:border-sky-800/30">
-                    <CardContent className="p-4">
-                        <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(onSubmit)}
-                                className="grid w-full gap-4"
-                            >
-                                <div className="md:!flex-row flex flex-col gap-8">
-                                    <FormField
-                                        control={form.control}
-                                        name="firstName"
-                                        render={({ field }) => (
-                                            <FormItem className="w-full">
-                                                <FormLabel>
-                                                    Jméno
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        placeholder="Jan"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="lastName"
-                                        render={({ field }) => (
-                                            <FormItem className="w-full">
-                                                <FormLabel>Příjmení</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        placeholder="Novák"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <div className="flex flex-col gap-1.5">
-                                    <FormField
-                                        control={form.control}
-                                        name="email"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Email</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="email"
-                                                        placeholder="me@domain.com"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <div className="flex flex-col gap-1.5">
-                                    <FormField
-                                        control={form.control}
-                                        name="subject"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Předmět</FormLabel>
-                                                <Select
-                                                    onValueChange={
-                                                        field.onChange
-                                                    }
-                                                    defaultValue={field.value}
-                                                >
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Vyberte předmět" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="Manuální Terapie">
-                                                            Manuální Terapie
-                                                        </SelectItem>
-                                                        <SelectItem value="Sportovní Rehabilitace">
-                                                            Sportovní Rehabilitace
-                                                        </SelectItem>
-                                                        <SelectItem value="Neurologická Rehabilitace">
-                                                            Neurologická Rehabilitace
-                                                        </SelectItem>
-                                                        <SelectItem value="Dětská Fyzioterapie">
-                                                            Dětská Fyzioterapie
-                                                        </SelectItem>
-                                                        <SelectItem value="Obecný Dotaz">
-                                                            Obecný Dotaz
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <div className="flex flex-col gap-1.5">
-                                    <FormField
-                                        control={form.control}
-                                        name="message"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Zpráva</FormLabel>
-                                                <FormControl>
-                                                    <Textarea
-                                                        rows={5}
-                                                        placeholder="Vaše zpráva..."
-                                                        className="resize-none"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-
-                                <Button className="mt-4 w-fit">Odeslat zprávu</Button>
-                            </form>
-                        </Form>
-                    </CardContent>
-
-                    <CardFooter />
-                </Card>
-            </section>
-        </section>
-    )
+  return (
+    <section id="contact" className={cn("bg-muted/50 py-32")}>
+      <div className="container">
+        <span className="text-xs text-muted-foreground">KONTAKT /</span>
+        <div className="mt-8 grid grid-cols-1 gap-8 md:gap-10 lg:grid-cols-2 lg:grid-rows-[min-content_1fr]">
+          <h2 className="order-1 text-4xl font-medium tracking-tight md:order-none md:text-5xl">
+            Spojte se s nami
+          </h2>
+          <div className="order-2 md:order-none md:row-span-2">
+            <div className="rounded-lg border border-border bg-background p-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="grid gap-6 sm:grid-cols-2"
+              >
+                <Controller
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>Jmeno</FieldLabel>
+                      <Input {...field} id={field.name} placeholder="Jan" />
+                    </Field>
+                  )}
+                />
+                <Controller
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>Prijmeni</FieldLabel>
+                      <Input {...field} id={field.name} placeholder="Novak" />
+                    </Field>
+                  )}
+                />
+                <Controller
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        placeholder="jan.novak@email.cz"
+                      />
+                    </Field>
+                  )}
+                />
+                <Controller
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>
+                        Predmet
+                      </FieldLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger id={field.name} className="w-full">
+                          <SelectValue placeholder="Vyberte predmet" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Manualni Terapie">Manualni Terapie</SelectItem>
+                          <SelectItem value="Sportovni Rehabilitace">Sportovni Rehabilitace</SelectItem>
+                          <SelectItem value="Neurologicka Rehabilitace">Neurologicka Rehabilitace</SelectItem>
+                          <SelectItem value="Detska Fyzioterapie">Detska Fyzioterapie</SelectItem>
+                          <SelectItem value="Obecny Dotaz">Obecny Dotaz</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  )}
+                />
+                <Controller
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <Field className="sm:col-span-2">
+                      <FieldLabel htmlFor={field.name}>Zprava</FieldLabel>
+                      <Textarea
+                        {...field}
+                        id={field.name}
+                        placeholder="Napiste nam svuj dotaz..."
+                      />
+                    </Field>
+                  )}
+                />
+                <Controller
+                  control={form.control}
+                  name="referrer"
+                  render={({ field }) => (
+                    <Field className="sm:col-span-2">
+                      <FieldLabel htmlFor={field.name}>
+                        Jak jste se o nas dozvedeli?
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        placeholder="Google / Doporuceni"
+                      />
+                    </Field>
+                  )}
+                />
+                <Button type="submit" className="sm:col-span-2">
+                  Odeslat zpravu
+                </Button>
+                <p className="text-xs text-muted-foreground sm:col-span-2">
+                  Odeslanim formulare souhlasíte se zpracovanim vasich osobnich udaju v souladu s nasimi{" "}
+                  <a href="#" className="text-primary hover:underline">
+                    zasadami ochrany soukromi
+                  </a>
+                  .
+                </p>
+              </form>
+            </div>
+          </div>
+          <div className="order-3 my-6 md:order-none">
+            <ul className="space-y-2 font-medium">
+              <li className="flex items-center gap-2">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-background">
+                  <Check className="size-4" />
+                </span>
+                Popiste sve potize a pozadavky
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-background">
+                  <Check className="size-4" />
+                </span>
+                Obdrzite nabidku na miru
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-background">
+                  <Check className="size-4" />
+                </span>
+                Domluvte si osobni konzultaci
+              </li>
+            </ul>
+            <p className="my-6 font-bold">
+              Duvera vice nez 3000 klientu po cele Ceske republice
+            </p>
+            <div className="grid grid-cols-2 place-items-center gap-8 md:grid-cols-4">
+              <img
+                src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-1.svg"
+                alt="partner"
+                className="max-w-24 dark:invert"
+              />
+              <img
+                src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-2.svg"
+                alt="partner"
+                className="max-w-24 dark:invert"
+              />
+              <img
+                src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-3.svg"
+                alt="partner"
+                className="max-w-24 dark:invert"
+              />
+              <img
+                src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-4.svg"
+                alt="partner"
+                className="max-w-24 dark:invert"
+              />
+              <img
+                src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-5.svg"
+                alt="partner"
+                className="max-w-24 dark:invert"
+              />
+              <img
+                src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-6.svg"
+                alt="partner"
+                className="max-w-24 dark:invert"
+              />
+              <img
+                src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-7.svg"
+                alt="partner"
+                className="max-w-24 dark:invert"
+              />
+              <img
+                src="https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/company/fictional-company-logo-8.svg"
+                alt="partner"
+                className="max-w-24 dark:invert"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="mt-16 grid gap-8 md:gap-12 lg:w-1/2 lg:grid-cols-2">
+          <div>
+            <h3 className="mb-1.5 font-bold">FAQ</h3>
+            <p className="text-sm text-muted-foreground">
+              Prohledejte nasi kolekci{" "}
+              <a href="#faq" className="text-primary underline hover:underline">
+                casto kladenych otazek
+              </a>{" "}
+              o nasich sluzbach a kurzech.
+            </p>
+          </div>
+          <div>
+            <h3 className="mb-1.5 font-bold">Kurzy</h3>
+            <p className="text-sm text-muted-foreground">
+              Prozkoumejte nasi nabidku{" "}
+              <a href="/kurzy" className="text-primary underline hover:underline">
+                profesionalnich kurzu
+              </a>{" "}
+              pro fyzioterapeuty vsech urovni.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }
