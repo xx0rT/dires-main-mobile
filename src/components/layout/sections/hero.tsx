@@ -94,7 +94,7 @@ export const HeroSection = () => {
         <div className="absolute top-1/3 left-1/2 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/10 blur-[150px] dark:bg-blue-500/15" />
       </div>
 
-      <div className="container relative z-10">
+      <div className="container relative z-10 mx-auto">
         <div className="flex flex-col gap-10">
           <div className="flex flex-col items-center gap-5 text-center">
             <div className="flex max-w-4xl flex-col items-center gap-4">
