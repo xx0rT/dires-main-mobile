@@ -43,8 +43,8 @@ export const ContactSection = () => {
   }
 
   return (
-    <section id="contact" className={cn("bg-muted/50 py-32")}>
-      <div className="container mx-auto max-w-5xl">
+    <section id="contact" className={cn("py-32")}>
+      <div className="container mx-auto max-w-5xl rounded-2xl border border-border/60 bg-muted/50 p-8 md:p-12 lg:p-16">
         <div className="text-center">
           <span className="text-xs text-muted-foreground">KONTAKT /</span>
         </div>
