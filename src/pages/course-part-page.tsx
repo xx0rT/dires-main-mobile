@@ -34,6 +34,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { PhysioChatbot } from "@/components/chatbot/physio-chatbot";
+import { useGamification } from "@/lib/use-gamification";
+import { XpRewardPopup } from "@/components/gamification/xp-reward-popup";
 
 interface Course {
   id: string;
@@ -71,6 +73,7 @@ export default function CoursePartPage() {
   const { courseId, partNumber } = useParams<{ courseId: string; partNumber: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { onLessonComplete, onCourseComplete, lastXpEvent, clearLastEvent } = useGamification();
 
   const partIndex = parseInt(partNumber || "1", 10) - 1;
 
@@ -515,6 +518,8 @@ export default function CoursePartPage() {
       setCompletedLessons((prev) => new Set([...prev, currentLesson.id]));
       setCompletionDates((prev) => new Map(prev).set(currentLesson.id, now));
 
+      await onLessonComplete(currentLesson.id);
+
       const isLast = partIndex === lessons.length - 1;
 
       toast.success("Lekce dokoncena!", {
@@ -542,6 +547,8 @@ export default function CoursePartPage() {
         .update({ completed: true, completion_date: new Date().toISOString() })
         .eq("user_id", user.id)
         .eq("course_id", courseId!);
+
+      await onCourseComplete(courseId!);
 
       confetti({
         particleCount: 150,
@@ -973,6 +980,17 @@ export default function CoursePartPage() {
       </div>
 
       <PhysioChatbot />
+
+      {lastXpEvent && (
+        <XpRewardPopup
+          amount={lastXpEvent.amount}
+          source={lastXpEvent.source}
+          newBadges={lastXpEvent.newBadges}
+          newRank={lastXpEvent.newRank}
+          visible={!!lastXpEvent}
+          onClose={clearLastEvent}
+        />
+      )}
     </div>
   );
 }

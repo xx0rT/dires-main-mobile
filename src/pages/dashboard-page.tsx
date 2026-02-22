@@ -15,6 +15,10 @@ import { SubscriptionTimerCard } from '@/components/dashboard/subscription-timer
 import { CourseDashboard } from '@/components/dashboard/course-dashboard'
 import { useSelectedCourse } from '@/lib/selected-course-context'
 import { supabase } from '@/lib/supabase'
+import { useGamification } from '@/lib/use-gamification'
+import { RankProgressCard } from '@/components/gamification/rank-progress-card'
+import { BadgesCollection } from '@/components/gamification/badges-collection'
+import { XpRewardPopup } from '@/components/gamification/xp-reward-popup'
 
 interface Course {
   id: string
@@ -38,6 +42,7 @@ export default function DashboardPage() {
   const { user } = useAuth()
   const { subscription, hasActiveSubscription, refetch } = useSubscription()
   const { selectedCourse } = useSelectedCourse()
+  const { userXp, earnedBadges, currentRank, nextRank, rankProgress, lastXpEvent, clearLastEvent } = useGamification()
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -351,6 +356,22 @@ export default function DashboardPage() {
         </motion.div>
       )}
 
+      {currentRank && userXp && (
+        <RankProgressCard
+          currentRank={currentRank}
+          nextRank={nextRank}
+          totalXp={userXp.total_xp}
+          rankProgress={rankProgress}
+          loginStreak={userXp.login_streak}
+          lessonsCompleted={userXp.lessons_completed}
+          coursesCompleted={userXp.courses_completed}
+        />
+      )}
+
+      <BadgesCollection
+        earnedBadgeIds={new Set(earnedBadges.map((b) => b.badge_id))}
+      />
+
       <div className="grid gap-4 md:grid-cols-2">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -359,16 +380,16 @@ export default function DashboardPage() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Rychlé Akce</CardTitle>
+              <CardTitle>Rychle Akce</CardTitle>
               <CardDescription>
-                Nejčastěji používané funkce
+                Nejcasteji pouzivane funkce
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <Button asChild variant="outline" className="w-full justify-start">
                 <Link to="/prehled/moje-kurzy">
                   <RiBookOpenLine className="mr-2 h-4 w-4" />
-                  Prohlížet Kurzy
+                  Prohlizet Kurzy
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full justify-start">
@@ -386,75 +407,18 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Vaše Úspěchy</CardTitle>
-              <CardDescription>
-                Sledujte svůj pokrok
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className={`mt-0.5 rounded-full p-1 ${stats.completedCourses > 0 ? 'bg-green-500/20' : 'bg-muted'}`}>
-                  {stats.completedCourses > 0 ? (
-                    <svg className="h-3 w-3 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <div className="h-3 w-3 rounded-full border-2 border-muted-foreground" />
-                  )}
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Dokončit První Kurz</p>
-                  <p className="text-xs text-muted-foreground">
-                    {stats.completedCourses > 0 ? 'Splněno! Skvělá práce!' : 'Dokončete svůj první kurz'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className={`mt-0.5 rounded-full p-1 ${stats.inProgressCourses > 0 ? 'bg-green-500/20' : 'bg-muted'}`}>
-                  {stats.inProgressCourses > 0 ? (
-                    <svg className="h-3 w-3 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <div className="h-3 w-3 rounded-full border-2 border-muted-foreground" />
-                  )}
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Zapsat se do Kurzu</p>
-                  <p className="text-xs text-muted-foreground">
-                    {stats.inProgressCourses > 0 ? 'Splněno! Pokračujte dál!' : 'Začněte svůj první kurz'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className={`mt-0.5 rounded-full p-1 ${stats.completedModules >= 10 ? 'bg-green-500/20' : 'bg-muted'}`}>
-                  {stats.completedModules >= 10 ? (
-                    <svg className="h-3 w-3 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <div className="h-3 w-3 rounded-full border-2 border-muted-foreground" />
-                  )}
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">Dokončit 10 Lekcí</p>
-                  <p className="text-xs text-muted-foreground">
-                    {stats.completedModules >= 10 ? 'Splněno! Jste na správné cestě!' : `${stats.completedModules}/10 lekcí dokončeno`}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
       </div>
+
+      {lastXpEvent && (
+        <XpRewardPopup
+          amount={lastXpEvent.amount}
+          source={lastXpEvent.source}
+          newBadges={lastXpEvent.newBadges}
+          newRank={lastXpEvent.newRank}
+          visible={!!lastXpEvent}
+          onClose={clearLastEvent}
+        />
+      )}
     </div>
   )
 }
