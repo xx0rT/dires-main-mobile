@@ -9,6 +9,12 @@ export interface Rank {
   icon: string
 }
 
+export interface BadgeReward {
+  type: 'promo_code' | 'subscription_days' | 'discount'
+  value: string
+  label: string
+}
+
 export interface BadgeDefinition {
   id: string
   name: string
@@ -17,6 +23,7 @@ export interface BadgeDefinition {
   xpReward: number
   category: 'lessons' | 'courses' | 'streaks' | 'special'
   condition: (stats: UserStats) => boolean
+  reward?: BadgeReward
 }
 
 export interface UserStats {
@@ -56,6 +63,7 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: XP_REWARDS.first_lesson,
     category: 'lessons',
     condition: (s) => s.lessonsCompleted >= 1,
+    reward: { type: 'promo_code', value: 'PRVNIKROK10', label: '10% sleva na dalsi kurz' },
   },
   {
     id: 'lessons_5',
@@ -65,6 +73,7 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: 50,
     category: 'lessons',
     condition: (s) => s.lessonsCompleted >= 5,
+    reward: { type: 'subscription_days', value: '3', label: '3 dny predplatneho zdarma' },
   },
   {
     id: 'lessons_10',
@@ -74,6 +83,7 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: 100,
     category: 'lessons',
     condition: (s) => s.lessonsCompleted >= 10,
+    reward: { type: 'promo_code', value: 'PRAKTIK15', label: '15% sleva na vsechny produkty' },
   },
   {
     id: 'lessons_25',
@@ -83,6 +93,7 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: 200,
     category: 'lessons',
     condition: (s) => s.lessonsCompleted >= 25,
+    reward: { type: 'subscription_days', value: '7', label: '7 dni predplatneho zdarma' },
   },
   {
     id: 'lessons_50',
@@ -92,6 +103,7 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: 400,
     category: 'lessons',
     condition: (s) => s.lessonsCompleted >= 50,
+    reward: { type: 'discount', value: '25', label: '25% sleva na rocni predplatne' },
   },
   {
     id: 'first_course',
@@ -101,6 +113,7 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: XP_REWARDS.first_course,
     category: 'courses',
     condition: (s) => s.coursesCompleted >= 1,
+    reward: { type: 'promo_code', value: 'ABSOLVENT20', label: '20% sleva na dalsi kurz' },
   },
   {
     id: 'courses_3',
@@ -110,6 +123,7 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: 250,
     category: 'courses',
     condition: (s) => s.coursesCompleted >= 3,
+    reward: { type: 'subscription_days', value: '14', label: '14 dni predplatneho zdarma' },
   },
   {
     id: 'courses_5',
@@ -119,6 +133,7 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: 500,
     category: 'courses',
     condition: (s) => s.coursesCompleted >= 5,
+    reward: { type: 'discount', value: '30', label: '30% sleva na cokoliv v obchode' },
   },
   {
     id: 'streak_3',
@@ -128,6 +143,7 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: XP_REWARDS.streak_3,
     category: 'streaks',
     condition: (s) => s.longestStreak >= 3,
+    reward: { type: 'promo_code', value: 'SERIE5', label: '5% sleva na dalsi nakup' },
   },
   {
     id: 'streak_7',
@@ -137,6 +153,7 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: XP_REWARDS.streak_7,
     category: 'streaks',
     condition: (s) => s.longestStreak >= 7,
+    reward: { type: 'subscription_days', value: '5', label: '5 dni predplatneho zdarma' },
   },
   {
     id: 'streak_30',
@@ -146,24 +163,27 @@ export const BADGES: BadgeDefinition[] = [
     xpReward: XP_REWARDS.streak_30,
     category: 'streaks',
     condition: (s) => s.longestStreak >= 30,
+    reward: { type: 'subscription_days', value: '30', label: '30 dni predplatneho zdarma' },
   },
   {
     id: 'xp_500',
     name: 'Stoupenec',
-    description: 'Nasbírejte 500 XP',
+    description: 'Nasbirejte 500 XP',
     icon: 'trending-up',
     xpReward: 50,
     category: 'special',
     condition: (s) => s.totalXp >= 500,
+    reward: { type: 'promo_code', value: 'XP500SLEVA', label: '10% sleva na e-shop' },
   },
   {
     id: 'xp_2000',
-    name: 'Veterán',
+    name: 'Veteran',
     description: 'Nasbirejte 2000 XP',
     icon: 'crown',
     xpReward: 200,
     category: 'special',
     condition: (s) => s.totalXp >= 2000,
+    reward: { type: 'discount', value: '50', label: '50% sleva na mesicni predplatne' },
   },
 ]
 
@@ -186,4 +206,8 @@ export function getXpProgressInRank(xp: number, rank: Rank): number {
   const xpInRank = xp - rank.minXp
   const xpNeeded = nextRank.minXp - rank.minXp
   return Math.min(Math.round((xpInRank / xpNeeded) * 100), 100)
+}
+
+export function getBadgeById(id: string): BadgeDefinition | undefined {
+  return BADGES.find((b) => b.id === id)
 }

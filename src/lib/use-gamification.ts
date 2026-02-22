@@ -28,6 +28,15 @@ interface EarnedBadge {
   xp_awarded: number
 }
 
+export interface ClaimedReward {
+  badge_id: string
+  reward_type: string
+  reward_value: string
+  reward_label: string
+  claimed: boolean
+  claimed_at: string | null
+}
+
 interface XpEvent {
   amount: number
   source: string
@@ -39,6 +48,7 @@ export function useGamification() {
   const { user } = useAuth()
   const [userXp, setUserXp] = useState<UserXp | null>(null)
   const [earnedBadges, setEarnedBadges] = useState<EarnedBadge[]>([])
+  const [claimedRewards, setClaimedRewards] = useState<ClaimedReward[]>([])
   const [loading, setLoading] = useState(true)
   const [lastXpEvent, setLastXpEvent] = useState<XpEvent | null>(null)
 
@@ -46,7 +56,7 @@ export function useGamification() {
     if (!user) return
 
     try {
-      const [{ data: xpData }, { data: badgesData }] = await Promise.all([
+      const [{ data: xpData }, { data: badgesData }, { data: rewardsData }] = await Promise.all([
         supabase
           .from('user_xp')
           .select('total_xp, current_rank, lessons_completed, courses_completed, login_streak, longest_streak, last_activity_date')
@@ -55,6 +65,10 @@ export function useGamification() {
         supabase
           .from('user_badges')
           .select('badge_id, earned_at, xp_awarded')
+          .eq('user_id', user.id),
+        supabase
+          .from('badge_rewards')
+          .select('badge_id, reward_type, reward_value, reward_label, claimed, claimed_at')
           .eq('user_id', user.id),
       ])
 
@@ -82,6 +96,7 @@ export function useGamification() {
       }
 
       setEarnedBadges(badgesData || [])
+      setClaimedRewards(rewardsData || [])
     } catch (error) {
       console.error('Error loading gamification data:', error)
     } finally {
@@ -188,6 +203,27 @@ export function useGamification() {
               source_id: badge.id,
             })
           }
+          if (badge.reward) {
+            await supabase.from('badge_rewards').insert({
+              user_id: user.id,
+              badge_id: badge.id,
+              reward_type: badge.reward.type,
+              reward_value: badge.reward.value,
+              reward_label: badge.reward.label,
+              claimed: false,
+            })
+            setClaimedRewards((prev) => [
+              ...prev,
+              {
+                badge_id: badge.id,
+                reward_type: badge.reward!.type,
+                reward_value: badge.reward!.value,
+                reward_label: badge.reward!.label,
+                claimed: false,
+                claimed_at: null,
+              },
+            ])
+          }
         }
       }
 
@@ -257,6 +293,28 @@ export function useGamification() {
     [user, userXp, awardXp],
   )
 
+  const claimReward = useCallback(
+    async (badgeId: string) => {
+      if (!user) return false
+      const now = new Date().toISOString()
+      const { error } = await supabase
+        .from('badge_rewards')
+        .update({ claimed: true, claimed_at: now })
+        .eq('user_id', user.id)
+        .eq('badge_id', badgeId)
+
+      if (error) return false
+
+      setClaimedRewards((prev) =>
+        prev.map((r) =>
+          r.badge_id === badgeId ? { ...r, claimed: true, claimed_at: now } : r,
+        ),
+      )
+      return true
+    },
+    [user],
+  )
+
   const clearLastEvent = useCallback(() => setLastXpEvent(null), [])
 
   const currentRank = userXp ? getRankForXp(userXp.total_xp) : null
@@ -266,6 +324,7 @@ export function useGamification() {
   return {
     userXp,
     earnedBadges,
+    claimedRewards,
     loading,
     currentRank,
     nextRank,
@@ -273,6 +332,7 @@ export function useGamification() {
     lastXpEvent,
     onLessonComplete,
     onCourseComplete,
+    claimReward,
     clearLastEvent,
     reload: loadData,
   }

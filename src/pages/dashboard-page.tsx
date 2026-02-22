@@ -42,7 +42,10 @@ export default function DashboardPage() {
   const { user } = useAuth()
   const { subscription, hasActiveSubscription, refetch } = useSubscription()
   const { selectedCourse } = useSelectedCourse()
-  const { userXp, earnedBadges, currentRank, nextRank, rankProgress, lastXpEvent, clearLastEvent } = useGamification()
+  const {
+    userXp, earnedBadges, claimedRewards, currentRank, nextRank,
+    rankProgress, lastXpEvent, clearLastEvent, claimReward,
+  } = useGamification()
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -57,9 +60,9 @@ export default function DashboardPage() {
     setRefreshing(true)
     try {
       await refetch()
-      toast.success('Předplatné aktualizováno')
-    } catch (error) {
-      toast.error('Nepodařilo se aktualizovat předplatné')
+      toast.success('Predplatne aktualizovano')
+    } catch {
+      toast.error('Nepodarilo se aktualizovat predplatne')
     } finally {
       setRefreshing(false)
     }
@@ -139,30 +142,22 @@ export default function DashboardPage() {
 
   const getGreeting = () => {
     const hour = new Date().getHours()
-    if (hour < 12) return 'Dobré ráno'
-    if (hour < 18) return 'Dobré odpoledne'
-    return 'Dobrý večer'
+    if (hour < 12) return 'Dobre rano'
+    if (hour < 18) return 'Dobre odpoledne'
+    return 'Dobry vecer'
   }
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+      transition: { staggerChildren: 0.1 }
     }
   }
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5
-      }
-    }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
   }
 
   if (loading) {
@@ -194,7 +189,7 @@ export default function DashboardPage() {
             {getGreeting()}, {user?.email?.split('@')[0] || 'Studente'}
           </h1>
           <p className="text-muted-foreground mt-2">
-            Vítejte zpět na vaší vzdělávací platformě. Pokračujte ve svém učení.
+            Vitejte zpet na vasi vzdelavaci platforme. Pokracujte ve svem uceni.
           </p>
         </div>
         <div className="w-full lg:w-auto lg:min-w-[320px]">
@@ -207,6 +202,24 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
+      {currentRank && userXp && (
+        <RankProgressCard
+          currentRank={currentRank}
+          nextRank={nextRank}
+          totalXp={userXp.total_xp}
+          rankProgress={rankProgress}
+          loginStreak={userXp.login_streak}
+          lessonsCompleted={userXp.lessons_completed}
+          coursesCompleted={userXp.courses_completed}
+        />
+      )}
+
+      <BadgesCollection
+        earnedBadgeIds={new Set(earnedBadges.map((b) => b.badge_id))}
+        claimedRewards={claimedRewards}
+        onClaimReward={claimReward}
+      />
+
       <motion.div
         className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
         variants={containerVariants}
@@ -214,19 +227,17 @@ export default function DashboardPage() {
         animate="visible"
       >
         {[
-          { title: 'Dokončené Kurzy', value: stats.completedCourses, icon: RiTrophyLine, color: 'text-green-600' },
-          { title: 'Probíhající Kurzy', value: stats.inProgressCourses, icon: RiBookOpenLine, color: 'text-blue-600' },
+          { title: 'Dokoncene Kurzy', value: stats.completedCourses, icon: RiTrophyLine, color: 'text-green-600' },
+          { title: 'Probihajici Kurzy', value: stats.inProgressCourses, icon: RiBookOpenLine, color: 'text-blue-600' },
           { title: 'Hodin Studia', value: stats.totalHoursSpent, icon: RiTimeLine, color: 'text-blue-600' },
-          { title: 'Dokončené Lekce', value: stats.completedModules, icon: RiCheckLine, color: 'text-orange-600' }
+          { title: 'Dokoncene Lekce', value: stats.completedModules, icon: RiCheckLine, color: 'text-orange-600' }
         ].map((stat) => {
           const Icon = stat.icon
           return (
             <motion.div key={stat.title} variants={itemVariants}>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {stat.title}
-                  </CardTitle>
+                  <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
                   <Icon className={`h-4 w-4 ${stat.color}`} />
                 </CardHeader>
                 <CardContent>
@@ -264,14 +275,12 @@ export default function DashboardPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Pokračovat ve Studiu</CardTitle>
-                  <CardDescription>
-                    Vaše aktivní kurzy a pokrok
-                  </CardDescription>
+                  <CardTitle>Pokracovat ve Studiu</CardTitle>
+                  <CardDescription>Vase aktivni kurzy a pokrok</CardDescription>
                 </div>
                 <Button asChild variant="outline" size="sm">
                   <Link to="/prehled/moje-kurzy">
-                    Zobrazit vše
+                    Zobrazit vse
                     <RiArrowRightLine className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -291,7 +300,7 @@ export default function DashboardPage() {
                           {enrollment.completed_at && (
                             <Badge variant="default" className="bg-green-600 text-xs">
                               <RiTrophyLine className="h-3 w-3 mr-1" />
-                              Dokončeno
+                              Dokonceno
                             </Badge>
                           )}
                         </div>
@@ -303,7 +312,7 @@ export default function DashboardPage() {
                         {enrollment.completed_at && (
                           <Badge variant="default" className="bg-green-600">
                             <RiTrophyLine className="h-3 w-3 mr-1" />
-                            Dokončeno
+                            Dokonceno
                           </Badge>
                         )}
                       </div>
@@ -316,9 +325,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <Button size="sm" asChild className="w-full sm:w-auto">
-                      <Link to="/prehled/moje-kurzy">
-                        Pokračovat
-                      </Link>
+                      <Link to="/prehled/moje-kurzy">Pokracovat</Link>
                     </Button>
                   </div>
                 ))}
@@ -334,43 +341,25 @@ export default function DashboardPage() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Začněte Svou Cestu</CardTitle>
+              <CardTitle>Zacnete Svou Cestu</CardTitle>
               <CardDescription>
-                Ještě nemáte žádné kurzy. Prohlédněte si naši nabídku a začněte se učit.
+                Jeste nemate zadne kurzy. Prohlednete si nasi nabidku a zacnete se ucit.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
                 <RiBookOpenLine className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground mb-6">
-                  Zapište se do svého prvního kurzu a začněte svou vzdělávací cestu
+                  Zapiste se do sveho prvniho kurzu a zacnete svou vzdelavaci cestu
                 </p>
                 <Button asChild size="lg">
-                  <Link to="/prehled/moje-kurzy">
-                    Prohlédnout Kurzy
-                  </Link>
+                  <Link to="/prehled/moje-kurzy">Prohlednout Kurzy</Link>
                 </Button>
               </div>
             </CardContent>
           </Card>
         </motion.div>
       )}
-
-      {currentRank && userXp && (
-        <RankProgressCard
-          currentRank={currentRank}
-          nextRank={nextRank}
-          totalXp={userXp.total_xp}
-          rankProgress={rankProgress}
-          loginStreak={userXp.login_streak}
-          lessonsCompleted={userXp.lessons_completed}
-          coursesCompleted={userXp.courses_completed}
-        />
-      )}
-
-      <BadgesCollection
-        earnedBadgeIds={new Set(earnedBadges.map((b) => b.badge_id))}
-      />
 
       <div className="grid gap-4 md:grid-cols-2">
         <motion.div
@@ -381,9 +370,7 @@ export default function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Rychle Akce</CardTitle>
-              <CardDescription>
-                Nejcasteji pouzivane funkce
-              </CardDescription>
+              <CardDescription>Nejcasteji pouzivane funkce</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <Button asChild variant="outline" className="w-full justify-start">
