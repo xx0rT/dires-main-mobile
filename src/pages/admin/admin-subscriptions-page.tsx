@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import {
   CreditCard,
   Search,
@@ -29,6 +30,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import {
+  AnimatedPage,
+  StaggerGrid,
+  StaggerItem,
+  HoverCard,
+} from '@/components/admin/admin-motion'
 
 interface Subscription {
   id: string
@@ -223,7 +230,7 @@ export default function AdminSubscriptionsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <AnimatedPage className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
@@ -239,31 +246,39 @@ export default function AdminSubscriptionsPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-4">
+      <StaggerGrid className="grid gap-4 sm:grid-cols-4">
         {Object.entries(statCounts).map(([key, count]) => {
           const config = statusConfig[key]
           const Icon = config?.icon || CreditCard
           return (
-            <Card
-              key={key}
-              className={`cursor-pointer transition-shadow hover:shadow-md ${statusFilter === key ? 'ring-2 ring-primary' : ''}`}
-              onClick={() => setStatusFilter(statusFilter === key ? 'all' : key)}
-            >
-              <CardContent className="flex items-center gap-3 pt-6">
-                <div className={`flex size-10 items-center justify-center rounded-lg ${config?.color.split(' ').slice(0, 2).join(' ')}`}>
-                  <Icon className={`size-5 ${config?.color.split(' ').slice(2).join(' ')}`} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{count}</p>
-                  <p className="text-xs text-neutral-500">{config?.label || key}</p>
-                </div>
-              </CardContent>
-            </Card>
+            <StaggerItem key={key}>
+              <HoverCard>
+                <Card
+                  className={`cursor-pointer transition-shadow hover:shadow-md ${statusFilter === key ? 'ring-2 ring-primary' : ''}`}
+                  onClick={() => setStatusFilter(statusFilter === key ? 'all' : key)}
+                >
+                  <CardContent className="flex items-center gap-3 pt-6">
+                    <div className={`flex size-10 items-center justify-center rounded-lg ${config?.color.split(' ').slice(0, 2).join(' ')}`}>
+                      <Icon className={`size-5 ${config?.color.split(' ').slice(2).join(' ')}`} />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{count}</p>
+                      <p className="text-xs text-neutral-500">{config?.label || key}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </HoverCard>
+            </StaggerItem>
           )
         })}
-      </div>
+      </StaggerGrid>
 
-      <div className="relative max-w-sm">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="relative max-w-sm"
+      >
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
         <Input
           placeholder="Hledat podle emailu nebo jmena..."
@@ -271,120 +286,126 @@ export default function AdminSubscriptionsPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
         />
-      </div>
+      </motion.div>
 
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-neutral-200 dark:border-neutral-700">
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Uzivatel</th>
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Plan</th>
-                  <th
-                    className="cursor-pointer px-4 py-3 text-left font-medium text-neutral-500"
-                    onClick={() => handleSort('status')}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      Status
-                      {sortField === 'status' && <SortIcon className="size-3" />}
-                    </span>
-                  </th>
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Obdobi</th>
-                  <th
-                    className="cursor-pointer px-4 py-3 text-left font-medium text-neutral-500"
-                    onClick={() => handleSort('created_at')}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      Vytvoreno
-                      {sortField === 'created_at' && <SortIcon className="size-3" />}
-                    </span>
-                  </th>
-                  <th className="px-4 py-3 text-right font-medium text-neutral-500">Akce</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((sub) => {
-                  const prof = getProfile(sub.user_id)
-                  const config = statusConfig[sub.status]
-                  return (
-                    <tr
-                      key={sub.id}
-                      className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-neutral-200 dark:border-neutral-700">
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Uzivatel</th>
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Plan</th>
+                    <th
+                      className="cursor-pointer px-4 py-3 text-left font-medium text-neutral-500"
+                      onClick={() => handleSort('status')}
                     >
-                      <td className="px-4 py-3">
-                        <div>
-                          <p className="font-medium text-neutral-900 dark:text-neutral-100">
-                            {prof?.full_name || prof?.email?.split('@')[0] || '-'}
-                          </p>
-                          <p className="text-xs text-neutral-500">{prof?.email}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge variant="outline">{planLabels[sub.plan_type] || sub.plan_type}</Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge className={config?.color || ''}>{config?.label || sub.status}</Badge>
-                      </td>
-                      <td className="px-4 py-3 text-neutral-500">
-                        {sub.current_period_end
-                          ? `do ${new Date(sub.current_period_end).toLocaleDateString('cs-CZ')}`
-                          : sub.plan_type === 'lifetime'
-                            ? 'Dozivotni'
-                            : '-'}
-                      </td>
-                      <td className="px-4 py-3 text-neutral-500">
-                        {new Date(sub.created_at).toLocaleDateString('cs-CZ')}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          {sub.status !== 'active' && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => updateStatus(sub, 'active')}
-                              className="text-green-600 hover:text-green-700"
-                            >
-                              Aktivovat
-                            </Button>
-                          )}
-                          {sub.status === 'active' && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => updateStatus(sub, 'cancelled')}
-                              className="text-amber-600 hover:text-amber-700"
-                            >
-                              Zrusit
-                            </Button>
-                          )}
-                          {sub.status !== 'expired' && sub.status !== 'active' && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => updateStatus(sub, 'expired')}
-                              className="text-neutral-500 hover:text-neutral-600"
-                            >
-                              Vyprsit
-                            </Button>
-                          )}
-                        </div>
+                      <span className="inline-flex items-center gap-1">
+                        Status
+                        {sortField === 'status' && <SortIcon className="size-3" />}
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Obdobi</th>
+                    <th
+                      className="cursor-pointer px-4 py-3 text-left font-medium text-neutral-500"
+                      onClick={() => handleSort('created_at')}
+                    >
+                      <span className="inline-flex items-center gap-1">
+                        Vytvoreno
+                        {sortField === 'created_at' && <SortIcon className="size-3" />}
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium text-neutral-500">Akce</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((sub) => {
+                    const prof = getProfile(sub.user_id)
+                    const config = statusConfig[sub.status]
+                    return (
+                      <tr
+                        key={sub.id}
+                        className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
+                      >
+                        <td className="px-4 py-3">
+                          <div>
+                            <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                              {prof?.full_name || prof?.email?.split('@')[0] || '-'}
+                            </p>
+                            <p className="text-xs text-neutral-500">{prof?.email}</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant="outline">{planLabels[sub.plan_type] || sub.plan_type}</Badge>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge className={config?.color || ''}>{config?.label || sub.status}</Badge>
+                        </td>
+                        <td className="px-4 py-3 text-neutral-500">
+                          {sub.current_period_end
+                            ? `do ${new Date(sub.current_period_end).toLocaleDateString('cs-CZ')}`
+                            : sub.plan_type === 'lifetime'
+                              ? 'Dozivotni'
+                              : '-'}
+                        </td>
+                        <td className="px-4 py-3 text-neutral-500">
+                          {new Date(sub.created_at).toLocaleDateString('cs-CZ')}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            {sub.status !== 'active' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => updateStatus(sub, 'active')}
+                                className="text-green-600 hover:text-green-700"
+                              >
+                                Aktivovat
+                              </Button>
+                            )}
+                            {sub.status === 'active' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => updateStatus(sub, 'cancelled')}
+                                className="text-amber-600 hover:text-amber-700"
+                              >
+                                Zrusit
+                              </Button>
+                            )}
+                            {sub.status !== 'expired' && sub.status !== 'active' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => updateStatus(sub, 'expired')}
+                                className="text-neutral-500 hover:text-neutral-600"
+                              >
+                                Vyprsit
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  {filtered.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-8 text-center text-neutral-500">
+                        Zadna predplatna nenalezena
                       </td>
                     </tr>
-                  )
-                })}
-                {filtered.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-neutral-500">
-                      Zadna predplatna nenalezena
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       <Dialog open={grantDialogOpen} onOpenChange={setGrantDialogOpen}>
         <DialogContent className="sm:max-w-md">
@@ -436,6 +457,6 @@ export default function AdminSubscriptionsPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </AnimatedPage>
   )
 }

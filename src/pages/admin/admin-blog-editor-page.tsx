@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save, Eye } from "lucide-react";
+import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 import { blocksToHtml } from "@/lib/blocks-to-html";
+import { AnimatedPage } from "@/components/admin/admin-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -197,7 +199,7 @@ const AdminBlogEditorPage = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <AnimatedPage className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/admin/blogs")}>
@@ -313,71 +315,77 @@ const AdminBlogEditorPage = () => {
         </div>
 
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Nastavení</CardTitle>
-              <CardDescription>Konfigurace článku</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="status">Stav</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value: "draft" | "published" | "archived") =>
-                    setFormData({ ...formData, status: value })
-                  }
-                >
-                  <SelectTrigger id="status">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Koncept</SelectItem>
-                    <SelectItem value="published">Publikováno</SelectItem>
-                    <SelectItem value="archived">Archivováno</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <motion.div
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle>Nastavení</CardTitle>
+                <CardDescription>Konfigurace článku</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="status">Stav</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value: "draft" | "published" | "archived") =>
+                      setFormData({ ...formData, status: value })
+                    }
+                  >
+                    <SelectTrigger id="status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Koncept</SelectItem>
+                      <SelectItem value="published">Publikováno</SelectItem>
+                      <SelectItem value="archived">Archivováno</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="featured_image">URL náhledového obrázku</Label>
-                <Input
-                  id="featured_image"
-                  value={formData.featured_image}
-                  onChange={(e) =>
-                    setFormData({ ...formData, featured_image: e.target.value })
-                  }
-                  placeholder="https://example.com/obrazek.jpg"
-                />
-                {formData.featured_image && (
-                  <div className="mt-2">
-                    <img
-                      src={formData.featured_image}
-                      alt="Náhled"
-                      className="w-full rounded-lg border object-cover"
-                    />
-                  </div>
-                )}
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="featured_image">URL náhledového obrázku</Label>
+                  <Input
+                    id="featured_image"
+                    value={formData.featured_image}
+                    onChange={(e) =>
+                      setFormData({ ...formData, featured_image: e.target.value })
+                    }
+                    placeholder="https://example.com/obrazek.jpg"
+                  />
+                  {formData.featured_image && (
+                    <div className="mt-2">
+                      <img
+                        src={formData.featured_image}
+                        alt="Náhled"
+                        className="w-full rounded-lg border object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="tags">Štítky</Label>
-                <Input
-                  id="tags"
-                  value={formData.tags}
-                  onChange={(e) =>
-                    setFormData({ ...formData, tags: e.target.value })
-                  }
-                  placeholder="štítek1, štítek2, štítek3"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Štítky oddělujte čárkou
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+                <div className="space-y-2">
+                  <Label htmlFor="tags">Štítky</Label>
+                  <Input
+                    id="tags"
+                    value={formData.tags}
+                    onChange={(e) =>
+                      setFormData({ ...formData, tags: e.target.value })
+                    }
+                    placeholder="štítek1, štítek2, štítek3"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Štítky oddělujte čárkou
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </AnimatedPage>
   );
 };
 

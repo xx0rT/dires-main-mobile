@@ -9,6 +9,7 @@ import {
   Search,
   Filter,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,7 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cs } from "date-fns/locale";
+import { AnimatedPage } from "@/components/admin/admin-motion";
 
 interface Blog {
   id: string;
@@ -135,7 +137,7 @@ const AdminBlogsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <AnimatedPage className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Správa blogu</h1>
@@ -151,136 +153,142 @@ const AdminBlogsPage = () => {
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Články</CardTitle>
-          <CardDescription>
-            Spravujte všechny své články na jednom místě
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative flex-1">
-              <Search className="absolute top-3 left-3 size-4 text-muted-foreground" />
-              <Input
-                placeholder="Hledat články..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle>Články</CardTitle>
+            <CardDescription>
+              Spravujte všechny své články na jednom místě
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center">
+              <div className="relative flex-1">
+                <Search className="absolute top-3 left-3 size-4 text-muted-foreground" />
+                <Input
+                  placeholder="Hledat články..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full md:w-48">
+                  <Filter className="mr-2 size-4" />
+                  <SelectValue placeholder="Filtrovat podle stavu" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Všechny stavy</SelectItem>
+                  <SelectItem value="published">Publikováno</SelectItem>
+                  <SelectItem value="draft">Koncept</SelectItem>
+                  <SelectItem value="archived">Archivováno</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-48">
-                <Filter className="mr-2 size-4" />
-                <SelectValue placeholder="Filtrovat podle stavu" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Všechny stavy</SelectItem>
-                <SelectItem value="published">Publikováno</SelectItem>
-                <SelectItem value="draft">Koncept</SelectItem>
-                <SelectItem value="archived">Archivováno</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
-          {loading ? (
-            <div className="flex h-64 items-center justify-center">
-              <p className="text-muted-foreground">Načítání článků...</p>
-            </div>
-          ) : filteredBlogs.length === 0 ? (
-            <div className="flex h-64 flex-col items-center justify-center gap-2">
-              <p className="text-muted-foreground">Žádné články nenalezeny</p>
-              <Button asChild variant="outline" size="sm">
-                <Link to="/admin/blogs/new">
-                  <Plus className="mr-2 size-4" />
-                  Vytvořit první článek
-                </Link>
-              </Button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Název</TableHead>
-                    <TableHead>Stav</TableHead>
-                    <TableHead>Zobrazení</TableHead>
-                    <TableHead>Publikováno</TableHead>
-                    <TableHead>Aktualizováno</TableHead>
-                    <TableHead className="text-right">Akce</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredBlogs.map((blog) => (
-                    <TableRow key={blog.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          {blog.featured_image && (
-                            <img
-                              src={blog.featured_image}
-                              alt={blog.title}
-                              className="size-10 rounded object-cover"
-                            />
-                          )}
-                          <div>
-                            <div className="font-medium">{blog.title}</div>
-                            <div className="text-sm text-muted-foreground line-clamp-1">
-                              {blog.excerpt}
+            {loading ? (
+              <div className="flex h-64 items-center justify-center">
+                <p className="text-muted-foreground">Načítání článků...</p>
+              </div>
+            ) : filteredBlogs.length === 0 ? (
+              <div className="flex h-64 flex-col items-center justify-center gap-2">
+                <p className="text-muted-foreground">Žádné články nenalezeny</p>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/admin/blogs/new">
+                    <Plus className="mr-2 size-4" />
+                    Vytvořit první článek
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="overflow-x-auto rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Název</TableHead>
+                      <TableHead>Stav</TableHead>
+                      <TableHead>Zobrazení</TableHead>
+                      <TableHead>Publikováno</TableHead>
+                      <TableHead>Aktualizováno</TableHead>
+                      <TableHead className="text-right">Akce</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredBlogs.map((blog) => (
+                      <TableRow key={blog.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            {blog.featured_image && (
+                              <img
+                                src={blog.featured_image}
+                                alt={blog.title}
+                                className="size-10 rounded object-cover"
+                              />
+                            )}
+                            <div>
+                              <div className="font-medium">{blog.title}</div>
+                              <div className="text-sm text-muted-foreground line-clamp-1">
+                                {blog.excerpt}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(blog.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Eye className="size-4 text-muted-foreground" />
-                          <span>{blog.view_count}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {blog.published_at ? (
-                          <div className="flex items-center gap-1 text-sm">
-                            <Calendar className="size-4 text-muted-foreground" />
-                            {format(new Date(blog.published_at), "d. MMM yyyy", { locale: cs })}
+                        </TableCell>
+                        <TableCell>{getStatusBadge(blog.status)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <Eye className="size-4 text-muted-foreground" />
+                            <span>{blog.view_count}</span>
                           </div>
-                        ) : (
+                        </TableCell>
+                        <TableCell>
+                          {blog.published_at ? (
+                            <div className="flex items-center gap-1 text-sm">
+                              <Calendar className="size-4 text-muted-foreground" />
+                              {format(new Date(blog.published_at), "d. MMM yyyy", { locale: cs })}
+                            </div>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">
+                              Nepublikováno
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
                           <span className="text-sm text-muted-foreground">
-                            Nepublikováno
+                            {format(new Date(blog.updated_at), "d. MMM yyyy", { locale: cs })}
                           </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-muted-foreground">
-                          {format(new Date(blog.updated_at), "d. MMM yyyy", { locale: cs })}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button asChild variant="ghost" size="sm">
-                            <Link to={`/admin/blogs/edit/${blog.id}`}>
-                              <Edit className="size-4" />
-                            </Link>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setBlogToDelete(blog.id);
-                              setDeleteDialogOpen(true);
-                            }}
-                          >
-                            <Trash2 className="size-4 text-red-500" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button asChild variant="ghost" size="sm">
+                              <Link to={`/admin/blogs/edit/${blog.id}`}>
+                                <Edit className="size-4" />
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setBlogToDelete(blog.id);
+                                setDeleteDialogOpen(true);
+                              }}
+                            >
+                              <Trash2 className="size-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
@@ -303,7 +311,7 @@ const AdminBlogsPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </AnimatedPage>
   );
 };
 

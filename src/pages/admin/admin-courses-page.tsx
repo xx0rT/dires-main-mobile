@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
   ChevronDown,
@@ -33,6 +34,13 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import {
+  AnimatedPage,
+  StaggerGrid,
+  StaggerItem,
+  HoverCard,
+  AnimatedListItem,
+} from '@/components/admin/admin-motion'
 
 interface CoursePackage {
   id: string
@@ -253,7 +261,7 @@ export default function AdminCoursesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <AnimatedPage className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
@@ -269,47 +277,59 @@ export default function AdminCoursesPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40">
-                <Package className="size-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{packages.length}</p>
-                <p className="text-xs text-neutral-500">Balicku</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/40">
-                <BookOpen className="size-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{publishedCount}/{courses.length}</p>
-                <p className="text-xs text-neutral-500">Publikovanych kurzu</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40">
-                <Users className="size-5 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{totalStudents}</p>
-                <p className="text-xs text-neutral-500">Studentu celkem</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <StaggerGrid className="grid gap-4 sm:grid-cols-3">
+        <StaggerItem>
+          <HoverCard>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40">
+                    <Package className="size-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{packages.length}</p>
+                    <p className="text-xs text-neutral-500">Balicku</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </HoverCard>
+        </StaggerItem>
+        <StaggerItem>
+          <HoverCard>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/40">
+                    <BookOpen className="size-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{publishedCount}/{courses.length}</p>
+                    <p className="text-xs text-neutral-500">Publikovanych kurzu</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </HoverCard>
+        </StaggerItem>
+        <StaggerItem>
+          <HoverCard>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40">
+                    <Users className="size-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{totalStudents}</p>
+                    <p className="text-xs text-neutral-500">Studentu celkem</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </HoverCard>
+        </StaggerItem>
+      </StaggerGrid>
 
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
@@ -354,86 +374,97 @@ export default function AdminCoursesPage() {
                   </Badge>
                 </div>
               </CardHeader>
-              {isExpanded && (
-                <CardContent className="pt-0">
-                  <div className="space-y-2">
-                    {pkgCourses.map((course) => (
-                      <div
-                        key={course.id}
-                        className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800/50"
-                      >
-                        <div
-                          className="flex-1 cursor-pointer"
-                          onClick={() => openCourseDetail(course)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                              {course.title}
-                            </p>
-                            {course.level && (
-                              <Badge variant="outline" className="text-[10px]">
-                                {levelLabels[course.level] || course.level}
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="mt-1 flex items-center gap-3 text-xs text-neutral-500">
-                            {course.instructor && <span>{course.instructor}</span>}
-                            <span>{course.lessons_count} lekci</span>
-                            <span>{course.students_count} studentu</span>
-                            <span className="font-medium text-neutral-900 dark:text-neutral-100">
-                              {formatCZK(Number(course.price))}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-7"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              navigate(`/admin/courses/${course.id}`)
-                            }}
-                          >
-                            <Pencil className="size-3.5 text-muted-foreground" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 gap-1 px-2"
-                            onClick={(e) => togglePublished(course, e)}
-                          >
-                            {course.published ? (
-                              <>
-                                <Eye className="size-3 text-green-600" />
-                                <span className="text-[10px] text-green-600">Aktivni</span>
-                              </>
-                            ) : (
-                              <>
-                                <EyeOff className="size-3 text-neutral-400" />
-                                <span className="text-[10px] text-neutral-400">Skryty</span>
-                              </>
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-7 text-red-500 hover:text-red-600"
-                            onClick={(e) => deleteCourse(course, e)}
-                          >
-                            <Trash2 className="size-3.5" />
-                          </Button>
-                        </div>
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <CardContent className="pt-0">
+                      <div className="space-y-2">
+                        {pkgCourses.map((course, i) => (
+                          <AnimatedListItem key={course.id} index={i}>
+                            <div
+                              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800/50"
+                            >
+                              <div
+                                className="flex-1 cursor-pointer"
+                                onClick={() => openCourseDetail(course)}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                                    {course.title}
+                                  </p>
+                                  {course.level && (
+                                    <Badge variant="outline" className="text-[10px]">
+                                      {levelLabels[course.level] || course.level}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="mt-1 flex items-center gap-3 text-xs text-neutral-500">
+                                  {course.instructor && <span>{course.instructor}</span>}
+                                  <span>{course.lessons_count} lekci</span>
+                                  <span>{course.students_count} studentu</span>
+                                  <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                                    {formatCZK(Number(course.price))}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="size-7"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    navigate(`/admin/courses/${course.id}`)
+                                  }}
+                                >
+                                  <Pencil className="size-3.5 text-muted-foreground" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 gap-1 px-2"
+                                  onClick={(e) => togglePublished(course, e)}
+                                >
+                                  {course.published ? (
+                                    <>
+                                      <Eye className="size-3 text-green-600" />
+                                      <span className="text-[10px] text-green-600">Aktivni</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <EyeOff className="size-3 text-neutral-400" />
+                                      <span className="text-[10px] text-neutral-400">Skryty</span>
+                                    </>
+                                  )}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="size-7 text-red-500 hover:text-red-600"
+                                  onClick={(e) => deleteCourse(course, e)}
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+                          </AnimatedListItem>
+                        ))}
+                        {pkgCourses.length === 0 && (
+                          <p className="py-4 text-center text-sm text-neutral-500">
+                            Zadne kurzy v tomto balicku
+                          </p>
+                        )}
                       </div>
-                    ))}
-                    {pkgCourses.length === 0 && (
-                      <p className="py-4 text-center text-sm text-neutral-500">
-                        Zadne kurzy v tomto balicku
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              )}
+                    </CardContent>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </Card>
           )
         })}
@@ -627,6 +658,6 @@ export default function AdminCoursesPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </AnimatedPage>
   )
 }

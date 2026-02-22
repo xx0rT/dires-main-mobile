@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import {
   Copy,
   Percent,
@@ -28,6 +29,7 @@ import {
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
+import { AnimatedPage, StaggerGrid, StaggerItem, HoverCard } from '@/components/admin/admin-motion'
 
 interface PromoCode {
   id: string
@@ -176,7 +178,7 @@ export default function AdminPromoCodesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <AnimatedPage className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
@@ -192,43 +194,60 @@ export default function AdminPromoCodesPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardContent className="flex items-center gap-3 pt-6">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-blue-100/60 dark:bg-blue-900/30">
-              <Percent className="size-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{codes.length}</p>
-              <p className="text-xs text-neutral-500">Celkem kodu</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 pt-6">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-green-100/60 dark:bg-green-900/30">
-              <ToggleRight className="size-5 text-green-600 dark:text-green-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{activeCount}</p>
-              <p className="text-xs text-neutral-500">Aktivnich</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="flex items-center gap-3 pt-6">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-amber-100/60 dark:bg-amber-900/30">
-              <Copy className="size-5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{totalUses}</p>
-              <p className="text-xs text-neutral-500">Celkem pouziti</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <StaggerGrid className="grid gap-4 sm:grid-cols-3">
+        <StaggerItem>
+          <HoverCard>
+            <Card>
+              <CardContent className="flex items-center gap-3 pt-6">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-blue-100/60 dark:bg-blue-900/30">
+                  <Percent className="size-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{codes.length}</p>
+                  <p className="text-xs text-neutral-500">Celkem kodu</p>
+                </div>
+              </CardContent>
+            </Card>
+          </HoverCard>
+        </StaggerItem>
+        <StaggerItem>
+          <HoverCard>
+            <Card>
+              <CardContent className="flex items-center gap-3 pt-6">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-green-100/60 dark:bg-green-900/30">
+                  <ToggleRight className="size-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{activeCount}</p>
+                  <p className="text-xs text-neutral-500">Aktivnich</p>
+                </div>
+              </CardContent>
+            </Card>
+          </HoverCard>
+        </StaggerItem>
+        <StaggerItem>
+          <HoverCard>
+            <Card>
+              <CardContent className="flex items-center gap-3 pt-6">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-amber-100/60 dark:bg-amber-900/30">
+                  <Copy className="size-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{totalUses}</p>
+                  <p className="text-xs text-neutral-500">Celkem pouziti</p>
+                </div>
+              </CardContent>
+            </Card>
+          </HoverCard>
+        </StaggerItem>
+      </StaggerGrid>
 
-      <div className="relative max-w-sm">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="relative max-w-sm"
+      >
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
         <Input
           placeholder="Hledat promo kody..."
@@ -236,114 +255,120 @@ export default function AdminPromoCodesPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
         />
-      </div>
+      </motion.div>
 
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-neutral-200 dark:border-neutral-700">
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Kod</th>
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Sleva</th>
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Plany</th>
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Pouziti</th>
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Platnost</th>
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Status</th>
-                  <th className="px-4 py-3 text-right font-medium text-neutral-500">Akce</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((code) => (
-                  <tr
-                    key={code.id}
-                    className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <code className="rounded bg-neutral-100 px-2 py-0.5 text-sm font-mono font-medium dark:bg-neutral-800">
-                          {code.code}
-                        </code>
-                        <button
-                          type="button"
-                          onClick={() => copyCode(code.code)}
-                          className="text-neutral-400 transition-colors hover:text-neutral-600 dark:hover:text-neutral-300"
-                        >
-                          <Copy className="size-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 font-medium">
-                      {code.discount_type === 'percentage'
-                        ? `${code.discount_value}%`
-                        : `${code.discount_value} CZK`}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {code.applicable_plans.map((plan) => (
-                          <Badge key={plan} variant="outline" className="text-[10px]">
-                            {plan === 'monthly' ? 'Mesicni' : plan === 'lifetime' ? 'Dozivotni' : plan}
-                          </Badge>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-neutral-600 dark:text-neutral-400">
-                      {code.current_uses}{code.max_uses ? ` / ${code.max_uses}` : ''}
-                    </td>
-                    <td className="px-4 py-3 text-neutral-500">
-                      {code.valid_until
-                        ? `do ${new Date(code.valid_until).toLocaleDateString('cs-CZ')}`
-                        : 'Bez limitu'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge className={code.is_active
-                        ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
-                        : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'
-                      }>
-                        {code.is_active ? 'Aktivni' : 'Neaktivni'}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-8"
-                          onClick={() => toggleActive(code)}
-                          title={code.is_active ? 'Deaktivovat' : 'Aktivovat'}
-                        >
-                          {code.is_active ? (
-                            <ToggleRight className="size-4 text-green-600" />
-                          ) : (
-                            <ToggleLeft className="size-4 text-neutral-400" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-8 text-red-500 hover:text-red-600"
-                          onClick={() => deleteCode(code)}
-                          title="Smazat"
-                          disabled={code.current_uses > 0}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                    </td>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-neutral-200 dark:border-neutral-700">
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Kod</th>
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Sleva</th>
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Plany</th>
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Pouziti</th>
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Platnost</th>
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Status</th>
+                    <th className="px-4 py-3 text-right font-medium text-neutral-500">Akce</th>
                   </tr>
-                ))}
-                {filtered.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-neutral-500">
-                      Zadne promo kody nenalezeny
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                </thead>
+                <tbody>
+                  {filtered.map((code) => (
+                    <tr
+                      key={code.id}
+                      className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <code className="rounded bg-neutral-100 px-2 py-0.5 text-sm font-mono font-medium dark:bg-neutral-800">
+                            {code.code}
+                          </code>
+                          <button
+                            type="button"
+                            onClick={() => copyCode(code.code)}
+                            className="text-neutral-400 transition-colors hover:text-neutral-600 dark:hover:text-neutral-300"
+                          >
+                            <Copy className="size-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-medium">
+                        {code.discount_type === 'percentage'
+                          ? `${code.discount_value}%`
+                          : `${code.discount_value} CZK`}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {code.applicable_plans.map((plan) => (
+                            <Badge key={plan} variant="outline" className="text-[10px]">
+                              {plan === 'monthly' ? 'Mesicni' : plan === 'lifetime' ? 'Dozivotni' : plan}
+                            </Badge>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-neutral-600 dark:text-neutral-400">
+                        {code.current_uses}{code.max_uses ? ` / ${code.max_uses}` : ''}
+                      </td>
+                      <td className="px-4 py-3 text-neutral-500">
+                        {code.valid_until
+                          ? `do ${new Date(code.valid_until).toLocaleDateString('cs-CZ')}`
+                          : 'Bez limitu'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge className={code.is_active
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
+                          : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'
+                        }>
+                          {code.is_active ? 'Aktivni' : 'Neaktivni'}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8"
+                            onClick={() => toggleActive(code)}
+                            title={code.is_active ? 'Deaktivovat' : 'Aktivovat'}
+                          >
+                            {code.is_active ? (
+                              <ToggleRight className="size-4 text-green-600" />
+                            ) : (
+                              <ToggleLeft className="size-4 text-neutral-400" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8 text-red-500 hover:text-red-600"
+                            onClick={() => deleteCode(code)}
+                            title="Smazat"
+                            disabled={code.current_uses > 0}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {filtered.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-8 text-center text-neutral-500">
+                        Zadne promo kody nenalezeny
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="sm:max-w-md">
@@ -441,6 +466,6 @@ export default function AdminPromoCodesPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </AnimatedPage>
   )
 }

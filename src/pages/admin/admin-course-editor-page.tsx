@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { ArrowLeft, Save, Eye, Loader2 } from "lucide-react"
+import { motion } from "framer-motion"
 import { supabase } from "@/lib/supabase"
 import { blocksToHtml } from "@/lib/blocks-to-html"
 import { Button } from "@/components/ui/button"
@@ -31,6 +32,7 @@ import CourseQuizEditor, {
   type QuizQuestion,
   type QuizOption,
 } from "@/components/admin/course-quiz-editor"
+import { AnimatedPage } from "@/components/admin/admin-motion"
 
 interface CoursePackage {
   id: string
@@ -502,7 +504,7 @@ export default function AdminCourseEditorPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <AnimatedPage className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
@@ -614,154 +616,158 @@ export default function AdminCourseEditorPage() {
         </div>
 
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Nastaveni</CardTitle>
-              <CardDescription>Konfigurace kurzu</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Stav</Label>
-                <Select
-                  value={formData.published ? "published" : "draft"}
-                  onValueChange={(val) =>
-                    setFormData({
-                      ...formData,
-                      published: val === "published",
-                    })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Koncept</SelectItem>
-                    <SelectItem value="published">Publikovano</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <motion.div initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}>
+            <Card>
+              <CardHeader>
+                <CardTitle>Nastaveni</CardTitle>
+                <CardDescription>Konfigurace kurzu</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Stav</Label>
+                  <Select
+                    value={formData.published ? "published" : "draft"}
+                    onValueChange={(val) =>
+                      setFormData({
+                        ...formData,
+                        published: val === "published",
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Koncept</SelectItem>
+                      <SelectItem value="published">Publikovano</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2">
-                <Label>Balicek</Label>
-                <Select
-                  value={formData.package_id || "none"}
-                  onValueChange={(val) =>
-                    setFormData({
-                      ...formData,
-                      package_id: val === "none" ? null : val,
-                    })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Bez balicku</SelectItem>
-                    {packages.map((pkg) => (
-                      <SelectItem key={pkg.id} value={pkg.id}>
-                        {pkg.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                <div className="space-y-2">
+                  <Label>Balicek</Label>
+                  <Select
+                    value={formData.package_id || "none"}
+                    onValueChange={(val) =>
+                      setFormData({
+                        ...formData,
+                        package_id: val === "none" ? null : val,
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Bez balicku</SelectItem>
+                      {packages.map((pkg) => (
+                        <SelectItem key={pkg.id} value={pkg.id}>
+                          {pkg.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2">
-                <Label>Lektor</Label>
+                <div className="space-y-2">
+                  <Label>Lektor</Label>
+                  <Input
+                    value={formData.instructor}
+                    onChange={(e) =>
+                      setFormData({ ...formData, instructor: e.target.value })
+                    }
+                    placeholder="Jmeno lektora"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Kategorie</Label>
+                  <Input
+                    value={formData.category}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
+                    placeholder="Kategorie kurzu"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Uroven</Label>
+                  <Select
+                    value={formData.level}
+                    onValueChange={(val) =>
+                      setFormData({ ...formData, level: val })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Zacatecnik</SelectItem>
+                      <SelectItem value="intermediate">Pokrocily</SelectItem>
+                      <SelectItem value="advanced">Expert</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Cena (CZK)</Label>
+                  <Input
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        price: Number(e.target.value) || 0,
+                      })
+                    }
+                    min={0}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Poradi</Label>
+                  <Input
+                    type="number"
+                    value={formData.order_index}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        order_index: Number(e.target.value) || 0,
+                      })
+                    }
+                    min={0}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}>
+            <Card>
+              <CardHeader>
+                <CardTitle>Nahledovy obrazek</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
                 <Input
-                  value={formData.instructor}
+                  value={formData.thumbnail_url}
                   onChange={(e) =>
-                    setFormData({ ...formData, instructor: e.target.value })
+                    setFormData({ ...formData, thumbnail_url: e.target.value })
                   }
-                  placeholder="Jmeno lektora"
+                  placeholder="https://example.com/obrazek.jpg"
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Kategorie</Label>
-                <Input
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
-                  }
-                  placeholder="Kategorie kurzu"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Uroven</Label>
-                <Select
-                  value={formData.level}
-                  onValueChange={(val) =>
-                    setFormData({ ...formData, level: val })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">Zacatecnik</SelectItem>
-                    <SelectItem value="intermediate">Pokrocily</SelectItem>
-                    <SelectItem value="advanced">Expert</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Cena (CZK)</Label>
-                <Input
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      price: Number(e.target.value) || 0,
-                    })
-                  }
-                  min={0}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Poradi</Label>
-                <Input
-                  type="number"
-                  value={formData.order_index}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      order_index: Number(e.target.value) || 0,
-                    })
-                  }
-                  min={0}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Nahledovy obrazek</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Input
-                value={formData.thumbnail_url}
-                onChange={(e) =>
-                  setFormData({ ...formData, thumbnail_url: e.target.value })
-                }
-                placeholder="https://example.com/obrazek.jpg"
-              />
-              {formData.thumbnail_url && (
-                <img
-                  src={formData.thumbnail_url}
-                  alt="Nahled"
-                  className="w-full rounded-lg border object-cover"
-                />
-              )}
-            </CardContent>
-          </Card>
+                {formData.thumbnail_url && (
+                  <img
+                    src={formData.thumbnail_url}
+                    alt="Nahled"
+                    className="w-full rounded-lg border object-cover"
+                  />
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </AnimatedPage>
   )
 }

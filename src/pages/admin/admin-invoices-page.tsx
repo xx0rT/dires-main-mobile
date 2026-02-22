@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { AnimatedPage, StaggerGrid, StaggerItem, HoverCard } from '@/components/admin/admin-motion'
 
 interface Profile {
   id: string
@@ -128,7 +130,7 @@ export default function AdminInvoicesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <AnimatedPage className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
           Faktury a platby
@@ -138,172 +140,188 @@ export default function AdminInvoicesPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-xs text-neutral-500">Prijmy z kurzu</p>
-            <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-              {formatCZK(totalPurchaseRevenue)}
-            </p>
-            <p className="mt-1 text-xs text-neutral-400">{purchases.length} transakci</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-xs text-neutral-500">Prijmy z objednavek</p>
-            <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-              {formatCZK(totalOrderRevenue)}
-            </p>
-            <p className="mt-1 text-xs text-neutral-400">{orders.length} objednavek</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-xs text-neutral-500">Celkove prijmy</p>
-            <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-              {formatCZK(totalPurchaseRevenue + totalOrderRevenue)}
-            </p>
-            <p className="mt-1 text-xs text-neutral-400">
-              {purchases.length + orders.length} celkem
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <StaggerGrid className="grid gap-4 sm:grid-cols-3">
+        <StaggerItem>
+          <HoverCard>
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-xs text-neutral-500">Prijmy z kurzu</p>
+                <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                  {formatCZK(totalPurchaseRevenue)}
+                </p>
+                <p className="mt-1 text-xs text-neutral-400">{purchases.length} transakci</p>
+              </CardContent>
+            </Card>
+          </HoverCard>
+        </StaggerItem>
+        <StaggerItem>
+          <HoverCard>
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-xs text-neutral-500">Prijmy z objednavek</p>
+                <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                  {formatCZK(totalOrderRevenue)}
+                </p>
+                <p className="mt-1 text-xs text-neutral-400">{orders.length} objednavek</p>
+              </CardContent>
+            </Card>
+          </HoverCard>
+        </StaggerItem>
+        <StaggerItem>
+          <HoverCard>
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-xs text-neutral-500">Celkove prijmy</p>
+                <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                  {formatCZK(totalPurchaseRevenue + totalOrderRevenue)}
+                </p>
+                <p className="mt-1 text-xs text-neutral-400">
+                  {purchases.length + orders.length} celkem
+                </p>
+              </CardContent>
+            </Card>
+          </HoverCard>
+        </StaggerItem>
+      </StaggerGrid>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
-        <Input
-          placeholder="Hledat podle emailu, kurzu nebo ID platby..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
-        />
-      </div>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
+          <Input
+            placeholder="Hledat podle emailu, kurzu nebo ID platby..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+      </motion.div>
 
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
-          <TabsTrigger value="purchases">Nakupy kurzu ({purchases.length})</TabsTrigger>
-          <TabsTrigger value="orders">Objednavky ({orders.length})</TabsTrigger>
-        </TabsList>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList>
+            <TabsTrigger value="purchases">Nakupy kurzu ({purchases.length})</TabsTrigger>
+            <TabsTrigger value="orders">Objednavky ({orders.length})</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="purchases" className="mt-4">
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-neutral-200 dark:border-neutral-700">
-                      <th className="px-4 py-3 text-left font-medium text-neutral-500">Uzivatel</th>
-                      <th className="px-4 py-3 text-left font-medium text-neutral-500">Kurz</th>
-                      <th className="px-4 py-3 text-left font-medium text-neutral-500">Castka</th>
-                      <th className="px-4 py-3 text-left font-medium text-neutral-500">Datum</th>
-                      <th className="px-4 py-3 text-left font-medium text-neutral-500">Stripe ID</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredPurchases.map((p) => (
-                      <tr
-                        key={p.id}
-                        className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
-                      >
-                        <td className="px-4 py-3">
-                          <div>
-                            <p className="font-medium text-neutral-900 dark:text-neutral-100">
-                              {getProfile(p.user_id)?.full_name || getProfile(p.user_id)?.email?.split('@')[0] || '-'}
-                            </p>
-                            <p className="text-xs text-neutral-500">{getProfile(p.user_id)?.email}</p>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-neutral-700 dark:text-neutral-300">
-                          {getCourseTitle(p.course_id)}
-                        </td>
-                        <td className="px-4 py-3 font-medium">{formatCZK(Number(p.amount_paid))}</td>
-                        <td className="px-4 py-3 text-neutral-500">
-                          {new Date(p.purchased_at).toLocaleDateString('cs-CZ')}
-                        </td>
-                        <td className="px-4 py-3">
-                          {p.stripe_payment_intent_id ? (
-                            <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs dark:bg-neutral-800">
-                              {p.stripe_payment_intent_id.slice(0, 20)}...
-                            </code>
-                          ) : (
-                            <span className="text-neutral-400">-</span>
-                          )}
-                        </td>
+          <TabsContent value="purchases" className="mt-4">
+            <Card>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-neutral-200 dark:border-neutral-700">
+                        <th className="px-4 py-3 text-left font-medium text-neutral-500">Uzivatel</th>
+                        <th className="px-4 py-3 text-left font-medium text-neutral-500">Kurz</th>
+                        <th className="px-4 py-3 text-left font-medium text-neutral-500">Castka</th>
+                        <th className="px-4 py-3 text-left font-medium text-neutral-500">Datum</th>
+                        <th className="px-4 py-3 text-left font-medium text-neutral-500">Stripe ID</th>
                       </tr>
-                    ))}
-                    {filteredPurchases.length === 0 && (
-                      <tr>
-                        <td colSpan={5} className="px-4 py-8 text-center text-neutral-500">
-                          Zadne nakupy nenalezeny
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    </thead>
+                    <tbody>
+                      {filteredPurchases.map((p) => (
+                        <tr
+                          key={p.id}
+                          className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
+                        >
+                          <td className="px-4 py-3">
+                            <div>
+                              <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                                {getProfile(p.user_id)?.full_name || getProfile(p.user_id)?.email?.split('@')[0] || '-'}
+                              </p>
+                              <p className="text-xs text-neutral-500">{getProfile(p.user_id)?.email}</p>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-neutral-700 dark:text-neutral-300">
+                            {getCourseTitle(p.course_id)}
+                          </td>
+                          <td className="px-4 py-3 font-medium">{formatCZK(Number(p.amount_paid))}</td>
+                          <td className="px-4 py-3 text-neutral-500">
+                            {new Date(p.purchased_at).toLocaleDateString('cs-CZ')}
+                          </td>
+                          <td className="px-4 py-3">
+                            {p.stripe_payment_intent_id ? (
+                              <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs dark:bg-neutral-800">
+                                {p.stripe_payment_intent_id.slice(0, 20)}...
+                              </code>
+                            ) : (
+                              <span className="text-neutral-400">-</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                      {filteredPurchases.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-8 text-center text-neutral-500">
+                            Zadne nakupy nenalezeny
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="orders" className="mt-4">
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-neutral-200 dark:border-neutral-700">
-                      <th className="px-4 py-3 text-left font-medium text-neutral-500">Uzivatel</th>
-                      <th className="px-4 py-3 text-left font-medium text-neutral-500">Status</th>
-                      <th className="px-4 py-3 text-left font-medium text-neutral-500">Celkem</th>
-                      <th className="px-4 py-3 text-left font-medium text-neutral-500">Datum</th>
-                      <th className="px-4 py-3 text-left font-medium text-neutral-500">Stripe ID</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredOrders.map((o) => (
-                      <tr
-                        key={o.id}
-                        className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
-                      >
-                        <td className="px-4 py-3">
-                          <div>
-                            <p className="font-medium text-neutral-900 dark:text-neutral-100">
-                              {getProfile(o.user_id)?.full_name || getProfile(o.user_id)?.email?.split('@')[0] || '-'}
-                            </p>
-                            <p className="text-xs text-neutral-500">{getProfile(o.user_id)?.email}</p>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">{orderStatusBadge(o.status)}</td>
-                        <td className="px-4 py-3 font-medium">{formatCZK(Number(o.total))}</td>
-                        <td className="px-4 py-3 text-neutral-500">
-                          {new Date(o.created_at).toLocaleDateString('cs-CZ')}
-                        </td>
-                        <td className="px-4 py-3">
-                          {o.stripe_payment_intent_id ? (
-                            <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs dark:bg-neutral-800">
-                              {o.stripe_payment_intent_id.slice(0, 20)}...
-                            </code>
-                          ) : (
-                            <span className="text-neutral-400">-</span>
-                          )}
-                        </td>
+          <TabsContent value="orders" className="mt-4">
+            <Card>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-neutral-200 dark:border-neutral-700">
+                        <th className="px-4 py-3 text-left font-medium text-neutral-500">Uzivatel</th>
+                        <th className="px-4 py-3 text-left font-medium text-neutral-500">Status</th>
+                        <th className="px-4 py-3 text-left font-medium text-neutral-500">Celkem</th>
+                        <th className="px-4 py-3 text-left font-medium text-neutral-500">Datum</th>
+                        <th className="px-4 py-3 text-left font-medium text-neutral-500">Stripe ID</th>
                       </tr>
-                    ))}
-                    {filteredOrders.length === 0 && (
-                      <tr>
-                        <td colSpan={5} className="px-4 py-8 text-center text-neutral-500">
-                          Zadne objednavky nenalezeny
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+                    </thead>
+                    <tbody>
+                      {filteredOrders.map((o) => (
+                        <tr
+                          key={o.id}
+                          className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
+                        >
+                          <td className="px-4 py-3">
+                            <div>
+                              <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                                {getProfile(o.user_id)?.full_name || getProfile(o.user_id)?.email?.split('@')[0] || '-'}
+                              </p>
+                              <p className="text-xs text-neutral-500">{getProfile(o.user_id)?.email}</p>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">{orderStatusBadge(o.status)}</td>
+                          <td className="px-4 py-3 font-medium">{formatCZK(Number(o.total))}</td>
+                          <td className="px-4 py-3 text-neutral-500">
+                            {new Date(o.created_at).toLocaleDateString('cs-CZ')}
+                          </td>
+                          <td className="px-4 py-3">
+                            {o.stripe_payment_intent_id ? (
+                              <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs dark:bg-neutral-800">
+                                {o.stripe_payment_intent_id.slice(0, 20)}...
+                              </code>
+                            ) : (
+                              <span className="text-neutral-400">-</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                      {filteredOrders.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-8 text-center text-neutral-500">
+                            Zadne objednavky nenalezeny
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
+    </AnimatedPage>
   )
 }

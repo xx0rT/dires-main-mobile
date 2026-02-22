@@ -17,6 +17,13 @@ import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  AnimatedPage,
+  StaggerGrid,
+  StaggerItem,
+  HoverCard,
+  AnimatedListItem,
+} from '@/components/admin/admin-motion'
 
 interface Stats {
   totalUsers: number
@@ -256,7 +263,7 @@ export default function AdminOverviewPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <AnimatedPage className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
           Admin Panel
@@ -266,226 +273,233 @@ export default function AdminOverviewPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <StaggerGrid className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map((card) => {
           const Icon = card.icon
           return (
-            <Link key={card.label} to={card.link}>
-              <Card className="transition-shadow hover:shadow-md">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-neutral-500">
-                    {card.label}
-                  </CardTitle>
-                  <div className={`flex size-8 items-center justify-center rounded-lg ${card.bg}`}>
-                    <Icon className={`size-4 ${card.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                    {card.value}
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+            <StaggerItem key={card.label}>
+              <HoverCard>
+                <Link to={card.link}>
+                  <Card className="transition-shadow hover:shadow-md">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                      <CardTitle className="text-sm font-medium text-neutral-500">
+                        {card.label}
+                      </CardTitle>
+                      <div className={`flex size-8 items-center justify-center rounded-lg ${card.bg}`}>
+                        <Icon className={`size-4 ${card.color}`} />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                        {card.value}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </HoverCard>
+            </StaggerItem>
           )
         })}
-      </div>
+      </StaggerGrid>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Activity className="size-5 text-green-600" />
-            <CardTitle className="text-base">Provoz webu (Traffic Monitor)</CardTitle>
-          </div>
-          <Badge variant="outline" className="text-xs font-normal">
-            <span className="mr-1.5 inline-block size-1.5 animate-pulse rounded-full bg-green-500" />
-            Zive
-          </Badge>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="mb-4 grid w-full grid-cols-3">
-              <TabsTrigger value="overview">Prehled</TabsTrigger>
-              <TabsTrigger value="pages">Stranky</TabsTrigger>
-              <TabsTrigger value="live">Ziva aktivita</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview">
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-lg border p-4 dark:border-neutral-700">
-                  <div className="flex items-center gap-2 text-xs text-neutral-500">
-                    <Globe className="size-3.5" />
-                    Zobrazeni dnes
-                  </div>
-                  <p className="mt-2 text-2xl font-bold">{traffic.todayPageViews}</p>
-                </div>
-                <div className="rounded-lg border p-4 dark:border-neutral-700">
-                  <div className="flex items-center gap-2 text-xs text-neutral-500">
-                    <Users className="size-3.5" />
-                    Unikatni navstevnici
-                  </div>
-                  <p className="mt-2 text-2xl font-bold">{traffic.uniqueUsers}</p>
-                </div>
-                <div className="rounded-lg border p-4 dark:border-neutral-700">
-                  <div className="flex items-center gap-2 text-xs text-neutral-500">
-                    <Activity className="size-3.5" />
-                    Celkem sezeni
-                  </div>
-                  <p className="mt-2 text-2xl font-bold">{traffic.uniqueSessions}</p>
-                </div>
-                <div className="rounded-lg border p-4 dark:border-neutral-700">
-                  <div className="flex items-center gap-2 text-xs text-neutral-500">
-                    <Clock className="size-3.5" />
-                    Prumerna doba
-                  </div>
-                  <p className="mt-2 text-2xl font-bold">{formatDuration(traffic.avgDuration)}</p>
-                </div>
+      <StaggerGrid className="space-y-8">
+        <StaggerItem>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity className="size-5 text-green-600" />
+                <CardTitle className="text-base">Provoz webu (Traffic Monitor)</CardTitle>
               </div>
+              <Badge variant="outline" className="text-xs font-normal">
+                <span className="mr-1.5 inline-block size-1.5 animate-pulse rounded-full bg-green-500" />
+                Zive
+              </Badge>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="mb-4 grid w-full grid-cols-3">
+                  <TabsTrigger value="overview">Prehled</TabsTrigger>
+                  <TabsTrigger value="pages">Stranky</TabsTrigger>
+                  <TabsTrigger value="live">Ziva aktivita</TabsTrigger>
+                </TabsList>
 
-              <div className="mt-6">
-                <h4 className="mb-3 text-sm font-medium text-neutral-500">Zarizeni</h4>
-                <div className="space-y-3">
-                  {[
-                    { label: 'Desktop', count: traffic.deviceBreakdown.desktop, icon: Monitor, color: 'bg-blue-500' },
-                    { label: 'Mobil', count: traffic.deviceBreakdown.mobile, icon: Smartphone, color: 'bg-green-500' },
-                    { label: 'Tablet', count: traffic.deviceBreakdown.tablet, icon: Tablet, color: 'bg-amber-500' },
-                  ].map((d) => (
-                    <div key={d.label} className="flex items-center gap-3">
-                      <d.icon className="size-4 text-neutral-500" />
-                      <span className="w-16 text-sm">{d.label}</span>
-                      <div className="flex-1">
-                        <div className="h-2 rounded-full bg-neutral-100 dark:bg-neutral-800">
-                          <div
-                            className={`h-2 rounded-full ${d.color} transition-all duration-500`}
-                            style={{ width: `${devicePercent(d.count)}%` }}
-                          />
-                        </div>
+                <TabsContent value="overview">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="rounded-lg border p-4 dark:border-neutral-700">
+                      <div className="flex items-center gap-2 text-xs text-neutral-500">
+                        <Globe className="size-3.5" />
+                        Zobrazeni dnes
                       </div>
-                      <span className="w-12 text-right text-xs tabular-nums text-neutral-500">
-                        {devicePercent(d.count)}%
-                      </span>
-                      <span className="w-10 text-right text-xs tabular-nums font-medium">
-                        {d.count}
-                      </span>
+                      <p className="mt-2 text-2xl font-bold">{traffic.todayPageViews}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
+                    <div className="rounded-lg border p-4 dark:border-neutral-700">
+                      <div className="flex items-center gap-2 text-xs text-neutral-500">
+                        <Users className="size-3.5" />
+                        Unikatni navstevnici
+                      </div>
+                      <p className="mt-2 text-2xl font-bold">{traffic.uniqueUsers}</p>
+                    </div>
+                    <div className="rounded-lg border p-4 dark:border-neutral-700">
+                      <div className="flex items-center gap-2 text-xs text-neutral-500">
+                        <Activity className="size-3.5" />
+                        Celkem sezeni
+                      </div>
+                      <p className="mt-2 text-2xl font-bold">{traffic.uniqueSessions}</p>
+                    </div>
+                    <div className="rounded-lg border p-4 dark:border-neutral-700">
+                      <div className="flex items-center gap-2 text-xs text-neutral-500">
+                        <Clock className="size-3.5" />
+                        Prumerna doba
+                      </div>
+                      <p className="mt-2 text-2xl font-bold">{formatDuration(traffic.avgDuration)}</p>
+                    </div>
+                  </div>
 
-            <TabsContent value="pages">
-              {traffic.topPages.length === 0 ? (
-                <p className="py-8 text-center text-sm text-neutral-500">Zatim zadna data o strankach</p>
-              ) : (
-                <div className="space-y-2">
-                  {traffic.topPages.map((page, idx) => {
-                    const maxViews = traffic.topPages[0]?.views || 1
-                    const pct = Math.round((page.views / maxViews) * 100)
-                    return (
-                      <div
-                        key={page.path}
-                        className="flex items-center gap-3 rounded-lg border p-3 dark:border-neutral-700"
-                      >
-                        <span className="flex size-6 items-center justify-center rounded-md bg-neutral-100 text-[10px] font-bold dark:bg-neutral-800">
-                          {idx + 1}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="truncate text-sm font-medium">{page.title}</p>
-                          <p className="truncate text-xs text-neutral-500">{page.path}</p>
+                  <div className="mt-6">
+                    <h4 className="mb-3 text-sm font-medium text-neutral-500">Zarizeni</h4>
+                    <div className="space-y-3">
+                      {[
+                        { label: 'Desktop', count: traffic.deviceBreakdown.desktop, icon: Monitor, color: 'bg-blue-500' },
+                        { label: 'Mobil', count: traffic.deviceBreakdown.mobile, icon: Smartphone, color: 'bg-green-500' },
+                        { label: 'Tablet', count: traffic.deviceBreakdown.tablet, icon: Tablet, color: 'bg-amber-500' },
+                      ].map((d) => (
+                        <div key={d.label} className="flex items-center gap-3">
+                          <d.icon className="size-4 text-neutral-500" />
+                          <span className="w-16 text-sm">{d.label}</span>
+                          <div className="flex-1">
+                            <div className="h-2 rounded-full bg-neutral-100 dark:bg-neutral-800">
+                              <div
+                                className={`h-2 rounded-full ${d.color} transition-all duration-500`}
+                                style={{ width: `${devicePercent(d.count)}%` }}
+                              />
+                            </div>
+                          </div>
+                          <span className="w-12 text-right text-xs tabular-nums text-neutral-500">
+                            {devicePercent(d.count)}%
+                          </span>
+                          <span className="w-10 text-right text-xs tabular-nums font-medium">
+                            {d.count}
+                          </span>
                         </div>
-                        <div className="hidden w-32 sm:block">
-                          <div className="h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800">
-                            <div
-                              className="h-1.5 rounded-full bg-blue-500 transition-all"
-                              style={{ width: `${pct}%` }}
-                            />
+                      ))}
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="pages">
+                  {traffic.topPages.length === 0 ? (
+                    <p className="py-8 text-center text-sm text-neutral-500">Zatim zadna data o strankach</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {traffic.topPages.map((page, idx) => {
+                        const maxViews = traffic.topPages[0]?.views || 1
+                        const pct = Math.round((page.views / maxViews) * 100)
+                        return (
+                          <AnimatedListItem key={page.path} index={idx}>
+                            <div className="flex items-center gap-3 rounded-lg border p-3 dark:border-neutral-700">
+                              <span className="flex size-6 items-center justify-center rounded-md bg-neutral-100 text-[10px] font-bold dark:bg-neutral-800">
+                                {idx + 1}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <p className="truncate text-sm font-medium">{page.title}</p>
+                                <p className="truncate text-xs text-neutral-500">{page.path}</p>
+                              </div>
+                              <div className="hidden w-32 sm:block">
+                                <div className="h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800">
+                                  <div
+                                    className="h-1.5 rounded-full bg-blue-500 transition-all"
+                                    style={{ width: `${pct}%` }}
+                                  />
+                                </div>
+                              </div>
+                              <span className="text-sm font-semibold tabular-nums">{page.views}</span>
+                            </div>
+                          </AnimatedListItem>
+                        )
+                      })}
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="live">
+                  {traffic.recentActivity.length === 0 ? (
+                    <p className="py-8 text-center text-sm text-neutral-500">Zatim zadna aktivita</p>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {traffic.recentActivity.map((a, idx) => (
+                        <AnimatedListItem key={a.id} index={idx}>
+                          <div className="flex items-center gap-3 rounded-lg border p-2.5 text-sm dark:border-neutral-700">
+                            <DeviceIcon type={a.device_type} />
+                            <Badge
+                              variant="outline"
+                              className="min-w-[80px] justify-center text-[10px] font-normal"
+                            >
+                              {a.event_type === 'page_view'
+                                ? 'Zobrazeni'
+                                : a.event_type === 'session_start'
+                                  ? 'Zacatek'
+                                  : a.event_type === 'session_end'
+                                    ? 'Konec'
+                                    : a.event_type}
+                            </Badge>
+                            <span className="flex-1 truncate text-neutral-700 dark:text-neutral-300">
+                              {a.page_title || a.page_path}
+                            </span>
+                            {a.duration_seconds > 0 && (
+                              <span className="text-xs tabular-nums text-neutral-400">
+                                {formatDuration(a.duration_seconds)}
+                              </span>
+                            )}
+                            <span className="text-xs text-neutral-400 whitespace-nowrap">
+                              {timeAgo(a.created_at)}
+                            </span>
+                          </div>
+                        </AnimatedListItem>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </StaggerItem>
+
+        <StaggerItem>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Posledni registrovani uzivatele</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {recentUsers.length === 0 ? (
+                <p className="text-sm text-neutral-500">Zadni uzivatele</p>
+              ) : (
+                <div className="space-y-3">
+                  {recentUsers.map((u, idx) => (
+                    <AnimatedListItem key={u.id} index={idx}>
+                      <div className="flex items-center justify-between rounded-lg border border-neutral-200 p-3 dark:border-neutral-700">
+                        <div className="flex items-center gap-3">
+                          <div className="flex size-8 items-center justify-center rounded-full bg-neutral-200 text-xs font-medium dark:bg-neutral-700">
+                            {(u.full_name || u.email)?.[0]?.toUpperCase() || 'U'}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                              {u.full_name || u.email?.split('@')[0]}
+                            </p>
+                            <p className="text-xs text-neutral-500">{u.email}</p>
                           </div>
                         </div>
-                        <span className="text-sm font-semibold tabular-nums">{page.views}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="live">
-              {traffic.recentActivity.length === 0 ? (
-                <p className="py-8 text-center text-sm text-neutral-500">Zatim zadna aktivita</p>
-              ) : (
-                <div className="space-y-1.5">
-                  {traffic.recentActivity.map((a) => (
-                    <div
-                      key={a.id}
-                      className="flex items-center gap-3 rounded-lg border p-2.5 text-sm dark:border-neutral-700"
-                    >
-                      <DeviceIcon type={a.device_type} />
-                      <Badge
-                        variant="outline"
-                        className="min-w-[80px] justify-center text-[10px] font-normal"
-                      >
-                        {a.event_type === 'page_view'
-                          ? 'Zobrazeni'
-                          : a.event_type === 'session_start'
-                            ? 'Zacatek'
-                            : a.event_type === 'session_end'
-                              ? 'Konec'
-                              : a.event_type}
-                      </Badge>
-                      <span className="flex-1 truncate text-neutral-700 dark:text-neutral-300">
-                        {a.page_title || a.page_path}
-                      </span>
-                      {a.duration_seconds > 0 && (
-                        <span className="text-xs tabular-nums text-neutral-400">
-                          {formatDuration(a.duration_seconds)}
+                        <span className="text-xs text-neutral-400">
+                          {new Date(u.created_at).toLocaleDateString('cs-CZ')}
                         </span>
-                      )}
-                      <span className="text-xs text-neutral-400 whitespace-nowrap">
-                        {timeAgo(a.created_at)}
-                      </span>
-                    </div>
+                      </div>
+                    </AnimatedListItem>
                   ))}
                 </div>
               )}
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Posledni registrovani uzivatele</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {recentUsers.length === 0 ? (
-            <p className="text-sm text-neutral-500">Zadni uzivatele</p>
-          ) : (
-            <div className="space-y-3">
-              {recentUsers.map((u) => (
-                <div
-                  key={u.id}
-                  className="flex items-center justify-between rounded-lg border border-neutral-200 p-3 dark:border-neutral-700"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-8 items-center justify-center rounded-full bg-neutral-200 text-xs font-medium dark:bg-neutral-700">
-                      {(u.full_name || u.email)?.[0]?.toUpperCase() || 'U'}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                        {u.full_name || u.email?.split('@')[0]}
-                      </p>
-                      <p className="text-xs text-neutral-500">{u.email}</p>
-                    </div>
-                  </div>
-                  <span className="text-xs text-neutral-400">
-                    {new Date(u.created_at).toLocaleDateString('cs-CZ')}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+            </CardContent>
+          </Card>
+        </StaggerItem>
+      </StaggerGrid>
+    </AnimatedPage>
   )
 }

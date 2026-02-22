@@ -10,6 +10,7 @@ import {
   UserCheck,
   X,
 } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -22,6 +23,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
+import { AnimatedPage, AnimatedListItem } from '@/components/admin/admin-motion'
 
 interface Profile {
   id: string
@@ -188,7 +190,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <AnimatedPage className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
           Sprava uzivatelu
@@ -198,7 +200,12 @@ export default function AdminUsersPage() {
         </p>
       </div>
 
-      <div className="relative max-w-sm">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="relative max-w-sm"
+      >
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
         <Input
           placeholder="Hledat podle emailu, jmena nebo ID..."
@@ -206,111 +213,117 @@ export default function AdminUsersPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
         />
-      </div>
+      </motion.div>
 
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-neutral-200 dark:border-neutral-700">
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Uzivatel</th>
-                  <th
-                    className="cursor-pointer px-4 py-3 text-left font-medium text-neutral-500"
-                    onClick={() => handleSort('email')}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      Email
-                      {sortField === 'email' && <SortIcon className="size-3" />}
-                    </span>
-                  </th>
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Predplatne</th>
-                  <th className="px-4 py-3 text-left font-medium text-neutral-500">Role</th>
-                  <th
-                    className="cursor-pointer px-4 py-3 text-left font-medium text-neutral-500"
-                    onClick={() => handleSort('created_at')}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      Registrace
-                      {sortField === 'created_at' && <SortIcon className="size-3" />}
-                    </span>
-                  </th>
-                  <th className="px-4 py-3 text-right font-medium text-neutral-500">Akce</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((profile) => {
-                  const sub = getSubscription(profile.id)
-                  return (
-                    <tr
-                      key={profile.id}
-                      className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+      >
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-neutral-200 dark:border-neutral-700">
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Uzivatel</th>
+                    <th
+                      className="cursor-pointer px-4 py-3 text-left font-medium text-neutral-500"
+                      onClick={() => handleSort('email')}
                     >
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex size-8 items-center justify-center rounded-full bg-neutral-200 text-xs font-medium dark:bg-neutral-700">
-                            {(profile.full_name || profile.email)?.[0]?.toUpperCase() || 'U'}
+                      <span className="inline-flex items-center gap-1">
+                        Email
+                        {sortField === 'email' && <SortIcon className="size-3" />}
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Predplatne</th>
+                    <th className="px-4 py-3 text-left font-medium text-neutral-500">Role</th>
+                    <th
+                      className="cursor-pointer px-4 py-3 text-left font-medium text-neutral-500"
+                      onClick={() => handleSort('created_at')}
+                    >
+                      <span className="inline-flex items-center gap-1">
+                        Registrace
+                        {sortField === 'created_at' && <SortIcon className="size-3" />}
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium text-neutral-500">Akce</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((profile) => {
+                    const sub = getSubscription(profile.id)
+                    return (
+                      <tr
+                        key={profile.id}
+                        className="border-b border-neutral-100 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
+                      >
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex size-8 items-center justify-center rounded-full bg-neutral-200 text-xs font-medium dark:bg-neutral-700">
+                              {(profile.full_name || profile.email)?.[0]?.toUpperCase() || 'U'}
+                            </div>
+                            <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                              {profile.full_name || profile.email?.split('@')[0]}
+                            </span>
                           </div>
-                          <span className="font-medium text-neutral-900 dark:text-neutral-100">
-                            {profile.full_name || profile.email?.split('@')[0]}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-neutral-600 dark:text-neutral-400">
-                        {profile.email}
-                      </td>
-                      <td className="px-4 py-3">{getStatusBadge(sub)}</td>
-                      <td className="px-4 py-3">
-                        {profile.is_admin ? (
-                          <Badge className="bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400">
-                            Admin
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline">Uzivatel</Badge>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-neutral-500">
-                        {new Date(profile.created_at).toLocaleDateString('cs-CZ')}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openUserDetail(profile)}
-                          >
-                            Detail
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8"
-                            onClick={() => toggleAdmin(profile)}
-                            title={profile.is_admin ? 'Odebrat admin' : 'Udelit admin'}
-                          >
-                            {profile.is_admin ? (
-                              <ShieldOff className="size-4 text-red-500" />
-                            ) : (
-                              <Shield className="size-4 text-neutral-400" />
-                            )}
-                          </Button>
-                        </div>
+                        </td>
+                        <td className="px-4 py-3 text-neutral-600 dark:text-neutral-400">
+                          {profile.email}
+                        </td>
+                        <td className="px-4 py-3">{getStatusBadge(sub)}</td>
+                        <td className="px-4 py-3">
+                          {profile.is_admin ? (
+                            <Badge className="bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400">
+                              Admin
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline">Uzivatel</Badge>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-neutral-500">
+                          {new Date(profile.created_at).toLocaleDateString('cs-CZ')}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openUserDetail(profile)}
+                            >
+                              Detail
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8"
+                              onClick={() => toggleAdmin(profile)}
+                              title={profile.is_admin ? 'Odebrat admin' : 'Udelit admin'}
+                            >
+                              {profile.is_admin ? (
+                                <ShieldOff className="size-4 text-red-500" />
+                              ) : (
+                                <Shield className="size-4 text-neutral-400" />
+                              )}
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  {filtered.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-8 text-center text-neutral-500">
+                        Zadni uzivatele nenalezeni
                       </td>
                     </tr>
-                  )
-                })}
-                {filtered.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-neutral-500">
-                      Zadni uzivatele nenalezeni
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
@@ -361,25 +374,26 @@ export default function AdminUsersPage() {
                       <p className="text-sm text-neutral-500">Zadne zapisy</p>
                     ) : (
                       <div className="space-y-2">
-                        {userEnrollments.map((e) => (
-                          <div
-                            key={e.id}
-                            className="flex items-center justify-between rounded-lg border p-3 dark:border-neutral-700"
-                          >
-                            <div>
-                              <p className="text-sm font-medium">{getCourseTitle(e.courses)}</p>
-                              <p className="text-xs text-neutral-500">
-                                Zapsano: {new Date(e.enrolled_at).toLocaleDateString('cs-CZ')}
-                              </p>
+                        {userEnrollments.map((e, i) => (
+                          <AnimatedListItem key={e.id} index={i}>
+                            <div
+                              className="flex items-center justify-between rounded-lg border p-3 dark:border-neutral-700"
+                            >
+                              <div>
+                                <p className="text-sm font-medium">{getCourseTitle(e.courses)}</p>
+                                <p className="text-xs text-neutral-500">
+                                  Zapsano: {new Date(e.enrolled_at).toLocaleDateString('cs-CZ')}
+                                </p>
+                              </div>
+                              {e.completed ? (
+                                <Badge className="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
+                                  Dokonceno
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline">Probiha</Badge>
+                              )}
                             </div>
-                            {e.completed ? (
-                              <Badge className="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
-                                Dokonceno
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline">Probiha</Badge>
-                            )}
-                          </div>
+                          </AnimatedListItem>
                         ))}
                       </div>
                     )}
@@ -394,25 +408,26 @@ export default function AdminUsersPage() {
                       <p className="text-sm text-neutral-500">Zadne nakupy</p>
                     ) : (
                       <div className="space-y-2">
-                        {userPurchases.map((p) => (
-                          <div
-                            key={p.id}
-                            className="flex items-center justify-between rounded-lg border p-3 dark:border-neutral-700"
-                          >
-                            <div>
-                              <p className="text-sm font-medium">{getCourseTitle(p.courses)}</p>
-                              <p className="text-xs text-neutral-500">
-                                {new Date(p.purchased_at).toLocaleDateString('cs-CZ')}
-                              </p>
+                        {userPurchases.map((p, i) => (
+                          <AnimatedListItem key={p.id} index={i}>
+                            <div
+                              className="flex items-center justify-between rounded-lg border p-3 dark:border-neutral-700"
+                            >
+                              <div>
+                                <p className="text-sm font-medium">{getCourseTitle(p.courses)}</p>
+                                <p className="text-xs text-neutral-500">
+                                  {new Date(p.purchased_at).toLocaleDateString('cs-CZ')}
+                                </p>
+                              </div>
+                              <span className="text-sm font-medium">
+                                {new Intl.NumberFormat('cs-CZ', {
+                                  style: 'currency',
+                                  currency: 'CZK',
+                                  maximumFractionDigits: 0,
+                                }).format(Number(p.amount_paid))}
+                              </span>
                             </div>
-                            <span className="text-sm font-medium">
-                              {new Intl.NumberFormat('cs-CZ', {
-                                style: 'currency',
-                                currency: 'CZK',
-                                maximumFractionDigits: 0,
-                              }).format(Number(p.amount_paid))}
-                            </span>
-                          </div>
+                          </AnimatedListItem>
                         ))}
                       </div>
                     )}
@@ -447,7 +462,7 @@ export default function AdminUsersPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </AnimatedPage>
   )
 }
 
