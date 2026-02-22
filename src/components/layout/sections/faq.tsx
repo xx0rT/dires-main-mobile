@@ -183,7 +183,9 @@ const Faq12 = ({ className }: Faq12Props) => {
       id="faq"
       className={cn("min-h-screen py-32", className)}
     >
-      <div className="container mx-auto max-w-3xl">
+      <div className="container mx-auto max-w-4xl">
+        <div className="rounded-3xl bg-muted/40 px-6 py-16 sm:px-12 lg:px-16">
+        <div className="mx-auto max-w-3xl">
         <div className="mb-16 text-center">
           <span className="mb-3 inline-block text-xs font-medium uppercase tracking-widest text-muted-foreground">
             FAQ /
@@ -251,6 +253,8 @@ const Faq12 = ({ className }: Faq12Props) => {
             })}
           </motion.div>
         </AnimatePresence>
+        </div>
+        </div>
       </div>
     </section>
   );
