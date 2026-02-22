@@ -1,5 +1,6 @@
 import { Check } from "lucide-react"
 import { Controller, useForm } from "react-hook-form"
+import { Link } from "react-router-dom"
 
 import { cn } from "@/lib/utils"
 import { site } from "@/config/site"
@@ -234,7 +235,14 @@ export const ContactSection = () => {
             <h3 className="mb-1.5 font-bold">FAQ</h3>
             <p className="text-sm text-muted-foreground">
               Prohledejte nasi kolekci{" "}
-              <a href="#faq" className="text-primary underline hover:underline">
+              <a
+                href="#faq"
+                onClick={(e) => {
+                  e.preventDefault()
+                  document.getElementById("faq")?.scrollIntoView({ behavior: "smooth" })
+                }}
+                className="text-primary underline hover:underline"
+              >
                 casto kladenych otazek
               </a>{" "}
               o nasich sluzbach a kurzech.
@@ -244,9 +252,9 @@ export const ContactSection = () => {
             <h3 className="mb-1.5 font-bold">Kurzy</h3>
             <p className="text-sm text-muted-foreground">
               Prozkoumejte nasi nabidku{" "}
-              <a href="/kurzy" className="text-primary underline hover:underline">
+              <Link to="/kurzy" className="text-primary underline hover:underline">
                 profesionalnich kurzu
-              </a>{" "}
+              </Link>{" "}
               pro fyzioterapeuty vsech urovni.
             </p>
           </div>

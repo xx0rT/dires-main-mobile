@@ -1,16 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 
 type Category = "Obecné" | "Cvičení" | "Bolest" | "Terapie" | "Ostatní";
 
@@ -21,7 +15,6 @@ interface FAQItem {
 }
 
 const faqItems: FAQItem[] = [
-  // Obecné Questions
   {
     category: "Obecné",
     question: "Jak dlouho trvá průměrná fyzioterapeutická léčba?",
@@ -40,7 +33,6 @@ const faqItems: FAQItem[] = [
     answer:
       "Fyzioterapie je součástí rehabilitace. Rehabilitace je širší pojem zahrnující celkový proces uzdravení, zatímco fyzioterapie se zaměřuje konkrétně na pohybové funkce pomocí cvičení, masáží a dalších technik.",
   },
-  // Cvičení Questions
   {
     category: "Cvičení",
     question: "Jak často bych měl cvičit doma?",
@@ -59,7 +51,6 @@ const faqItems: FAQItem[] = [
     answer:
       "Správná technika je zásadní. Měli byste cítit zapojení správných svalů, mít kontrolu nad pohybem a nedocházet k náhradním pohybovým vzorcům. Při pochybnostech vždy požádejte fyzioterapeuta o kontrolu techniky.",
   },
-  // Bolest Questions
   {
     category: "Bolest",
     question: "Je normální, že mě bolí po terapii?",
@@ -78,7 +69,6 @@ const faqItems: FAQItem[] = [
     answer:
       "Ano, fyzioterapie je velmi efektivní při léčbě chronické bolesti. Kombinuje aktivní cvičení, manuální techniky a edukaci o bolesti. Cílem je nejen zmírnit bolest, ale také naučit vás, jak s ní lépe fungovat.",
   },
-  // Terapie Questions
   {
     category: "Terapie",
     question: "Co mám vzít s sebou na první návštěvu?",
@@ -97,7 +87,6 @@ const faqItems: FAQItem[] = [
     answer:
       "Ano, máte právo si vybrat fyzioterapeuta podle svých preferencí. Doporučujeme vybrat si terapeuta se specializací odpovídající vašemu problému, například sport, neurologie nebo ortopedie.",
   },
-  // Ostatní Questions
   {
     category: "Ostatní",
     question: "Hradí fyzioterapii zdravotní pojišťovna?",
@@ -126,7 +115,56 @@ const categories: Category[] = [
   "Ostatní",
 ];
 
-const TOP_PADDING = 300;
+interface FAQItemCardProps {
+  item: FAQItem;
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+function FAQItemCard({ item, isOpen, onToggle }: FAQItemCardProps) {
+  return (
+    <motion.div
+      layout
+      initial={false}
+      className={cn(
+        "cursor-pointer rounded-xl border border-transparent bg-background/60 backdrop-blur-sm transition-colors",
+        isOpen && "border-sky-200/40 bg-background dark:border-sky-800/30"
+      )}
+      whileHover={{ scale: 1.008, y: -2 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+      >
+        <span className="text-base font-medium leading-snug">{item.question}</span>
+        <motion.span
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className="flex shrink-0 items-center justify-center"
+        >
+          <ChevronDown className="size-5 text-muted-foreground" />
+        </motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="px-6 pb-5 text-[0.95rem] leading-relaxed text-muted-foreground">
+              {item.answer}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
 
 interface Faq12Props {
   className?: string;
@@ -134,196 +172,85 @@ interface Faq12Props {
 
 const Faq12 = ({ className }: Faq12Props) => {
   const [activeCategory, setActiveCategory] = useState<Category>("Obecné");
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const isScrollingRef = useRef(false);
-  const categoryRefs = useRef<Record<Category, HTMLDivElement | null>>({
-    Obecné: null,
-    Cvičení: null,
-    Bolest: null,
-    Terapie: null,
-    Ostatní: null,
-  });
+  const [openItem, setOpenItem] = useState<string | null>("Obecné-0");
 
-  const setupObserver = useCallback(() => {
-    observerRef.current?.disconnect();
-
-    let debounceTimeout: NodeJS.Timeout;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        // Skip if we're programmatically scrolling
-        if (isScrollingRef.current) return;
-
-        // Clear any pending timeout
-        if (debounceTimeout) {
-          clearTimeout(debounceTimeout);
-        }
-
-        // Debounce the category update
-        debounceTimeout = setTimeout(() => {
-          const intersectingEntries = entries.filter(
-            (entry) => entry.isIntersecting,
-          );
-
-          // Find the entry that's closest to being 100px from the top
-          const entry = intersectingEntries.reduce(
-            (closest, current) => {
-              const rect = current.boundingClientRect;
-              const distanceFromThreshold = Math.abs(rect.top - TOP_PADDING);
-              const closestDistance = closest
-                ? Math.abs(closest.boundingClientRect.top - TOP_PADDING)
-                : Infinity;
-
-              return distanceFromThreshold < closestDistance
-                ? current
-                : closest;
-            },
-            null as IntersectionObserverEntry | null,
-          );
-
-          if (entry) {
-            const category = entry.target.getAttribute(
-              "data-category",
-            ) as Category;
-            if (category) {
-              setActiveCategory(category);
-            }
-          }
-        }, 150);
-      },
-      {
-        root: null,
-        rootMargin: `-${TOP_PADDING}px 0px -100% 0px`,
-        threshold: [0, 0.25, 0.5, 0.75, 1],
-      },
-    );
-
-    Object.entries(categoryRefs.current).forEach(([category, element]) => {
-      if (element) {
-        element.setAttribute("data-category", category);
-        observerRef.current?.observe(element);
-      }
-    });
-
-    return () => {
-      if (debounceTimeout) {
-        clearTimeout(debounceTimeout);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const cleanup = setupObserver();
-    return () => {
-      cleanup();
-      observerRef.current?.disconnect();
-    };
-  }, [setupObserver]);
-
-  const handleCategoryClick = (category: Category) => {
-    setActiveCategory(category);
-    isScrollingRef.current = true;
-
-    const element = document.getElementById(`faq-${category.toLowerCase()}`);
-    if (element) {
-      element.style.scrollMargin = `${TOP_PADDING}px`;
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-
-      setTimeout(() => {
-        isScrollingRef.current = false;
-      }, 1000);
-    }
-  };
+  const filteredItems = faqItems.filter(
+    (item) => item.category === activeCategory
+  );
 
   return (
     <section
-      className={cn(
-        "min-h-screen py-32",
-        className,
-      )}
+      id="faq"
+      className={cn("min-h-screen py-32", className)}
     >
-      <div className="container max-w-4xl mx-auto">
-        <div className="flex flex-col items-center justify-center gap-14">
-          <div className="flex flex-col gap-4 border-b-2 border-sky-200/60 dark:border-sky-800/30 pb-6 text-center max-w-3xl mx-auto">
-            <h3 className="text-3xl font-light tracking-tight lg:text-6xl">
-              Často kladené otázky
-            </h3>
-            <p className="text-sm tracking-tight text-muted-foreground lg:text-lg">
-              Získáš systematické know-how od českých odborníků
-            </p>
-          </div>
+      <div className="container mx-auto max-w-3xl">
+        <div className="mb-16 text-center">
+          <span className="mb-3 inline-block text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            FAQ /
+          </span>
+          <h2 className="text-3xl font-light tracking-tight lg:text-5xl">
+            Často kladené otázky
+          </h2>
+          <p className="mx-auto mt-4 max-w-lg text-base text-muted-foreground">
+            Prohledejte naši kolekci často kladených otázek o našich službách a kurzech.
+          </p>
+        </div>
 
-        <div className="mt-0 grid max-w-5xl gap-8 md:mt-0 md:grid-cols-[200px_1fr] md:gap-12 lg:mt-0 mx-auto w-full">
-          {/* Sidebar */}
-          <div className="sticky top-24 flex h-fit flex-col gap-4 max-md:hidden">
-            {categories.map((category) => (
-              <Button
-                variant="ghost"
-                key={category}
-                onClick={() => handleCategoryClick(category)}
-                className={`justify-start text-left text-xl transition-colors ${
-                  activeCategory === category
-                    ? "font-semibold text-sky-700 dark:text-sky-400"
-                    : "font-normal hover:opacity-75"
-                }`}
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
+        <div className="mb-10 flex flex-wrap justify-center gap-2">
+          {categories.map((category) => (
+            <motion.button
+              key={category}
+              type="button"
+              onClick={() => {
+                setActiveCategory(category);
+                setOpenItem(null);
+              }}
+              className={cn(
+                "relative rounded-full px-5 py-2 text-sm font-medium transition-colors",
+                activeCategory === category
+                  ? "text-sky-900 dark:text-sky-100"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            >
+              {activeCategory === category && (
+                <motion.div
+                  layoutId="faq-tab-indicator"
+                  className="absolute inset-0 rounded-full bg-sky-100 dark:bg-sky-900/40"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">{category}</span>
+            </motion.button>
+          ))}
+        </div>
 
-          {/* FAQ Items by Category */}
-          <div className="space-y-6">
-            {categories.map((category) => {
-              const categoryItems = faqItems.filter(
-                (item) => item.category === category,
-              );
-
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeCategory}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="space-y-3"
+          >
+            {filteredItems.map((item, i) => {
+              const itemKey = `${activeCategory}-${i}`;
               return (
-                <div
-                  key={category}
-                  id={`faq-${category.toLowerCase()}`}
-                  ref={(el) => {
-                    categoryRefs.current[category] = el;
-                  }}
-                  className={cn(
-                    `rounded-xl`,
-                    activeCategory === category
-                      ? "bg-background"
-                      : "bg-background/40",
-                    "px-6",
-                  )}
-                  style={{
-                    scrollMargin: `${TOP_PADDING}px`,
-                  }}
-                >
-                  <Accordion
-                    type="single"
-                    collapsible
-                    defaultValue={`${categories[0]}-0`}
-                    className="w-full"
-                  >
-                    {categoryItems.map((item, i) => (
-                      <AccordionItem
-                        key={i}
-                        value={`${category}-${i}`}
-                        className="border-b border-sky-100 dark:border-sky-900/30 last:border-0"
-                      >
-                        <AccordionTrigger className="text-base font-medium hover:no-underline">
-                          {item.question}
-                        </AccordionTrigger>
-                        <AccordionContent className="text-base font-medium text-muted-foreground">
-                          {item.answer}
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </div>
+                <FAQItemCard
+                  key={itemKey}
+                  item={item}
+                  isOpen={openItem === itemKey}
+                  onToggle={() =>
+                    setOpenItem(openItem === itemKey ? null : itemKey)
+                  }
+                />
               );
             })}
-          </div>
-        </div>
-        </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   );
