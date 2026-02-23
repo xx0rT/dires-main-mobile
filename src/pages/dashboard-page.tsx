@@ -11,12 +11,11 @@ import { useSubscription } from '@/lib/use-subscription'
 import { toast } from 'sonner'
 import { PhysioAnalyticsChart } from '@/components/dashboard/physio-analytics-chart'
 import { PhysioTodoList } from '@/components/dashboard/physio-todo-list'
-import { SubscriptionTimerCard } from '@/components/dashboard/subscription-timer-card'
+import { DashboardHero } from '@/components/dashboard/dashboard-hero'
 import { CourseDashboard } from '@/components/dashboard/course-dashboard'
 import { useSelectedCourse } from '@/lib/selected-course-context'
 import { supabase } from '@/lib/supabase'
 import { useGamification } from '@/lib/use-gamification'
-import { RankProgressCard } from '@/components/gamification/rank-progress-card'
 import { BadgesCollection } from '@/components/gamification/badges-collection'
 import { XpRewardPopup } from '@/components/gamification/xp-reward-popup'
 
@@ -140,13 +139,6 @@ export default function DashboardPage() {
     }
   }
 
-  const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return 'Dobre rano'
-    if (hour < 18) return 'Dobre odpoledne'
-    return 'Dobry vecer'
-  }
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -178,41 +170,20 @@ export default function DashboardPage() {
         <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/3 left-1/2 h-[40%] w-[60%] animate-pulse bg-gradient-to-r from-primary/15 via-blue-400/15 to-primary/15 blur-3xl" />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
-      >
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">
-            {getGreeting()}, {user?.email?.split('@')[0] || 'Studente'}
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Vitejte zpet na vasi vzdelavaci platforme. Pokracujte ve svem uceni.
-          </p>
-        </div>
-        <div className="w-full lg:w-auto lg:min-w-[320px]">
-          <SubscriptionTimerCard
-            subscription={subscription}
-            hasActiveSubscription={hasActiveSubscription}
-            onRefresh={handleRefreshSubscription}
-            refreshing={refreshing}
-          />
-        </div>
-      </motion.div>
-
-      {currentRank && userXp && (
-        <RankProgressCard
-          currentRank={currentRank}
-          nextRank={nextRank}
-          totalXp={userXp.total_xp}
-          rankProgress={rankProgress}
-          loginStreak={userXp.login_streak}
-          lessonsCompleted={userXp.lessons_completed}
-          coursesCompleted={userXp.courses_completed}
-        />
-      )}
+      <DashboardHero
+        user={user}
+        subscription={subscription}
+        hasActiveSubscription={hasActiveSubscription}
+        currentRank={currentRank}
+        nextRank={nextRank}
+        totalXp={userXp?.total_xp ?? 0}
+        rankProgress={rankProgress}
+        loginStreak={userXp?.login_streak ?? 0}
+        lessonsCompleted={userXp?.lessons_completed ?? 0}
+        coursesCompleted={userXp?.courses_completed ?? 0}
+        onRefresh={handleRefreshSubscription}
+        refreshing={refreshing}
+      />
 
       <BadgesCollection
         earnedBadgeIds={new Set(earnedBadges.map((b) => b.badge_id))}
