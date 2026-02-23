@@ -61,8 +61,8 @@ const GlowOrb = styled.div<{ $color: string; $x: number; $y: number; $size: numb
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
-  filter: blur(60px);
-  opacity: 0.12;
+  filter: blur(70px);
+  opacity: 0.06;
   width: ${({ $size }) => $size}px;
   height: ${({ $size }) => $size}px;
   background: ${({ $color }) => $color};
@@ -138,7 +138,7 @@ const ShimmerText = styled.span<{ $color: string }>`
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: ${shimmer} 3s linear infinite;
+  animation: ${shimmer} 2.2s linear 1 forwards;
 `
 
 const SubGreeting = styled.p`
@@ -245,7 +245,7 @@ const ProgressGlow = styled(motion.div)<{ $color: string }>`
   border-radius: 9999px;
   background: ${({ $color }) => $color};
   filter: blur(4px);
-  opacity: 0.5;
+  opacity: 0.3;
 `
 
 const StatsRow = styled.div`
@@ -528,23 +528,9 @@ export function DashboardHero({
   const username = user?.email?.split('@')[0] || 'Studente'
   const RankIcon = currentRank ? (RANK_ICONS[currentRank.icon] || Star) : Star
 
-  const accentColor = currentRank
-    ? currentRank.color.replace('text-', '').replace('-500', '')
-    : 'green'
+  const accentHex = '#3b82f6'
 
-  const accentHex = {
-    'zinc': '#71717a',
-    'green': '#22c55e',
-    'blue': '#3b82f6',
-    'cyan': '#06b6d4',
-    'amber': '#f59e0b',
-    'orange': '#f97316',
-    'red': '#ef4444',
-  }[accentColor] ?? '#22c55e'
-
-  const subAccentHex =
-    subscription?.plan_type === 'lifetime' ? '#eab308' :
-    subscription?.plan_type === 'free_trial' ? '#3b82f6' : '#22c55e'
+  const subAccentHex = '#3b82f6'
 
   const getPlanLabel = () => {
     switch (subscription?.plan_type) {
