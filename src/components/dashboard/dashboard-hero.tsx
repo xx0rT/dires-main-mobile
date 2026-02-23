@@ -26,14 +26,9 @@ const spin = keyframes`
   to { transform: rotate(360deg); }
 `
 
-const shimmer = keyframes`
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-`
-
-const float = keyframes`
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
+const ambientPulse = keyframes`
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 `
 
 const HeroWrapper = styled.div`
@@ -67,18 +62,6 @@ const HeroWrapper = styled.div`
     padding: 1.25rem;
     border-radius: 1rem;
   }
-`
-
-const GridLines = styled.div`
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.025;
-  background-image:
-    linear-gradient(to right, currentColor 1px, transparent 1px),
-    linear-gradient(to bottom, currentColor 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
 `
 
 const Content = styled.div`
@@ -124,18 +107,7 @@ const GreetingName = styled.h1`
 `
 
 const ShimmerText = styled.span<{ $color: string }>`
-  background: linear-gradient(
-    90deg,
-    ${({ $color }) => $color} 0%,
-    #ffffff 40%,
-    ${({ $color }) => $color} 60%,
-    ${({ $color }) => $color} 100%
-  );
-  background-size: 200% auto;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: ${shimmer} 2.2s linear 1 forwards;
+  color: ${({ $color }) => $color};
 `
 
 const SubGreeting = styled.p`
@@ -158,10 +130,22 @@ const RankIconBox = styled(motion.div)<{ $bgColor: string; $borderColor: string 
   align-items: center;
   justify-content: center;
   background: ${({ $bgColor }) => $bgColor};
-  border: 2px solid ${({ $borderColor }) => $borderColor};
+  border: 1.5px solid ${({ $borderColor }) => $borderColor};
   flex-shrink: 0;
-  animation: ${float} 3s ease-in-out infinite;
   position: relative;
+  box-shadow:
+    0 0 16px ${({ $borderColor }) => $borderColor}55,
+    inset 0 0 12px ${({ $borderColor }) => $borderColor}22;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at 50% 50%, ${({ $borderColor }) => $borderColor}33 0%, transparent 68%);
+    pointer-events: none;
+    animation: ${ambientPulse} 3s ease-in-out infinite;
+  }
 `
 
 const RankLvlPip = styled.div<{ $bgColor: string; $borderColor: string }>`
@@ -558,8 +542,6 @@ export function DashboardHero({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
     >
-      <GridLines />
-
       <Content>
         <LeftCol>
           <GreetingSection>
