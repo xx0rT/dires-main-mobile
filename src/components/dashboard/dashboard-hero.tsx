@@ -31,11 +31,6 @@ const shimmer = keyframes`
   100% { background-position: 200% center; }
 `
 
-const pulse = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-`
-
 const float = keyframes`
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-6px); }
@@ -47,29 +42,31 @@ const HeroWrapper = styled.div`
   overflow: hidden;
   padding: 2rem;
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(59, 130, 246, 0.18);
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.06),
+    0 4px 24px rgba(59, 130, 246, 0.05),
+    inset 0 1px 0 rgba(59, 130, 246, 0.08);
   isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      ellipse 60% 40% at 90% 0%,
+      rgba(59, 130, 246, 0.04) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
 
   @media (max-width: 768px) {
     padding: 1.25rem;
     border-radius: 1rem;
   }
-`
-
-const GlowOrb = styled.div<{ $color: string; $x: number; $y: number; $size: number }>`
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  filter: blur(70px);
-  opacity: 0.06;
-  width: ${({ $size }) => $size}px;
-  height: ${({ $size }) => $size}px;
-  background: ${({ $color }) => $color};
-  top: ${({ $y }) => $y}%;
-  left: ${({ $x }) => $x}%;
-  transform: translate(-50%, -50%);
-  animation: ${pulse} 4s ease-in-out infinite;
 `
 
 const GridLines = styled.div`
@@ -561,8 +558,6 @@ export function DashboardHero({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
     >
-      <GlowOrb $color={accentHex} $x={85} $y={20} $size={300} />
-      <GlowOrb $color={subAccentHex} $x={10} $y={80} $size={200} />
       <GridLines />
 
       <Content>
