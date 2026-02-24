@@ -734,7 +734,7 @@ function ContentArea({ children }: ContentAreaProps) {
           )}
         />
         <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-white md:pb-0 dark:md:bg-neutral-900">
-          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-24 sm:p-6 md:pb-6">
+          <div className="flex-1 overflow-y-auto p-4 pb-24 sm:p-6 md:pb-6" style={{ WebkitOverflowScrolling: 'touch' }}>
             {children}
           </div>
         </main>

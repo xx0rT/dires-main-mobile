@@ -90,6 +90,8 @@ export default function CoursePartPage() {
   const [actualWatchTime, setActualWatchTime] = useState(0);
   const [lastPosition, setLastPosition] = useState(0);
 
+  const [videoActivated, setVideoActivated] = useState(false);
+
   const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const progressIntervalRef = useRef<any>(null);
@@ -116,6 +118,7 @@ export default function CoursePartPage() {
     setVideoDuration(0);
     setActualWatchTime(0);
     setLastPosition(0);
+    setVideoActivated(false);
   }, [courseId, partNumber]);
 
   useEffect(() => {
@@ -745,10 +748,29 @@ export default function CoursePartPage() {
                     }}
                   />
                 ) : (
-                  <div
-                    ref={videoRef}
-                    className="w-full h-full [&>div]:w-full [&>div]:h-full [&_iframe]:w-full [&_iframe]:h-full"
-                  />
+                  <>
+                    <div
+                      ref={videoRef}
+                      className="w-full h-full [&>div]:w-full [&>div]:h-full [&_iframe]:w-full [&_iframe]:h-full"
+                    />
+                    {!videoActivated && (
+                      <div
+                        className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer"
+                        onClick={() => setVideoActivated(true)}
+                        onTouchEnd={(e) => {
+                          e.preventDefault();
+                          setVideoActivated(true);
+                        }}
+                      >
+                        <div className="flex flex-col items-center gap-2 select-none">
+                          <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                            <PlayCircle className="h-9 w-9 text-white drop-shadow" />
+                          </div>
+                          <span className="text-white/80 text-xs font-medium tracking-wide drop-shadow">Klepnete pro prehrani</span>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
               <div className="px-4 sm:px-5 py-3 bg-muted/30 border-t">
