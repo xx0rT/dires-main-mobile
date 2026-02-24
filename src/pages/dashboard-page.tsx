@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase'
 import { useGamification } from '@/lib/use-gamification'
 import { BadgesCollection } from '@/components/gamification/badges-collection'
 import { XpRewardPopup } from '@/components/gamification/xp-reward-popup'
+import { CourseRoadmapModal } from '@/components/dashboard/course-roadmap-modal'
 
 interface Course {
   id: string
@@ -46,6 +47,8 @@ export default function DashboardPage() {
     rankProgress, lastXpEvent, clearLastEvent, claimReward,
   } = useGamification()
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
+  const [allCourses, setAllCourses] = useState<Course[]>([])
+  const [roadmapOpen, setRoadmapOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [stats, setStats] = useState({
@@ -118,6 +121,16 @@ export default function DashboardPage() {
 
       setEnrollments(enrollmentsWithCourses as Enrollment[])
 
+      const { data: coursesData } = await supabase
+        .from('courses')
+        .select('id, title, description, order_index')
+        .eq('is_published', true)
+        .order('order_index', { ascending: true })
+
+      if (coursesData) {
+        setAllCourses(coursesData as Course[])
+      }
+
       const { data: progressData } = await supabase
         .from('user_course_progress')
         .select('completed')
@@ -183,6 +196,7 @@ export default function DashboardPage() {
         coursesCompleted={userXp?.courses_completed ?? 0}
         onRefresh={handleRefreshSubscription}
         refreshing={refreshing}
+        onOpenRoadmap={() => setRoadmapOpen(true)}
       />
 
       <BadgesCollection
@@ -377,6 +391,22 @@ export default function DashboardPage() {
           onClose={clearLastEvent}
         />
       )}
+
+      <CourseRoadmapModal
+        open={roadmapOpen}
+        onClose={() => setRoadmapOpen(false)}
+        courses={allCourses.length > 0 ? allCourses : enrollments.map((e) => e.course)}
+        enrollments={enrollments.map((e) => ({
+          course_id: e.course_id,
+          completed_at: e.completed_at,
+          progress_percentage: e.progress_percentage,
+        }))}
+        earnedBadgeIds={new Set(earnedBadges.map((b) => b.badge_id))}
+        totalXp={userXp?.total_xp ?? 0}
+        lessonsCompleted={userXp?.lessons_completed ?? 0}
+        coursesCompleted={userXp?.courses_completed ?? 0}
+        loginStreak={userXp?.login_streak ?? 0}
+      />
     </div>
   )
 }

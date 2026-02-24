@@ -15,6 +15,7 @@ import {
   Star,
   ChevronRight,
   Clock,
+  Map,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { Subscription } from '@/lib/subscription'
@@ -461,6 +462,7 @@ interface DashboardHeroProps {
   coursesCompleted: number
   onRefresh?: () => void
   refreshing?: boolean
+  onOpenRoadmap?: () => void
 }
 
 export function DashboardHero({
@@ -476,6 +478,7 @@ export function DashboardHero({
   coursesCompleted,
   onRefresh,
   refreshing,
+  onOpenRoadmap,
 }: DashboardHeroProps) {
   const navigate = useNavigate()
   const [timeRemaining, setTimeRemaining] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
@@ -637,6 +640,36 @@ export function DashboardHero({
                       </StatChip>
                     ))}
                   </StatsRow>
+
+                  {onOpenRoadmap && (
+                    <motion.button
+                      onClick={onOpenRoadmap}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.75, type: 'spring', stiffness: 300 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 0.875rem',
+                        borderRadius: '0.625rem',
+                        background: `${accentHex}12`,
+                        border: `1.5px solid ${accentHex}30`,
+                        color: accentHex,
+                        fontSize: '0.8125rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        width: 'fit-content',
+                        transition: 'background 0.15s',
+                      }}
+                    >
+                      <Map style={{ width: '0.875rem', height: '0.875rem' }} />
+                      Zobrazit Cestu Vzdelavani
+                      <ChevronRight style={{ width: '0.75rem', height: '0.75rem' }} />
+                    </motion.button>
+                  )}
                 </RankInfo>
               </RankBlock>
             </motion.div>
