@@ -734,7 +734,14 @@ function ContentArea({ children }: ContentAreaProps) {
           )}
         />
         <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-white md:pb-0 dark:md:bg-neutral-900">
-          <div className="flex-1 overflow-y-auto p-4 pb-24 sm:p-6 md:pb-6" style={{ WebkitOverflowScrolling: 'touch', overflowX: 'clip' }}>
+          <div
+            className="flex-1 overflow-y-auto px-4 pb-24 sm:px-6 md:px-6 md:pb-6"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              overflowX: 'clip',
+              paddingTop: 'max(env(safe-area-inset-top, 0px) + 12px, 16px)',
+            }}
+          >
             {children}
           </div>
         </main>
@@ -884,7 +891,10 @@ function MobileNavigation({
         </DrawerContent>
       </Drawer>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur md:hidden">
+      <nav
+        className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur md:hidden"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
         <div
           className="grid px-[15px]"
           style={{
