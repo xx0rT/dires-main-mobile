@@ -1,13 +1,17 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from 'sonner'
+import { AnimatePresence } from 'framer-motion'
 import { AuthProvider } from './lib/auth-context'
 import { CartProvider } from './lib/cart-context'
 import { useActivityTracker } from './lib/use-activity-tracker'
+import { ProtectedRoute } from './components/layout/protected-route'
+import { PageTransition } from './components/layout/page-transition'
 import MarketingLayout from './layouts/marketing-layout'
 import DashboardLayout from './layouts/dashboard-layout'
 import AdminLayout from './layouts/admin-layout'
 import HomePage from './pages/home-page'
+import OnboardingPage from './pages/onboarding-page'
 import CoursesPage from './pages/courses-page'
 import ShopPage from './pages/shop-page'
 import CartPage from './pages/cart-page'
@@ -61,55 +65,63 @@ export default function App() {
         <CartProvider>
         <ScrollToTop />
         <ActivityTrackerInit />
-        <Routes>
-          <Route path="/" element={<MarketingLayout />}>
-            <Route index element={<HomePage />} />
-            <Route path="kurzy" element={<CoursesPage />} />
-            <Route path="obchod" element={<ShopPage />} />
-            <Route path="produkt/:productId" element={<ProductDetailPage />} />
-            <Route path="kosik" element={<CartPage />} />
-            <Route path="reference" element={<ReferencesPage />} />
-            <Route path="tym" element={<TeamPage />} />
-            <Route path="tym/:slug" element={<TeamMemberPage />} />
-            <Route path="blog" element={<BlogPage />} />
-            <Route path="blog/:slug" element={<BlogPostPage />} />
-          </Route>
-          <Route path="/potvrzeni-objednavky" element={<OrderConfirmationPage />} />
-          <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
-          <Route path="/prihlaseni" element={<SignInPage />} />
-          <Route path="/registrace" element={<SignUpPage />} />
-          <Route path="/overeni-emailu" element={<VerifyEmailPage />} />
-          <Route path="/zapomenute-heslo" element={<ForgotPasswordPage />} />
-          <Route path="/obnoveni-hesla" element={<ResetPasswordPage />} />
-          <Route path="/kurz/:courseId" element={<CourseOverviewPage />} />
-          <Route path="/kurz/:courseId/cast/:partNumber" element={<CoursePartPage />} />
-          <Route path="/prehled" element={<DashboardLayout />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="analytika" element={<AnalyticsPage />} />
-            <Route path="api" element={<ApiPage />} />
-            <Route path="fakturace" element={<BillingPage />} />
-            <Route path="integrace" element={<IntegrationsPage />} />
-            <Route path="moje-kurzy" element={<MyCoursesPage />} />
-            <Route path="moje-kurzy/:courseId" element={<MyCourseDetailPage />} />
-            <Route path="predplatne" element={<SubscriptionPage />} />
-            <Route path="faktury" element={<InvoicesPage />} />
-            <Route path="pokrok" element={<ProgressPage />} />
-            <Route path="vysledky-testu" element={<TestResultsPage />} />
-            <Route path="certifikaty" element={<CertificatesPage />} />
-            <Route path="nastaveni" element={<SettingsPage />} />
-          </Route>
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminOverviewPage />} />
-            <Route path="users" element={<AdminUsersPage />} />
-            <Route path="blogs" element={<AdminBlogsPage />} />
-            <Route path="blogs/:id" element={<AdminBlogEditorPage />} />
-            <Route path="courses" element={<AdminCoursesPage />} />
-            <Route path="courses/:id" element={<AdminCourseEditorPage />} />
-            <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
-            <Route path="promo-codes" element={<AdminPromoCodesPage />} />
-            <Route path="invoices" element={<AdminInvoicesPage />} />
-          </Route>
-        </Routes>
+        <AnimatePresence mode="wait">
+          <Routes>
+            <Route path="/" element={<Navigate to="/prihlaseni" replace />} />
+            <Route path="/prihlaseni" element={<PageTransition><SignInPage /></PageTransition>} />
+            <Route path="/registrace" element={<PageTransition><SignUpPage /></PageTransition>} />
+            <Route path="/overeni-emailu" element={<PageTransition><VerifyEmailPage /></PageTransition>} />
+            <Route path="/zapomenute-heslo" element={<PageTransition><ForgotPasswordPage /></PageTransition>} />
+            <Route path="/obnoveni-hesla" element={<PageTransition><ResetPasswordPage /></PageTransition>} />
+            <Route path="/onboarding" element={<ProtectedRoute><PageTransition><OnboardingPage /></PageTransition></ProtectedRoute>} />
+
+            <Route path="/home" element={<MarketingLayout />}>
+              <Route index element={<PageTransition><HomePage /></PageTransition>} />
+              <Route path="kurzy" element={<PageTransition><CoursesPage /></PageTransition>} />
+              <Route path="obchod" element={<PageTransition><ShopPage /></PageTransition>} />
+              <Route path="produkt/:productId" element={<PageTransition><ProductDetailPage /></PageTransition>} />
+              <Route path="kosik" element={<PageTransition><CartPage /></PageTransition>} />
+              <Route path="reference" element={<PageTransition><ReferencesPage /></PageTransition>} />
+              <Route path="tym" element={<PageTransition><TeamPage /></PageTransition>} />
+              <Route path="tym/:slug" element={<PageTransition><TeamMemberPage /></PageTransition>} />
+              <Route path="blog" element={<PageTransition><BlogPage /></PageTransition>} />
+              <Route path="blog/:slug" element={<PageTransition><BlogPostPage /></PageTransition>} />
+            </Route>
+
+            <Route path="/potvrzeni-objednavky" element={<PageTransition><OrderConfirmationPage /></PageTransition>} />
+            <Route path="/order-confirmation" element={<PageTransition><OrderConfirmationPage /></PageTransition>} />
+            <Route path="/kurz/:courseId" element={<ProtectedRoute><PageTransition><CourseOverviewPage /></PageTransition></ProtectedRoute>} />
+            <Route path="/kurz/:courseId/cast/:partNumber" element={<ProtectedRoute><PageTransition><CoursePartPage /></PageTransition></ProtectedRoute>} />
+
+            <Route path="/prehled" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+              <Route index element={<PageTransition><DashboardPage /></PageTransition>} />
+              <Route path="analytika" element={<PageTransition><AnalyticsPage /></PageTransition>} />
+              <Route path="api" element={<PageTransition><ApiPage /></PageTransition>} />
+              <Route path="fakturace" element={<PageTransition><BillingPage /></PageTransition>} />
+              <Route path="integrace" element={<PageTransition><IntegrationsPage /></PageTransition>} />
+              <Route path="moje-kurzy" element={<PageTransition><MyCoursesPage /></PageTransition>} />
+              <Route path="moje-kurzy/:courseId" element={<PageTransition><MyCourseDetailPage /></PageTransition>} />
+              <Route path="predplatne" element={<PageTransition><SubscriptionPage /></PageTransition>} />
+              <Route path="faktury" element={<PageTransition><InvoicesPage /></PageTransition>} />
+              <Route path="pokrok" element={<PageTransition><ProgressPage /></PageTransition>} />
+              <Route path="vysledky-testu" element={<PageTransition><TestResultsPage /></PageTransition>} />
+              <Route path="certifikaty" element={<PageTransition><CertificatesPage /></PageTransition>} />
+              <Route path="nastaveni" element={<PageTransition><SettingsPage /></PageTransition>} />
+            </Route>
+
+            <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+              <Route index element={<PageTransition><AdminOverviewPage /></PageTransition>} />
+              <Route path="users" element={<PageTransition><AdminUsersPage /></PageTransition>} />
+              <Route path="blogs" element={<PageTransition><AdminBlogsPage /></PageTransition>} />
+              <Route path="blogs/:id" element={<PageTransition><AdminBlogEditorPage /></PageTransition>} />
+              <Route path="courses" element={<PageTransition><AdminCoursesPage /></PageTransition>} />
+              <Route path="courses/:id" element={<PageTransition><AdminCourseEditorPage /></PageTransition>} />
+              <Route path="subscriptions" element={<PageTransition><AdminSubscriptionsPage /></PageTransition>} />
+              <Route path="promo-codes" element={<PageTransition><AdminPromoCodesPage /></PageTransition>} />
+              <Route path="invoices" element={<PageTransition><AdminInvoicesPage /></PageTransition>} />
+            </Route>
+          </Routes>
+        </AnimatePresence>
         <Toaster />
         </CartProvider>
       </AuthProvider>

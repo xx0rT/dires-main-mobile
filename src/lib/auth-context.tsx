@@ -73,13 +73,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.session) {
       setUser(data.user)
       setSession(data.session)
+      localStorage.removeItem('onboarding_completed')
 
       const pendingPlan = localStorage.getItem('pending_plan')
       if (pendingPlan) {
         localStorage.removeItem('pending_plan')
-        navigate('/', { state: { scrollTo: 'pricing', selectedPlan: pendingPlan } })
+        navigate('/onboarding')
       } else {
-        navigate('/prehled')
+        navigate('/onboarding')
       }
     }
   }
