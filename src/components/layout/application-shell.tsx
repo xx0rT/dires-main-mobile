@@ -740,7 +740,7 @@ function ContentArea({ children }: ContentAreaProps) {
             style={{
               WebkitOverflowScrolling: 'touch',
               overflowX: 'clip',
-              paddingTop: 'max(env(safe-area-inset-top, 0px) + 12px, 16px)',
+              paddingTop: 'max(env(safe-area-inset-top, 0px) + 20px, 24px)',
             }}
           >
             {children}

@@ -21,7 +21,7 @@ export default function MarketingLayout() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar10 />
-      <main className="flex-1 pt-20">
+      <main className="flex-1" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px) + 80px, 80px)' }}>
         <Outlet />
       </main>
       {!hideFooter && <FooterSection />}
