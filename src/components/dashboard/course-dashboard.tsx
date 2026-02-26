@@ -1,20 +1,26 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  ArrowLeft,
+  ArrowRight,
   BookOpen,
-  ChevronDown,
+  CalendarClock,
+  CheckCircle2,
   Clock,
   Layers,
+  Lock,
   Play,
   Trophy,
+  User,
 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
-import { useSelectedCourse, type UserCourse } from '@/lib/selected-course-context'
+import type { UserCourse } from '@/lib/selected-course-context'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { CoursePath } from './course-path'
+import { cn } from '@/lib/utils'
 
 interface Lesson {
   id: string
@@ -38,12 +44,11 @@ interface Props {
 export function CourseDashboard({ course }: Props) {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const { courses, setSelectedCourseId } = useSelectedCourse()
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [progressMap, setProgressMap] = useState<Map<string, LessonProgress>>(new Map())
   const [isCompleted, setIsCompleted] = useState(false)
+  const [enrolledAt, setEnrolledAt] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [selectorOpen, setSelectorOpen] = useState(false)
 
   useEffect(() => {
     if (user) loadCourseData()
@@ -79,6 +84,7 @@ export function CourseDashboard({ course }: Props) {
 
       setLessons(lessonsData || [])
       setIsCompleted(enrollmentData?.completed || false)
+      setEnrolledAt(enrollmentData?.enrolled_at || null)
 
       if (progressData) {
         const map = new Map<string, LessonProgress>()
@@ -130,14 +136,6 @@ export function CourseDashboard({ course }: Props) {
     return null
   }
 
-  const pathLessons = lessons.map((lesson, i) => ({
-    ...lesson,
-    status: getLessonStatus(i),
-  }))
-
-  const nextLessonIndex = getNextLessonIndex()
-  const otherCourses = courses.filter(c => c.id !== course.id)
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
@@ -146,164 +144,218 @@ export function CourseDashboard({ course }: Props) {
     )
   }
 
+  const nextLessonIndex = getNextLessonIndex()
+
   return (
-    <div className="space-y-0 -mx-4 sm:-mx-6">
+    <div className="space-y-6 mx-auto max-w-7xl">
       <motion.div
-        initial={{ opacity: 0, y: -8 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
-        className="relative px-4 sm:px-6 pt-1 pb-4"
+        transition={{ duration: 0.4 }}
+        className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
       >
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(to bottom, color-mix(in srgb, var(--primary) 5%, var(--background)) 0%, var(--background) 100%)',
-          }}
-        />
-
-        <div className="relative">
-          <div className="flex items-center gap-2 mb-3">
-            <motion.button
-              type="button"
-              onClick={() => setSelectedCourseId(null)}
-              whileTap={{ scale: 0.9 }}
-              className="w-8 h-8 rounded-xl flex items-center justify-center border border-border/40 bg-background/60 backdrop-blur text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </motion.button>
-
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Kurz</p>
-              <h2 className="text-base font-bold truncate leading-tight">{course.title}</h2>
-            </div>
-
-            {otherCourses.length > 0 && (
-              <div className="relative">
-                <motion.button
-                  type="button"
-                  onClick={() => setSelectorOpen(!selectorOpen)}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-border/40 bg-background/60 backdrop-blur text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${selectorOpen ? 'rotate-180' : ''}`} />
-                </motion.button>
-
-                <AnimatePresence>
-                  {selectorOpen && (
-                    <>
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-40"
-                        onClick={() => setSelectorOpen(false)}
-                      />
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -4 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute right-0 top-full mt-1.5 z-50 w-56 rounded-xl bg-popover border border-border shadow-lg overflow-hidden"
-                      >
-                        <div className="p-1.5">
-                          <p className="px-2 py-1 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Prepnout kurz</p>
-                          {otherCourses.map((c) => (
-                            <button
-                              key={c.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedCourseId(c.id)
-                                setSelectorOpen(false)
-                              }}
-                              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg text-left hover:bg-accent active:bg-accent transition-colors"
-                            >
-                              <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                <BookOpen className="w-3.5 h-3.5 text-primary" />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-xs font-semibold truncate">{c.title}</p>
-                                {c.category && (
-                                  <p className="text-[10px] text-muted-foreground truncate">{c.category}</p>
-                                )}
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      </motion.div>
-                    </>
-                  )}
-                </AnimatePresence>
-              </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            {isCompleted ? (
+              <Badge className="bg-green-500/20 text-green-600 border-green-500/30">
+                <Trophy className="h-3 w-3 mr-1" />
+                Dokonceno
+              </Badge>
+            ) : overallProgress > 0 ? (
+              <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">
+                <Play className="h-3 w-3 mr-1" />
+                Probiha
+              </Badge>
+            ) : (
+              <Badge variant="outline">
+                <BookOpen className="h-3 w-3 mr-1" />
+                Nezahajeno
+              </Badge>
+            )}
+            {course.level && (
+              <Badge variant="outline" className="capitalize">{course.level}</Badge>
+            )}
+            {course.category && (
+              <Badge variant="outline">{course.category}</Badge>
             )}
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-4 flex-1">
-              <div className="flex items-center gap-1.5 text-[11px]">
-                {isCompleted ? (
-                  <span className="flex items-center gap-1 text-green-600 font-bold">
-                    <Trophy className="w-3.5 h-3.5" />
-                    Dokonceno
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-muted-foreground font-medium">
-                    <Layers className="w-3.5 h-3.5" />
-                    {completedLessons}/{totalLessons} lekci
-                  </span>
-                )}
-              </div>
-              {totalDuration > 0 && (
-                <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                  <Clock className="w-3 h-3" />
-                  {totalDuration} min
-                </div>
-              )}
-            </div>
-            <span className="text-[11px] font-bold tabular-nums">{overallProgress}%</span>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">{course.title}</h1>
+
+          {course.description && (
+            <p className="text-muted-foreground leading-relaxed max-w-2xl">{course.description}</p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mt-3">
+            {course.instructor && (
+              <span className="flex items-center gap-1.5">
+                <User className="h-4 w-4" />
+                {course.instructor}
+              </span>
+            )}
+            <span className="flex items-center gap-1.5">
+              <Layers className="h-4 w-4" />
+              {totalLessons} lekci
+            </span>
+            {totalDuration > 0 && (
+              <span className="flex items-center gap-1.5">
+                <Clock className="h-4 w-4" />
+                {totalDuration} min
+              </span>
+            )}
+            {enrolledAt && (
+              <span className="flex items-center gap-1.5">
+                Zapsano: {new Date(enrolledAt).toLocaleDateString('cs-CZ')}
+              </span>
+            )}
           </div>
-          <Progress value={overallProgress} className="h-1.5 mt-1.5" />
         </div>
+
+        {nextLessonIndex !== null && (
+          <Button
+            size="lg"
+            className="shrink-0"
+            onClick={() => navigate(`/kurz/${course.id}/cast/${nextLessonIndex + 1}`)}
+          >
+            <Play className="h-4 w-4 mr-2" />
+            Pokracovat ve studiu
+          </Button>
+        )}
+        {isCompleted && nextLessonIndex === null && (
+          <Button
+            variant="outline"
+            size="lg"
+            className="shrink-0"
+            onClick={() => navigate(`/kurz/${course.id}/cast/1`)}
+          >
+            <ArrowRight className="h-4 w-4 mr-2" />
+            Zopakovat kurz
+          </Button>
+        )}
       </motion.div>
 
-      {nextLessonIndex !== null && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.35 }}
-          className="px-4 sm:px-6 pb-4"
-        >
-          <button
-            type="button"
-            onClick={() => navigate(`/kurz/${course.id}/cast/${nextLessonIndex + 1}`)}
-            className="w-full flex items-center gap-3 p-3 rounded-2xl bg-primary/10 border border-primary/20 active:bg-primary/15 transition-colors"
-          >
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
-              <Play className="w-5 h-5 text-primary-foreground ml-0.5" />
-            </div>
-            <div className="flex-1 min-w-0 text-left">
-              <p className="text-[10px] font-medium text-primary/70 uppercase tracking-wider">Dalsi lekce</p>
-              <p className="text-sm font-bold truncate">{lessons[nextLessonIndex]?.title}</p>
-            </div>
-            <div className="flex items-center gap-1 text-[11px] text-muted-foreground flex-shrink-0">
-              <Clock className="w-3 h-3" />
-              {lessons[nextLessonIndex]?.duration} min
-            </div>
-          </button>
-        </motion.div>
-      )}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="grid gap-4 grid-cols-2 sm:grid-cols-4"
+      >
+        {[
+          { label: 'Celkem lekci', value: totalLessons, icon: Layers, color: 'text-blue-600' },
+          { label: 'Dokonceno', value: completedLessons, icon: CheckCircle2, color: 'text-green-600' },
+          { label: 'Zbyvajicich', value: totalLessons - completedLessons, icon: BookOpen, color: 'text-orange-600' },
+          { label: 'Celkovy cas', value: `${totalDuration} min`, icon: Clock, color: 'text-blue-600' },
+        ].map((stat) => (
+          <Card key={stat.label}>
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-2.5">
+                <stat.icon className={`h-5 w-5 ${stat.color}`} />
+              </div>
+              <div>
+                <p className="text-xl font-bold">{stat.value}</p>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </motion.div>
 
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-        className="px-4 sm:px-6 pt-2"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.15 }}
       >
-        <CoursePath
-          courseId={course.id}
-          lessons={pathLessons}
-          courseTitle={course.title}
-        />
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium">Celkovy pokrok</p>
+              <p className="text-sm font-bold tabular-nums">{overallProgress}%</p>
+            </div>
+            <Progress value={overallProgress} className="h-3" />
+            <p className="text-xs text-muted-foreground mt-2">
+              {completedLessons} z {totalLessons} lekci dokonceno
+            </p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Lekce</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="divide-y">
+              {lessons.map((lesson, index) => {
+                const status = getLessonStatus(index)
+                const canOpen = status === 'completed' || status === 'available'
+
+                return (
+                  <button
+                    key={lesson.id}
+                    type="button"
+                    disabled={!canOpen}
+                    onClick={() => {
+                      if (canOpen) navigate(`/kurz/${course.id}/cast/${index + 1}`)
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-4 px-6 py-4 text-left transition-colors',
+                      canOpen && 'hover:bg-accent/50 cursor-pointer',
+                      !canOpen && 'cursor-not-allowed opacity-60'
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        'w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold shrink-0',
+                        status === 'completed' && 'bg-green-500 text-white',
+                        status === 'available' && 'bg-primary/10 text-primary',
+                        status === 'daily_locked' && 'bg-amber-500/15 text-amber-600',
+                        status === 'locked' && 'bg-muted text-muted-foreground'
+                      )}
+                    >
+                      {status === 'completed' ? (
+                        <CheckCircle2 className="h-4 w-4" />
+                      ) : status === 'daily_locked' ? (
+                        <CalendarClock className="h-4 w-4" />
+                      ) : status === 'locked' ? (
+                        <Lock className="h-3.5 w-3.5" />
+                      ) : (
+                        index + 1
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate text-sm">{lesson.title}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                        <Clock className="h-3 w-3" />
+                        <span>{lesson.duration} min</span>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 flex items-center gap-2">
+                      {status === 'completed' && (
+                        <Badge variant="outline" className="text-green-600 border-green-500/30 text-xs">
+                          Hotovo
+                        </Badge>
+                      )}
+                      {status === 'daily_locked' && (
+                        <Badge variant="outline" className="text-amber-600 border-amber-500/30 text-xs gap-1">
+                          <CalendarClock className="h-3 w-3" />
+                          Zitra
+                        </Badge>
+                      )}
+                      {canOpen && <ArrowRight className="h-4 w-4 text-muted-foreground" />}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
       </motion.div>
     </div>
   )
