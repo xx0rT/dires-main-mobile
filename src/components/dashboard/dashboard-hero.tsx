@@ -14,11 +14,13 @@ import {
   Star,
   ChevronRight,
   Clock,
+  Sparkles,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { Subscription } from '@/lib/subscription'
 import type { Rank } from '@/lib/gamification'
 import { useNavigate } from 'react-router-dom'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const RANK_ICONS: Record<string, LucideIcon> = {
   seedling: Sprout,
@@ -31,7 +33,7 @@ const RANK_ICONS: Record<string, LucideIcon> = {
 }
 
 interface DashboardHeroProps {
-  user: { email?: string } | null
+  user: { email?: string; user_metadata?: { avatar_url?: string } } | null
   subscription: Subscription | null
   hasActiveSubscription: boolean
   currentRank: Rank | null
@@ -43,6 +45,15 @@ interface DashboardHeroProps {
   coursesCompleted: number
   onRefresh?: () => void
   refreshing?: boolean
+}
+
+function getInitials(name: string) {
+  return name
+    .split(/[.\-_\s]/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join('') || 'U'
 }
 
 export function DashboardHero({
@@ -80,6 +91,7 @@ export function DashboardHero({
 
   const getGreeting = () => {
     const h = new Date().getHours()
+    if (h < 6) return 'Dobrou noc'
     if (h < 12) return 'Dobre rano'
     if (h < 18) return 'Dobre odpoledne'
     return 'Dobry vecer'
@@ -101,110 +113,152 @@ export function DashboardHero({
                   subscription?.plan_type === 'free_trial' ? Zap : Calendar
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
-        className="space-y-1"
+        className="-mx-4 sm:-mx-6 px-4 sm:px-6 pt-2 pb-5 relative overflow-hidden"
       >
-        <p className="text-xs font-medium text-muted-foreground tracking-wider uppercase">
-          {getGreeting()},
-        </p>
-        <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
-          {username}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Vitejte zpet. Pokracujte ve svem uceni.
-        </p>
-      </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-blue-500/5 dark:from-primary/12 dark:to-blue-500/8" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
 
-      {currentRank && (
-        <motion.div
-          initial={{ opacity: 0, x: -16 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.1, ease: [0.33, 1, 0.68, 1] }}
-          className="flex items-start gap-3"
-        >
+        <div className="relative flex items-start gap-4">
           <motion.div
-            className="relative flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center bg-primary/10 border border-primary/20"
-            whileHover={{ scale: 1.08, rotate: 3 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 300 }}
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.1 }}
           >
-            <RankIcon className="w-5 h-5 text-primary" />
-            <div className="absolute -top-1.5 -right-1.5 bg-primary/10 border border-primary/25 rounded-full px-1.5 py-px">
-              <span className="text-[9px] font-extrabold text-primary leading-none">LVL</span>
-            </div>
+            <Avatar className="w-14 h-14 border-2 border-primary/20 shadow-lg">
+              <AvatarImage src={user?.user_metadata?.avatar_url} />
+              <AvatarFallback className="bg-primary/10 text-primary text-lg font-bold">
+                {getInitials(username)}
+              </AvatarFallback>
+            </Avatar>
           </motion.div>
 
-          <div className="flex-1 min-w-0 space-y-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-base font-bold text-primary">{currentRank.name}</span>
-              <motion.div
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary border border-border"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 400, delay: 0.3 }}
-              >
-                <Zap className="w-3 h-3" />
-                <span className="text-[11px] font-bold">{totalXp} XP</span>
-              </motion.div>
-            </div>
-
-            {nextRank && (
-              <p className="text-xs text-muted-foreground">
-                {nextRank.minXp - totalXp} XP do <span className="font-semibold text-foreground">{nextRank.name}</span>
+          <div className="flex-1 min-w-0 space-y-1 pt-0.5">
+            <motion.div
+              className="flex items-center gap-1.5"
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.15, duration: 0.4 }}
+            >
+              <Sparkles className="w-3 h-3 text-primary/60" />
+              <p className="text-[11px] font-semibold text-primary/70 tracking-wide uppercase">
+                {getGreeting()}
               </p>
-            )}
-
-            <div className="space-y-1.5">
-              <div className="flex justify-between items-center">
-                <span className="text-[11px] text-muted-foreground font-medium">Pokrok</span>
-                <span className="text-[11px] font-bold">{rankProgress}%</span>
-              </div>
-              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                <motion.div
-                  className="h-full rounded-full bg-primary"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${rankProgress}%` }}
-                  transition={{ duration: 1.2, ease: [0.33, 1, 0.68, 1], delay: 0.3 }}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 flex-wrap pt-0.5">
-              {[
-                { icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10', label: `${loginStreak} dnu` },
-                { icon: BookOpen, color: 'text-green-500', bg: 'bg-green-500/10', label: `${lessonsCompleted} lekci` },
-                { icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-500/10', label: `${coursesCompleted} kurzu` },
-              ].map(({ icon: Icon, color, bg, label }, i) => (
-                <motion.div
-                  key={label}
-                  className={`flex items-center gap-1.5 px-2 py-1 rounded-lg ${bg} border border-transparent`}
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.4 + i * 0.06, type: 'spring', stiffness: 350 }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <Icon className={`w-3 h-3 ${color}`} />
-                  <span className="text-[11px] font-semibold">{label}</span>
-                </motion.div>
-              ))}
-            </div>
+            </motion.div>
+            <motion.h1
+              className="text-[22px] font-extrabold tracking-tight text-foreground leading-tight"
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+            >
+              {username}
+            </motion.h1>
+            <motion.p
+              className="text-xs text-muted-foreground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+            >
+              Pokracujte ve svem uceni
+            </motion.p>
           </div>
+
+          {onRefresh && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={onRefresh}
+              disabled={refreshing}
+              className="w-9 h-9 rounded-xl flex items-center justify-center border border-border/60 bg-background/80 backdrop-blur text-muted-foreground hover:text-foreground hover:bg-accent transition-colors disabled:opacity-50 mt-1"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            </motion.button>
+          )}
+        </div>
+
+        {currentRank && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.4 }}
+            className="relative mt-4 flex items-center gap-3 p-3 rounded-2xl bg-background/60 backdrop-blur border border-border/30"
+          >
+            <motion.div
+              className="relative flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center bg-primary/12 border border-primary/20"
+              whileTap={{ scale: 0.92 }}
+            >
+              <RankIcon className="w-5 h-5 text-primary" />
+            </motion.div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-bold text-primary">{currentRank.name}</span>
+                <span className="text-[10px] font-bold px-1.5 py-px rounded-md bg-secondary/80 border border-border/50">
+                  {totalXp} XP
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-primary"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${rankProgress}%` }}
+                    transition={{ duration: 1.2, ease: [0.33, 1, 0.68, 1], delay: 0.4 }}
+                  />
+                </div>
+                <span className="text-[10px] font-bold text-muted-foreground tabular-nums">{rankProgress}%</span>
+              </div>
+              {nextRank && (
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {nextRank.minXp - totalXp} XP do {nextRank.name}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        <motion.div
+          className="relative flex items-center gap-2 mt-3 overflow-x-auto scrollbar-hide"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35, duration: 0.4 }}
+        >
+          {[
+            { icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10 border-orange-500/15', val: loginStreak, unit: 'dnu' },
+            { icon: BookOpen, color: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-500/15', val: lessonsCompleted, unit: 'lekci' },
+            { icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-500/10 border-blue-500/15', val: coursesCompleted, unit: 'kurzu' },
+          ].map(({ icon: Icon, color, bg, val, unit }, i) => (
+            <motion.div
+              key={unit}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border ${bg} flex-shrink-0`}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 + i * 0.05, duration: 0.35 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Icon className={`w-3.5 h-3.5 ${color}`} />
+              <span className="text-[11px] font-bold">{val}</span>
+              <span className="text-[10px] text-muted-foreground">{unit}</span>
+            </motion.div>
+          ))}
         </motion.div>
-      )}
+      </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="rounded-2xl bg-muted/50 border border-border/50 p-4 space-y-3"
+        transition={{ duration: 0.45, delay: 0.3 }}
+        className="rounded-2xl bg-muted/40 border border-border/40 p-4 space-y-3"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center bg-primary/10 border border-primary/20">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-primary/10 border border-primary/20">
               <SubIcon className="w-4 h-4 text-primary" />
             </div>
             <div>
@@ -212,28 +266,18 @@ export function DashboardHero({
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold">{getPlanLabel()}</span>
                 {hasActiveSubscription && subscription?.plan_type && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 border border-primary/25 text-primary">
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary">
                     {subscription.plan_type === 'free_trial' ? 'Zkusebni' : subscription.plan_type === 'lifetime' ? 'Dozivotni' : 'Premium'}
                   </span>
                 )}
               </div>
             </div>
           </div>
-          {onRefresh && (
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={onRefresh}
-              disabled={refreshing}
-              className="w-8 h-8 rounded-lg flex items-center justify-center border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-accent transition-colors disabled:opacity-50"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-            </motion.button>
-          )}
         </div>
 
         {subscription?.current_period_end && subscription.plan_type !== 'lifetime' && (
           <>
-            <div className="h-px bg-border/60" />
+            <div className="h-px bg-border/50" />
             <div className="space-y-2.5">
               <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
                 <Clock className="w-3 h-3" />
@@ -248,17 +292,17 @@ export function DashboardHero({
                 ].map(({ val, unit }, i) => (
                   <motion.div
                     key={unit}
-                    className="flex flex-col items-center py-2 rounded-xl bg-background border border-border/40"
-                    initial={{ opacity: 0, y: 8 }}
+                    className="flex flex-col items-center py-2 rounded-xl bg-background border border-border/30"
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 + i * 0.05, type: 'spring', stiffness: 300 }}
+                    transition={{ delay: 0.4 + i * 0.04, type: 'spring', stiffness: 300 }}
                   >
                     <span className="text-lg font-extrabold tabular-nums leading-tight">{String(val).padStart(2, '0')}</span>
                     <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">{unit}</span>
                   </motion.div>
                 ))}
               </div>
-              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                 <Calendar className="w-3 h-3 flex-shrink-0" />
                 <span>
                   {new Date(subscription.current_period_end).toLocaleDateString('cs-CZ', {
@@ -272,7 +316,7 @@ export function DashboardHero({
 
         {subscription?.plan_type === 'lifetime' && (
           <>
-            <div className="h-px bg-border/60" />
+            <div className="h-px bg-border/50" />
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/5 border border-primary/15">
               <Crown className="w-4 h-4 text-primary flex-shrink-0" />
               <span className="text-xs font-semibold">Aktivni navzdy</span>
@@ -283,7 +327,6 @@ export function DashboardHero({
         {(!subscription || subscription.plan_type === 'free_trial') && (
           <motion.button
             onClick={() => navigate('/#pricing')}
-            whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity"
           >

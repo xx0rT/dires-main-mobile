@@ -1,7 +1,22 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { ApplicationShell } from '@/components/layout/application-shell'
 import { SelectedCourseProvider } from '@/lib/selected-course-context'
+import { useNavVisibility } from '@/lib/nav-visibility-context'
+
+function NavShowOnSubPages() {
+  const location = useLocation()
+  const { showMobileNav, mobileNavVisible } = useNavVisibility()
+
+  useEffect(() => {
+    if (location.pathname !== '/prehled' && !mobileNavVisible) {
+      showMobileNav()
+    }
+  }, [location.pathname, mobileNavVisible, showMobileNav])
+
+  return null
+}
 
 export default function DashboardLayout() {
   const { user, loading } = useAuth()
@@ -21,6 +36,7 @@ export default function DashboardLayout() {
   return (
     <SelectedCourseProvider>
       <ApplicationShell>
+        <NavShowOnSubPages />
         <Outlet />
       </ApplicationShell>
     </SelectedCourseProvider>

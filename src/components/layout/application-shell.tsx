@@ -30,6 +30,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAdmin } from "@/lib/use-admin";
 import { useSelectedCourse } from "@/lib/selected-course-context";
+import { useNavVisibility } from "@/lib/nav-visibility-context";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -891,43 +892,81 @@ function MobileNavigation({
         </DrawerContent>
       </Drawer>
 
-      <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur md:hidden"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-      >
-        <div
-          className="grid px-[15px]"
-          style={{
-            gridTemplateColumns: `repeat(${railIcons.length}, minmax(0, 1fr))`,
-          }}
-        >
-          {railIcons.map((module) => {
-            const Icon = module.icon;
-            const isActive = module.moduleId === activeModuleId;
-            return (
-              <button
-                key={module.moduleId}
-                type="button"
-                onClick={() => {
-                  onModuleChange(module.moduleId);
-                  onOpenChange(true);
-                }}
-                className={cn(
-                  "flex flex-col items-center gap-1 py-2 text-xs",
-                  isActive
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-                aria-label={module.label}
-              >
-                <Icon className="h-5 w-5" />
-                <span>{module.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </nav>
+      <MobileBottomBar
+        railIcons={railIcons}
+        activeModuleId={activeModuleId}
+        onModuleChange={onModuleChange}
+        onOpenChange={onOpenChange}
+      />
     </>
+  );
+}
+
+function MobileBottomBar({
+  railIcons,
+  activeModuleId,
+  onModuleChange,
+  onOpenChange,
+}: {
+  railIcons: RailIconConfig[];
+  activeModuleId: string;
+  onModuleChange: (moduleId: string) => void;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const { mobileNavVisible } = useNavVisibility();
+
+  return (
+    <AnimatePresence>
+      {mobileNavVisible && (
+        <motion.nav
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 80, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur md:hidden"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        >
+          <div
+            className="grid px-[15px]"
+            style={{
+              gridTemplateColumns: `repeat(${railIcons.length}, minmax(0, 1fr))`,
+            }}
+          >
+            {railIcons.map((module) => {
+              const Icon = module.icon;
+              const isActive = module.moduleId === activeModuleId;
+              return (
+                <button
+                  key={module.moduleId}
+                  type="button"
+                  onClick={() => {
+                    onModuleChange(module.moduleId);
+                    onOpenChange(true);
+                  }}
+                  className={cn(
+                    "relative flex flex-col items-center gap-1 py-2 text-xs transition-colors",
+                    isActive
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                  aria-label={module.label}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="mobile-nav-indicator"
+                      className="absolute -top-px left-1/4 right-1/4 h-0.5 rounded-full bg-primary"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  <Icon className="h-5 w-5" />
+                  <span className={cn("text-[10px]", isActive && "font-semibold")}>{module.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </motion.nav>
+      )}
+    </AnimatePresence>
   );
 }
 

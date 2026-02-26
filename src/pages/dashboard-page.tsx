@@ -15,6 +15,7 @@ import { useGamification } from '@/lib/use-gamification'
 import { BadgesCollection } from '@/components/gamification/badges-collection'
 import { XpRewardPopup } from '@/components/gamification/xp-reward-popup'
 import { WelcomeLoader } from '@/components/dashboard/welcome-loader'
+import { useNavVisibility } from '@/lib/nav-visibility-context'
 
 interface Course {
   id: string
@@ -47,6 +48,28 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.33, 1, 0.68, 1] as const } },
 }
 
+function SectionHeader({ title, subtitle, delay = 0 }: { title: string; subtitle?: string; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.4, delay }}
+      className="sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-3 pb-2 bg-background/80 backdrop-blur-lg border-b border-border/20"
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-sm font-bold tracking-tight">{title}</h2>
+          {subtitle && <p className="text-[10px] text-muted-foreground mt-0.5">{subtitle}</p>}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+function SectionDivider() {
+  return <div className="h-px -mx-4 sm:-mx-6 bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+}
+
 export default function DashboardPage() {
   const { user } = useAuth()
   const { subscription, hasActiveSubscription, refetch } = useSubscription()
@@ -59,6 +82,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [showWelcome, setShowWelcome] = useState(true)
+  const { showMobileNav } = useNavVisibility()
   const [stats, setStats] = useState({
     completedCourses: 0,
     inProgressCourses: 0,
@@ -152,7 +176,8 @@ export default function DashboardPage() {
 
   const handleWelcomeComplete = useCallback(() => {
     setShowWelcome(false)
-  }, [])
+    showMobileNav()
+  }, [showMobileNav])
 
   if (selectedCourse) {
     return <CourseDashboard course={selectedCourse} />
@@ -170,7 +195,7 @@ export default function DashboardPage() {
 
       {!showWelcome && (
         <motion.div
-          className="space-y-8 pb-8"
+          className="pb-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -195,167 +220,187 @@ export default function DashboardPage() {
               <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
             </div>
           ) : (
-            <>
-              <motion.div
-                className="grid grid-cols-2 gap-3"
-                variants={stagger}
-                initial="hidden"
-                animate="visible"
-              >
-                {[
-                  { title: 'Dokoncene', value: stats.completedCourses, icon: RiTrophyLine, color: 'text-green-500', bg: 'bg-green-500/10' },
-                  { title: 'Probihajici', value: stats.inProgressCourses, icon: RiBookOpenLine, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                  { title: 'Hodin', value: stats.totalHoursSpent, icon: RiTimeLine, color: 'text-cyan-500', bg: 'bg-cyan-500/10' },
-                  { title: 'Lekci', value: stats.completedModules, icon: RiCheckLine, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-                ].map((stat) => {
-                  const Icon = stat.icon
-                  return (
-                    <motion.div
-                      key={stat.title}
-                      variants={fadeUp}
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-center gap-3 p-4 rounded-2xl bg-muted/40 border border-border/30"
-                    >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.bg}`}>
-                        <Icon className={`h-5 w-5 ${stat.color}`} />
-                      </div>
-                      <div>
-                        <div className="text-xl font-extrabold leading-tight">{stat.value}</div>
-                        <div className="text-[11px] text-muted-foreground font-medium">{stat.title}</div>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </motion.div>
+            <div className="space-y-0">
+              <SectionDivider />
 
-              {enrollments.length > 0 ? (
+              <div>
+                <SectionHeader title="Statistiky" subtitle="Vas prehled uceni" delay={0.1} />
                 <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  className="space-y-4"
+                  className="grid grid-cols-2 gap-3 pt-4 pb-6"
+                  variants={stagger}
+                  initial="hidden"
+                  animate="visible"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-lg font-bold">Pokracovat</h2>
-                      <p className="text-xs text-muted-foreground">Vase aktivni kurzy</p>
-                    </div>
-                    <Button asChild variant="ghost" size="sm" className="text-xs">
-                      <Link to="/prehled/moje-kurzy">
-                        Vse
-                        <RiArrowRightLine className="ml-1 h-3 w-3" />
-                      </Link>
-                    </Button>
-                  </div>
-
-                  <div className="space-y-3">
-                    {enrollments.slice(0, 3).map((enrollment, i) => (
+                  {[
+                    { title: 'Dokoncene', value: stats.completedCourses, icon: RiTrophyLine, color: 'text-green-500', bg: 'bg-green-500/10' },
+                    { title: 'Probihajici', value: stats.inProgressCourses, icon: RiBookOpenLine, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                    { title: 'Hodin', value: stats.totalHoursSpent, icon: RiTimeLine, color: 'text-cyan-500', bg: 'bg-cyan-500/10' },
+                    { title: 'Lekci', value: stats.completedModules, icon: RiCheckLine, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+                  ].map((stat) => {
+                    const Icon = stat.icon
+                    return (
                       <motion.div
-                        key={enrollment.id}
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.35 + i * 0.08, duration: 0.4 }}
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
+                        key={stat.title}
+                        variants={fadeUp}
+                        whileTap={{ scale: 0.97 }}
+                        className="flex items-center gap-3 p-3.5 rounded-2xl bg-muted/30 border border-border/25"
                       >
-                        <Link
-                          to="/prehled/moje-kurzy"
-                          className="flex items-center gap-3 p-3 rounded-2xl bg-muted/30 border border-border/30 hover:bg-muted/60 transition-colors"
-                        >
-                          <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-primary/15 to-blue-400/15 flex items-center justify-center">
-                            <RiBookOpenLine className="h-5 w-5 text-primary/70" />
-                          </div>
-                          <div className="flex-1 min-w-0 space-y-1.5">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-semibold text-sm truncate">{enrollment.course.title}</h3>
-                              {enrollment.completed_at && (
-                                <span className="flex-shrink-0 text-[10px] font-bold text-green-600 bg-green-500/10 px-1.5 py-0.5 rounded-full">
-                                  Hotovo
-                                </span>
-                              )}
-                            </div>
-                            <div className="space-y-1">
-                              <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-muted-foreground">Pokrok</span>
-                                <span className="font-bold">{Math.round(enrollment.progress_percentage)}%</span>
-                              </div>
-                              <Progress value={enrollment.progress_percentage} className="h-1.5" />
-                            </div>
-                          </div>
-                          <RiArrowRightLine className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        </Link>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.bg}`}>
+                          <Icon className={`h-5 w-5 ${stat.color}`} />
+                        </div>
+                        <div>
+                          <div className="text-xl font-extrabold leading-tight">{stat.value}</div>
+                          <div className="text-[11px] text-muted-foreground font-medium">{stat.title}</div>
+                        </div>
                       </motion.div>
-                    ))}
-                  </div>
+                    )
+                  })}
                 </motion.div>
-              ) : (
+              </div>
+
+              <SectionDivider />
+
+              <div>
+                {enrollments.length > 0 ? (
+                  <>
+                    <div className="sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-3 pb-2 bg-background/80 backdrop-blur-lg border-b border-border/20">
+                      <motion.div
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: 0.2 }}
+                        className="flex items-center justify-between"
+                      >
+                        <div>
+                          <h2 className="text-sm font-bold tracking-tight">Pokracovat v uceni</h2>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">Vase aktivni kurzy</p>
+                        </div>
+                        <Button asChild variant="ghost" size="sm" className="text-[11px] h-7 px-2">
+                          <Link to="/prehled/moje-kurzy">
+                            Vse
+                            <RiArrowRightLine className="ml-1 h-3 w-3" />
+                          </Link>
+                        </Button>
+                      </motion.div>
+                    </div>
+
+                    <div className="space-y-2.5 pt-4 pb-6">
+                      {enrollments.slice(0, 3).map((enrollment, i) => (
+                        <motion.div
+                          key={enrollment.id}
+                          initial={{ opacity: 0, x: -12 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.25 + i * 0.08, duration: 0.4 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <Link
+                            to="/prehled/moje-kurzy"
+                            className="flex items-center gap-3 p-3 rounded-2xl bg-muted/25 border border-border/25 active:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-primary/12 to-blue-400/12 flex items-center justify-center">
+                              <RiBookOpenLine className="h-5 w-5 text-primary/70" />
+                            </div>
+                            <div className="flex-1 min-w-0 space-y-1.5">
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-semibold text-sm truncate">{enrollment.course.title}</h3>
+                                {enrollment.completed_at && (
+                                  <span className="flex-shrink-0 text-[9px] font-bold text-green-600 bg-green-500/10 px-1.5 py-0.5 rounded-md">
+                                    Hotovo
+                                  </span>
+                                )}
+                              </div>
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="text-muted-foreground">Pokrok</span>
+                                  <span className="font-bold tabular-nums">{Math.round(enrollment.progress_percentage)}%</span>
+                                </div>
+                                <Progress value={enrollment.progress_percentage} className="h-1.5" />
+                              </div>
+                            </div>
+                            <RiArrowRightLine className="h-4 w-4 text-muted-foreground/50 flex-shrink-0" />
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <SectionHeader title="Kurzy" subtitle="Zacnete svou cestu" delay={0.2} />
+                    <motion.div
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.3 }}
+                      className="text-center py-10 space-y-4"
+                    >
+                      <motion.div
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 200, delay: 0.4 }}
+                      >
+                        <RiBookOpenLine className="h-12 w-12 text-muted-foreground/30 mx-auto" />
+                      </motion.div>
+                      <div className="space-y-1">
+                        <h3 className="text-base font-bold">Zatim zadne kurzy</h3>
+                        <p className="text-xs text-muted-foreground">
+                          Zapiste se do sveho prvniho kurzu
+                        </p>
+                      </div>
+                      <Button asChild size="default" className="rounded-xl">
+                        <Link to="/prehled/moje-kurzy">Prohlednout Kurzy</Link>
+                      </Button>
+                    </motion.div>
+                  </>
+                )}
+              </div>
+
+              <SectionDivider />
+
+              <div>
+                <SectionHeader title="Oceneni" subtitle="Vase sbierka odznaku" delay={0.3} />
+                <div className="pt-4 pb-6">
+                  <BadgesCollection
+                    earnedBadgeIds={new Set(earnedBadges.map((b) => b.badge_id))}
+                    claimedRewards={claimedRewards}
+                    onClaimReward={claimReward}
+                  />
+                </div>
+              </div>
+
+              <SectionDivider />
+
+              <div>
+                <SectionHeader title="Rychle akce" delay={0.4} />
                 <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  className="text-center py-10 space-y-4"
+                  className="grid grid-cols-3 gap-2 pt-4 pb-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.45 }}
                 >
-                  <motion.div
-                    initial={{ scale: 0.8 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 200, delay: 0.4 }}
-                  >
-                    <RiBookOpenLine className="h-14 w-14 text-muted-foreground/40 mx-auto" />
-                  </motion.div>
-                  <div className="space-y-1">
-                    <h3 className="text-base font-bold">Zacnete Svou Cestu</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Zapiste se do sveho prvniho kurzu
-                    </p>
-                  </div>
-                  <Button asChild size="lg" className="rounded-xl">
-                    <Link to="/prehled/moje-kurzy">Prohlednout Kurzy</Link>
-                  </Button>
-                </motion.div>
-              )}
-
-              <BadgesCollection
-                earnedBadgeIds={new Set(earnedBadges.map((b) => b.badge_id))}
-                claimedRewards={claimedRewards}
-                onClaimReward={claimReward}
-              />
-
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="space-y-2"
-              >
-                <h2 className="text-lg font-bold">Rychle Akce</h2>
-                <div className="grid grid-cols-3 gap-2">
                   {[
                     { to: '/prehled/moje-kurzy', icon: RiBookOpenLine, label: 'Kurzy', color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                    { to: '/prehled/fakturace', icon: RiBillLine, label: 'Platby', color: 'text-green-500', bg: 'bg-green-500/10' },
+                    { to: '/prehled/fakturace', icon: RiBillLine, label: 'Platby', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
                     { to: '/prehled/nastaveni', icon: RiUserLine, label: 'Profil', color: 'text-orange-500', bg: 'bg-orange-500/10' },
                   ].map(({ to, icon: Icon, label, color, bg }, i) => (
                     <motion.div
                       key={to}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.55 + i * 0.06, type: 'spring', stiffness: 300 }}
-                      whileHover={{ scale: 1.04, y: -2 }}
-                      whileTap={{ scale: 0.96 }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 + i * 0.06, type: 'spring', stiffness: 300 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <Link
                         to={to}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-muted/30 border border-border/30 hover:bg-muted/60 transition-colors"
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-muted/25 border border-border/25 active:bg-muted/50 transition-colors"
                       >
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${bg}`}>
                           <Icon className={`h-5 w-5 ${color}`} />
                         </div>
-                        <span className="text-xs font-semibold">{label}</span>
+                        <span className="text-[11px] font-semibold">{label}</span>
                       </Link>
                     </motion.div>
                   ))}
-                </div>
-              </motion.div>
-            </>
+                </motion.div>
+              </div>
+            </div>
           )}
 
           {lastXpEvent && (

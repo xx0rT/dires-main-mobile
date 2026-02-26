@@ -4,6 +4,7 @@ import { Toaster } from 'sonner'
 import { AnimatePresence } from 'framer-motion'
 import { AuthProvider } from './lib/auth-context'
 import { CartProvider } from './lib/cart-context'
+import { NavVisibilityProvider } from './lib/nav-visibility-context'
 import { useActivityTracker } from './lib/use-activity-tracker'
 import { ProtectedRoute } from './components/layout/protected-route'
 import { PageTransition } from './components/layout/page-transition'
@@ -62,6 +63,7 @@ export default function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthProvider>
+        <NavVisibilityProvider>
         <CartProvider>
         <ScrollToTop />
         <ActivityTrackerInit />
@@ -124,6 +126,7 @@ export default function App() {
         </AnimatePresence>
         <Toaster />
         </CartProvider>
+        </NavVisibilityProvider>
       </AuthProvider>
     </ThemeProvider>
   )
