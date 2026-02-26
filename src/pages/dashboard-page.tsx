@@ -48,26 +48,18 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.33, 1, 0.68, 1] as const } },
 }
 
-function SectionHeader({ title, subtitle, delay = 0 }: { title: string; subtitle?: string; delay?: number }) {
+function SectionLabel({ title, delay = 0, right }: { title: string; delay?: number; right?: React.ReactNode }) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay }}
-      className="sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-3 pb-2 bg-background/80 backdrop-blur-lg border-b border-border/20"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.35, delay }}
+      className="flex items-center justify-between mb-3"
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-sm font-bold tracking-tight">{title}</h2>
-          {subtitle && <p className="text-[10px] text-muted-foreground mt-0.5">{subtitle}</p>}
-        </div>
-      </div>
+      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{title}</span>
+      {right}
     </motion.div>
   )
-}
-
-function SectionDivider() {
-  return <div className="h-px -mx-4 sm:-mx-6 bg-gradient-to-r from-transparent via-border/50 to-transparent" />
 }
 
 export default function DashboardPage() {
@@ -195,7 +187,7 @@ export default function DashboardPage() {
 
       {!showWelcome && (
         <motion.div
-          className="pb-8"
+          className="pb-8 space-y-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -220,13 +212,11 @@ export default function DashboardPage() {
               <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
             </div>
           ) : (
-            <div className="space-y-0">
-              <SectionDivider />
-
+            <>
               <div>
-                <SectionHeader title="Statistiky" subtitle="Vas prehled uceni" delay={0.1} />
+                <SectionLabel title="Statistiky" delay={0.1} />
                 <motion.div
-                  className="grid grid-cols-2 gap-3 pt-4 pb-6"
+                  className="grid grid-cols-2 gap-3"
                   variants={stagger}
                   initial="hidden"
                   animate="visible"
@@ -258,32 +248,22 @@ export default function DashboardPage() {
                 </motion.div>
               </div>
 
-              <SectionDivider />
-
               <div>
                 {enrollments.length > 0 ? (
                   <>
-                    <div className="sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-3 pb-2 bg-background/80 backdrop-blur-lg border-b border-border/20">
-                      <motion.div
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.4, delay: 0.2 }}
-                        className="flex items-center justify-between"
-                      >
-                        <div>
-                          <h2 className="text-sm font-bold tracking-tight">Pokracovat v uceni</h2>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">Vase aktivni kurzy</p>
-                        </div>
-                        <Button asChild variant="ghost" size="sm" className="text-[11px] h-7 px-2">
+                    <SectionLabel
+                      title="Pokracovat v uceni"
+                      delay={0.2}
+                      right={
+                        <Button asChild variant="ghost" size="sm" className="text-[11px] h-6 px-2 -mr-2">
                           <Link to="/prehled/moje-kurzy">
-                            Vse
+                            Zobrazit vse
                             <RiArrowRightLine className="ml-1 h-3 w-3" />
                           </Link>
                         </Button>
-                      </motion.div>
-                    </div>
-
-                    <div className="space-y-2.5 pt-4 pb-6">
+                      }
+                    />
+                    <div className="space-y-2.5">
                       {enrollments.slice(0, 3).map((enrollment, i) => (
                         <motion.div
                           key={enrollment.id}
@@ -323,54 +303,45 @@ export default function DashboardPage() {
                     </div>
                   </>
                 ) : (
-                  <>
-                    <SectionHeader title="Kurzy" subtitle="Zacnete svou cestu" delay={0.2} />
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    className="text-center py-10 space-y-4 rounded-2xl bg-muted/15 border border-border/20"
+                  >
                     <motion.div
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.3 }}
-                      className="text-center py-10 space-y-4"
+                      initial={{ scale: 0.8 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 200, delay: 0.4 }}
                     >
-                      <motion.div
-                        initial={{ scale: 0.8 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: 'spring', stiffness: 200, delay: 0.4 }}
-                      >
-                        <RiBookOpenLine className="h-12 w-12 text-muted-foreground/30 mx-auto" />
-                      </motion.div>
-                      <div className="space-y-1">
-                        <h3 className="text-base font-bold">Zatim zadne kurzy</h3>
-                        <p className="text-xs text-muted-foreground">
-                          Zapiste se do sveho prvniho kurzu
-                        </p>
-                      </div>
-                      <Button asChild size="default" className="rounded-xl">
-                        <Link to="/prehled/moje-kurzy">Prohlednout Kurzy</Link>
-                      </Button>
+                      <RiBookOpenLine className="h-12 w-12 text-muted-foreground/30 mx-auto" />
                     </motion.div>
-                  </>
+                    <div className="space-y-1">
+                      <h3 className="text-base font-bold">Zatim zadne kurzy</h3>
+                      <p className="text-xs text-muted-foreground">
+                        Zapiste se do sveho prvniho kurzu
+                      </p>
+                    </div>
+                    <Button asChild size="default" className="rounded-xl">
+                      <Link to="/prehled/moje-kurzy">Prohlednout Kurzy</Link>
+                    </Button>
+                  </motion.div>
                 )}
               </div>
 
-              <SectionDivider />
-
               <div>
-                <SectionHeader title="Oceneni" subtitle="Vase sbierka odznaku" delay={0.3} />
-                <div className="pt-4 pb-6">
-                  <BadgesCollection
-                    earnedBadgeIds={new Set(earnedBadges.map((b) => b.badge_id))}
-                    claimedRewards={claimedRewards}
-                    onClaimReward={claimReward}
-                  />
-                </div>
+                <SectionLabel title="Oceneni" delay={0.3} />
+                <BadgesCollection
+                  earnedBadgeIds={new Set(earnedBadges.map((b) => b.badge_id))}
+                  claimedRewards={claimedRewards}
+                  onClaimReward={claimReward}
+                />
               </div>
 
-              <SectionDivider />
-
               <div>
-                <SectionHeader title="Rychle akce" delay={0.4} />
+                <SectionLabel title="Rychle akce" delay={0.4} />
                 <motion.div
-                  className="grid grid-cols-3 gap-2 pt-4 pb-6"
+                  className="grid grid-cols-3 gap-2"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.45 }}
@@ -400,7 +371,7 @@ export default function DashboardPage() {
                   ))}
                 </motion.div>
               </div>
-            </div>
+            </>
           )}
 
           {lastXpEvent && (
