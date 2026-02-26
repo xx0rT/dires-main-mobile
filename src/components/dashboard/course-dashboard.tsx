@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
+  ArrowLeft,
   BookOpen,
   ChevronDown,
   Clock,
@@ -135,6 +136,7 @@ export function CourseDashboard({ course }: Props) {
   }))
 
   const nextLessonIndex = getNextLessonIndex()
+  const otherCourses = courses.filter(c => c.id !== course.id)
 
   if (loading) {
     return (
@@ -152,82 +154,88 @@ export function CourseDashboard({ course }: Props) {
         transition={{ duration: 0.35 }}
         className="relative px-4 sm:px-6 pt-1 pb-4"
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/8 to-transparent dark:from-primary/12" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to bottom, color-mix(in srgb, var(--primary) 5%, var(--background)) 0%, var(--background) 100%)',
+          }}
+        />
 
         <div className="relative">
-          <div className="relative mb-3">
-            <button
+          <div className="flex items-center gap-2 mb-3">
+            <motion.button
               type="button"
-              onClick={() => setSelectorOpen(!selectorOpen)}
-              className="w-full flex items-center justify-between p-3 rounded-2xl bg-background/60 backdrop-blur border border-border/30 active:bg-background/80 transition-colors"
+              onClick={() => setSelectedCourseId(null)}
+              whileTap={{ scale: 0.9 }}
+              className="w-8 h-8 rounded-xl flex items-center justify-center border border-border/40 bg-background/60 backdrop-blur text-muted-foreground hover:text-foreground transition-colors"
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-primary/12 flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="w-5 h-5 text-primary" />
-                </div>
-                <div className="min-w-0 text-left">
-                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Aktualni kurz</p>
-                  <p className="text-sm font-bold truncate">{course.title}</p>
-                </div>
-              </div>
-              <motion.div
-                animate={{ rotate: selectorOpen ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ChevronDown className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              </motion.div>
-            </button>
+              <ArrowLeft className="w-4 h-4" />
+            </motion.button>
 
-            <AnimatePresence>
-              {selectorOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8, height: 0 }}
-                  animate={{ opacity: 1, y: 0, height: 'auto' }}
-                  exit={{ opacity: 0, y: -8, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Kurz</p>
+              <h2 className="text-base font-bold truncate leading-tight">{course.title}</h2>
+            </div>
+
+            {otherCourses.length > 0 && (
+              <div className="relative">
+                <motion.button
+                  type="button"
+                  onClick={() => setSelectorOpen(!selectorOpen)}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-border/40 bg-background/60 backdrop-blur text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <div className="mt-2 rounded-2xl bg-background border border-border/40 shadow-lg overflow-hidden">
-                    {courses.filter(c => c.id !== course.id).map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedCourseId(c.id)
-                          setSelectorOpen(false)
-                        }}
-                        className="w-full flex items-center gap-3 p-3 text-left hover:bg-accent/50 active:bg-accent transition-colors border-b border-border/20 last:border-b-0"
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${selectorOpen ? 'rotate-180' : ''}`} />
+                </motion.button>
+
+                <AnimatePresence>
+                  {selectorOpen && (
+                    <>
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-40"
+                        onClick={() => setSelectorOpen(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 top-full mt-1.5 z-50 w-56 rounded-xl bg-popover border border-border shadow-lg overflow-hidden"
                       >
-                        <div className="w-9 h-9 rounded-xl bg-muted/50 flex items-center justify-center flex-shrink-0">
-                          <BookOpen className="w-4 h-4 text-muted-foreground" />
+                        <div className="p-1.5">
+                          <p className="px-2 py-1 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Prepnout kurz</p>
+                          {otherCourses.map((c) => (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedCourseId(c.id)
+                                setSelectorOpen(false)
+                              }}
+                              className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg text-left hover:bg-accent active:bg-accent transition-colors"
+                            >
+                              <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <BookOpen className="w-3.5 h-3.5 text-primary" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-xs font-semibold truncate">{c.title}</p>
+                                {c.category && (
+                                  <p className="text-[10px] text-muted-foreground truncate">{c.category}</p>
+                                )}
+                              </div>
+                            </button>
+                          ))}
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold truncate">{c.title}</p>
-                          {c.category && (
-                            <p className="text-[10px] text-muted-foreground">{c.category}</p>
-                          )}
-                        </div>
-                      </button>
-                    ))}
-                    {courses.filter(c => c.id !== course.id).length === 0 && (
-                      <div className="p-4 text-center text-xs text-muted-foreground">
-                        Zadne dalsi kurzy
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedCourseId(null)
-                        setSelectorOpen(false)
-                      }}
-                      className="w-full p-3 text-xs font-semibold text-primary text-center hover:bg-accent/50 transition-colors border-t border-border/30"
-                    >
-                      Zpet na prehled
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3">

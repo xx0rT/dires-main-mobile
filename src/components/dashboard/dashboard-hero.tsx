@@ -118,12 +118,20 @@ export function DashboardHero({
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
-        className="-mx-4 sm:-mx-6 px-4 sm:px-6 pt-2 pb-8 relative overflow-hidden"
+        className="-mx-4 sm:-mx-6 px-4 sm:px-6 pt-2 pb-6 relative overflow-hidden"
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/6 via-primary/3 to-transparent dark:from-primary/10 dark:via-primary/5 dark:to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/4 via-transparent to-transparent dark:from-blue-500/6" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/4 rounded-full blur-[80px] -translate-y-1/3 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to bottom, color-mix(in srgb, var(--primary) 5%, var(--background)) 0%, var(--background) 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse 80% 60% at 70% 0%, color-mix(in srgb, var(--primary) 8%, transparent) 0%, transparent 70%)',
+          }}
+        />
 
         <div className="relative flex items-start gap-4">
           <motion.div
