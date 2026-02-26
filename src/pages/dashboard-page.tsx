@@ -187,7 +187,7 @@ export default function DashboardPage() {
 
       {!showWelcome && (
         <motion.div
-          className="pb-8 space-y-6"
+          className="pb-8 space-y-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
