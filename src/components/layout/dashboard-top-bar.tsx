@@ -83,10 +83,10 @@ export function DashboardTopBar() {
         'sticky top-0 z-30 border-b border-border/40 md:hidden',
         'bg-background'
       )}
-      style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)' }}
+      style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 20px)' }}
     >
-      <div className="px-4 pt-2 pb-2">
-        <h1 className="text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
+      <div className="px-4 pt-4 pb-3">
+        <h1 className="text-center text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
       </div>
 
       <div className="relative px-3 pb-3">
