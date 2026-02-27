@@ -89,7 +89,7 @@ export function SubscriptionTimerCard({
             <p className="text-sm text-muted-foreground mb-1">Předplatné</p>
             <p className="font-semibold">Žádné aktivní</p>
           </div>
-          <Button size="sm" onClick={() => navigate("/#pricing")}>
+          <Button size="sm" onClick={() => navigate("/prehled/predplatne")}>
             Zobrazit plány
           </Button>
         </div>
@@ -215,7 +215,7 @@ export function SubscriptionTimerCard({
           <Button
             size="sm"
             className="w-full"
-            onClick={() => navigate("/#pricing")}
+            onClick={() => navigate("/prehled/predplatne")}
           >
             Upgradovat plán
           </Button>

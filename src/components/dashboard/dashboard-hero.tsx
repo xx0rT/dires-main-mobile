@@ -305,7 +305,7 @@ export function DashboardHero({
 
         {(!subscription || subscription.plan_type === 'free_trial') && (
           <motion.button
-            onClick={() => navigate('/#pricing')}
+            onClick={() => navigate('/prehled/predplatne')}
             whileTap={{ scale: 0.98 }}
             className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity"
           >

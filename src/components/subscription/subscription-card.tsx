@@ -204,7 +204,7 @@ export function SubscriptionCard({ userId }: SubscriptionCardProps) {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => navigate("/#pricing")}
+              onClick={() => navigate("/prehled/predplatne")}
             >
               {subscription.plan_type === "free_trial"
                 ? "Upgradovat plán"
@@ -219,7 +219,7 @@ export function SubscriptionCard({ userId }: SubscriptionCardProps) {
           </p>
           <Button
             className="w-full"
-            onClick={() => navigate("/#pricing")}
+            onClick={() => navigate("/prehled/predplatne")}
           >
             Zobrazit plány
           </Button>
