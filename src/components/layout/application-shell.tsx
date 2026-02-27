@@ -53,6 +53,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { DashboardTopBar } from "@/components/layout/dashboard-top-bar";
 import {
   Tooltip,
   TooltipContent,
@@ -736,14 +737,16 @@ function ContentArea({ children }: ContentAreaProps) {
         />
         <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-white md:pb-0 dark:md:bg-neutral-900">
           <div
-            className="flex-1 overflow-y-auto px-4 pb-24 sm:px-6 md:px-6 md:pb-6"
+            className="flex-1 overflow-y-auto"
             style={{
               WebkitOverflowScrolling: 'touch',
               overflowX: 'clip',
-              paddingTop: 'max(env(safe-area-inset-top, 0px) + 20px, 24px)',
             }}
           >
-            {children}
+            <DashboardTopBar />
+            <div className="px-4 pt-4 pb-24 sm:px-6 md:pt-6 md:pb-6">
+              {children}
+            </div>
           </div>
         </main>
       </div>
