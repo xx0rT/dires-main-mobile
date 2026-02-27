@@ -369,7 +369,7 @@ function ChatView({
   const online = isOnline(partner.last_seen_at)
 
   return (
-    <div className="flex flex-col -mt-4 -mx-4 sm:-mx-6 md:mt-0 md:mx-0 md:rounded-2xl md:border md:border-border/40 md:bg-muted/10 h-[calc(100vh-8rem)] md:h-[calc(100vh-10rem)]">
+    <div className="flex flex-col -mt-4 -mx-4 -mb-24 sm:-mx-6 md:mt-0 md:mx-0 md:-mb-6 md:rounded-2xl md:border md:border-border/40 md:bg-muted/10 h-[calc(100vh-8rem)] md:h-[calc(100vh-10rem)]">
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border/40 bg-background/80 backdrop-blur-sm">
         <button type="button" onClick={onBack} className="p-1 -ml-1 rounded-lg hover:bg-muted/60 transition-colors">
           <ArrowLeft className="h-5 w-5" />
