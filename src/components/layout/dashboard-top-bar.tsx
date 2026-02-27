@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -28,10 +28,25 @@ const sections: SectionItem[] = [
   { label: 'Analytika', path: '/prehled/analytika', icon: Layers, keywords: ['analytika', 'analytics', 'studijni'] },
 ]
 
-function isActive(pathname: string, sectionPath: string) {
-  if (pathname === sectionPath) return true
-  if (sectionPath !== '/prehled' && pathname.startsWith(sectionPath + '/')) return true
-  return false
+const pageTitles: Record<string, string> = {
+  '/prehled': 'Prehled',
+  '/prehled/moje-kurzy': 'Moje Kurzy',
+  '/prehled/pokrok': 'Pokrok',
+  '/prehled/predplatne': 'Predplatne',
+  '/prehled/certifikaty': 'Certifikaty',
+  '/prehled/nastaveni': 'Nastaveni',
+  '/prehled/faktury': 'Faktury',
+  '/prehled/fakturace': 'Objednavky',
+  '/prehled/vysledky-testu': 'Vysledky Testu',
+  '/prehled/analytika': 'Analytika',
+}
+
+function getPageTitle(pathname: string): string {
+  if (pageTitles[pathname]) return pageTitles[pathname]
+  for (const [path, title] of Object.entries(pageTitles)) {
+    if (path !== '/prehled' && pathname.startsWith(path + '/')) return title
+  }
+  return 'Prehled'
 }
 
 export function DashboardTopBar() {
@@ -39,18 +54,9 @@ export function DashboardTopBar() {
   const location = useLocation()
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const activeRef = useRef<HTMLButtonElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (activeRef.current && scrollRef.current) {
-      const container = scrollRef.current
-      const el = activeRef.current
-      const left = el.offsetLeft - container.offsetWidth / 2 + el.offsetWidth / 2
-      container.scrollTo({ left, behavior: 'smooth' })
-    }
-  }, [location.pathname])
+  const pageTitle = getPageTitle(location.pathname)
 
   const filteredSections = useMemo(() => {
     if (!searchQuery.trim()) return []
@@ -72,36 +78,15 @@ export function DashboardTopBar() {
   }
 
   return (
-    <div className="sticky top-0 z-30 bg-background border-b border-border/40 md:hidden" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-      <div className="flex items-center gap-3 px-4 pt-3 pb-2">
-        <img src="/logo.svg" alt="Logo" className="h-5" />
-      </div>
-
-      <div
-        ref={scrollRef}
-        className="flex gap-1 px-3 pb-2 overflow-x-auto scrollbar-hide"
-      >
-        {sections.map((section) => {
-          const active = isActive(location.pathname, section.path)
-          const Icon = section.icon
-          return (
-            <button
-              key={section.path}
-              ref={active ? activeRef : undefined}
-              type="button"
-              onClick={() => navigate(section.path)}
-              className={cn(
-                'flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors shrink-0',
-                active
-                  ? 'bg-foreground text-background'
-                  : 'bg-muted/60 text-muted-foreground hover:bg-muted'
-              )}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              {section.label}
-            </button>
-          )
-        })}
+    <div
+      className={cn(
+        'sticky top-0 z-30 border-b border-border/40 md:hidden',
+        'bg-background'
+      )}
+      style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)' }}
+    >
+      <div className="px-4 pt-2 pb-2">
+        <h1 className="text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
       </div>
 
       <div className="relative px-3 pb-3">
