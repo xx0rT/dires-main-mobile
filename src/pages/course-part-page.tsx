@@ -675,8 +675,11 @@ export default function CoursePartPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="mx-auto max-w-7xl py-3 px-4 sm:px-6 lg:px-8">
+      <div
+        className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
+        <div className="mx-auto max-w-7xl py-3 px-4 sm:px-6 lg:px-8 landscape-compact">
           <div className="flex items-center justify-between gap-4">
             <Breadcrumb>
               <BreadcrumbList>
@@ -719,8 +722,8 @@ export default function CoursePartPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_360px] gap-6 lg:gap-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8 landscape-compact">
+        <div className="landscape-video-fullwidth grid grid-cols-1 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_360px] gap-6 lg:gap-8">
           <div className="space-y-6">
             <div className="rounded-2xl border bg-card overflow-hidden shadow-sm">
               <div className="bg-black aspect-video relative">
@@ -787,7 +790,7 @@ export default function CoursePartPage() {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 landscape-hide">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="secondary" className="text-xs font-medium gap-1.5 px-2.5 py-1">
                   <GraduationCap className="h-3 w-3" />
@@ -817,7 +820,7 @@ export default function CoursePartPage() {
             </div>
 
             {course.description && (
-              <div className="rounded-2xl border bg-gradient-to-br from-card to-muted/30 p-5 sm:p-6">
+              <div className="rounded-2xl border bg-gradient-to-br from-card to-muted/30 p-5 sm:p-6 landscape-hide">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <Trophy className="h-5 w-5 text-primary" />
@@ -833,7 +836,7 @@ export default function CoursePartPage() {
             )}
 
             {!isCompleted && (
-              <div className="rounded-2xl border-2 border-dashed border-primary/20 bg-primary/[0.02] p-5 sm:p-6">
+              <div className="rounded-2xl border-2 border-dashed border-primary/20 bg-primary/[0.02] p-5 sm:p-6 landscape-hide">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <Sparkles className="h-6 w-6 text-primary" />
@@ -852,7 +855,7 @@ export default function CoursePartPage() {
               </div>
             )}
 
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center gap-3 pt-2 landscape-hide">
               {!isFirstPart && (
                 <Button
                   variant="outline"

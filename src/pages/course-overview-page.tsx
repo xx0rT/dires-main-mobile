@@ -211,7 +211,10 @@ export default function CourseOverviewPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div
+        className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
         <div className="container max-w-4xl mx-auto py-4 px-4">
           <Breadcrumb className="mb-3">
             <BreadcrumbList>
