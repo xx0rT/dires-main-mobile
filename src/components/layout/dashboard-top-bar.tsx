@@ -39,6 +39,8 @@ const pageTitles: Record<string, string> = {
   '/prehled/fakturace': 'Objednavky',
   '/prehled/vysledky-testu': 'Vysledky Testu',
   '/prehled/analytika': 'Analytika',
+  '/prehled/treneri': 'Treneri',
+  '/prehled/zpravy': 'Zpravy',
 }
 
 function getPageTitle(pathname: string): string {

@@ -53,6 +53,9 @@ import TeamPage from './pages/team-page'
 import TeamMemberPage from './pages/team-member-page'
 import BlogPage from './pages/blog-page'
 import BlogPostPage from './pages/blog-post-page'
+import TrainersPage from './pages/trainers-page'
+import TrainerProfilePage from './pages/trainer-profile-page'
+import MessagesPage from './pages/messages-page'
 
 function ActivityTrackerInit() {
   useActivityTracker()
@@ -109,6 +112,9 @@ export default function App() {
               <Route path="vysledky-testu" element={<PageTransition><TestResultsPage /></PageTransition>} />
               <Route path="certifikaty" element={<PageTransition><CertificatesPage /></PageTransition>} />
               <Route path="nastaveni" element={<PageTransition><SettingsPage /></PageTransition>} />
+              <Route path="treneri" element={<PageTransition><TrainersPage /></PageTransition>} />
+              <Route path="treneri/:trainerId" element={<PageTransition><TrainerProfilePage /></PageTransition>} />
+              <Route path="zpravy" element={<PageTransition><MessagesPage /></PageTransition>} />
             </Route>
 
             <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>

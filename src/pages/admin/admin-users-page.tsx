@@ -8,6 +8,7 @@ import {
   Shield,
   ShieldOff,
   UserCheck,
+  Users2,
   X,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -34,6 +35,9 @@ interface Profile {
   company: string | null
   location: string | null
   is_admin: boolean
+  is_trainer: boolean
+  trainer_role: string | null
+  trainer_specializations: string[]
   created_at: string
 }
 
@@ -129,6 +133,46 @@ export default function AdminUsersPage() {
     )
     if (selectedUser?.id === profile.id) {
       setSelectedUser({ ...profile, is_admin: !profile.is_admin })
+    }
+  }
+
+  const toggleTrainer = async (profile: Profile) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ is_trainer: !profile.is_trainer })
+      .eq('id', profile.id)
+
+    if (error) {
+      toast.error('Chyba pri zmene trenerskeho statusu')
+      return
+    }
+
+    toast.success(profile.is_trainer ? 'Trener status odebran' : 'Nastaven jako trener')
+    setProfiles((prev) =>
+      prev.map((p) => (p.id === profile.id ? { ...p, is_trainer: !p.is_trainer } : p))
+    )
+    if (selectedUser?.id === profile.id) {
+      setSelectedUser({ ...profile, is_trainer: !profile.is_trainer })
+    }
+  }
+
+  const updateTrainerRole = async (profile: Profile, role: string) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ trainer_role: role })
+      .eq('id', profile.id)
+
+    if (error) {
+      toast.error('Chyba pri zmene role')
+      return
+    }
+
+    toast.success('Role trenera aktualizovana')
+    setProfiles((prev) =>
+      prev.map((p) => (p.id === profile.id ? { ...p, trainer_role: role } : p))
+    )
+    if (selectedUser?.id === profile.id) {
+      setSelectedUser({ ...profile, trainer_role: role })
     }
   }
 
@@ -273,13 +317,21 @@ export default function AdminUsersPage() {
                         </td>
                         <td className="px-4 py-3">{getStatusBadge(sub)}</td>
                         <td className="px-4 py-3">
-                          {profile.is_admin ? (
-                            <Badge className="bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400">
-                              Admin
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline">Uzivatel</Badge>
-                          )}
+                          <div className="flex items-center gap-1">
+                            {profile.is_admin && (
+                              <Badge className="bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400">
+                                Admin
+                              </Badge>
+                            )}
+                            {profile.is_trainer && (
+                              <Badge className="bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-400">
+                                Trener
+                              </Badge>
+                            )}
+                            {!profile.is_admin && !profile.is_trainer && (
+                              <Badge variant="outline">Uzivatel</Badge>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-neutral-500">
                           {new Date(profile.created_at).toLocaleDateString('cs-CZ')}
@@ -434,6 +486,40 @@ export default function AdminUsersPage() {
                   </div>
                 </>
               )}
+
+              <div className="border-t pt-4 dark:border-neutral-700 space-y-3">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <Users2 className="size-4" />
+                  Trener
+                </h3>
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant={selectedUser.is_trainer ? 'destructive' : 'outline'}
+                    size="sm"
+                    onClick={() => toggleTrainer(selectedUser)}
+                  >
+                    <Users2 className="mr-2 size-4" />
+                    {selectedUser.is_trainer ? 'Odebrat trenera' : 'Nastavit jako trenera'}
+                  </Button>
+                  {selectedUser.is_trainer && (
+                    <Input
+                      placeholder="Role trenera (napr. Fyzioterapeut)"
+                      defaultValue={selectedUser.trainer_role || ''}
+                      className="h-8 text-sm max-w-xs"
+                      onBlur={(e) => {
+                        if (e.target.value !== (selectedUser.trainer_role || '')) {
+                          updateTrainerRole(selectedUser, e.target.value)
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          (e.target as HTMLInputElement).blur()
+                        }
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
 
               <div className="flex gap-2 border-t pt-4 dark:border-neutral-700">
                 <Button

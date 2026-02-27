@@ -12,6 +12,8 @@ import {
   Home,
   type LucideIcon,
   Layers,
+  MessageCircle,
+  Moon,
   PanelLeft,
   PanelLeftClose,
   Plus,
@@ -19,11 +21,14 @@ import {
   Settings,
   Shield,
   ShoppingBag,
+  Sun,
   Target,
   Users,
+  Users2,
   BarChart3,
   CreditCard,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import * as React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -405,7 +410,7 @@ function OrganizationSwitcher() {
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/kurzy')}>
+        <DropdownMenuItem onClick={() => navigate('/prehled/integrace')}>
           <Plus className="mr-2 size-4" />
           Zapsat se na kurz
         </DropdownMenuItem>
@@ -641,7 +646,55 @@ function SidebarPanel({ module, utilities, panelHeader }: SidebarPanelProps) {
   );
 }
 
+function ThemeToggleItem() {
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className="group flex h-8 w-full items-center justify-between rounded-lg p-2 text-sm leading-none text-neutral-700 hover:bg-black/5 active:bg-black/10 dark:text-neutral-300 dark:hover:bg-white/5 dark:active:bg-white/10 transition-[background-color,color] duration-75"
+    >
+      <span className="flex min-w-0 items-center gap-2.5">
+        <span className="relative size-4 shrink-0">
+          <motion.span
+            className="absolute inset-0 flex items-center justify-center"
+            initial={false}
+            animate={{ rotate: isDark ? 90 : 0, opacity: isDark ? 0 : 1 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <Sun className="size-4 text-amber-500" />
+          </motion.span>
+          <motion.span
+            className="absolute inset-0 flex items-center justify-center"
+            initial={false}
+            animate={{ rotate: isDark ? 0 : -90, opacity: isDark ? 1 : 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <Moon className="size-4 text-blue-400" />
+          </motion.span>
+        </span>
+        <span className="truncate">{isDark ? "Svetly rezim" : "Tmavy rezim"}</span>
+      </span>
+      <div className={cn(
+        "relative h-5 w-9 rounded-full transition-colors duration-300",
+        isDark ? "bg-blue-500" : "bg-neutral-300"
+      )}>
+        <motion.div
+          className="absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm"
+          initial={false}
+          animate={{ x: isDark ? 16 : 0 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        />
+      </div>
+    </button>
+  );
+}
+
 function NavItem({ item, isActive }: { item: NavItemConfig; isActive: boolean }) {
+  if (item.path === "#theme-toggle") return <ThemeToggleItem />;
+
   const isExternal = item.path.startsWith("http");
   const Icon = item.icon;
   const navigate = useNavigate();
@@ -982,6 +1035,8 @@ function MobileNavItem({
   isActive: boolean;
   onSelect?: () => void;
 }) {
+  if (item.path === "#theme-toggle") return <ThemeToggleItem />;
+
   const isExternal = item.path.startsWith("http");
   const Icon = item.icon;
   const navigate = useNavigate();
@@ -1052,6 +1107,15 @@ const navigationData: NavigationConfig = {
             { id: "my-courses-home", label: "Moje Kurzy", icon: BookOpen, path: "/prehled/moje-kurzy" },
             { id: "progress-home", label: "Pokrok", icon: BarChart3, path: "/prehled/pokrok" },
             { id: "certificates-home", label: "Certifikaty", icon: Award, path: "/prehled/certifikaty" },
+            { id: "trainers", label: "Treneri", icon: Users2, path: "/prehled/treneri" },
+            { id: "messages", label: "Zpravy", icon: MessageCircle, path: "/prehled/zpravy" },
+          ],
+        },
+        {
+          id: "tools",
+          label: "Nastroje",
+          items: [
+            { id: "theme-toggle", label: "Tmave/Svetle", icon: Sun, path: "#theme-toggle" },
           ],
         },
       ],
@@ -1136,6 +1200,8 @@ export function ApplicationShell({
     if (resolveActiveModuleIdProp) return resolveActiveModuleIdProp(location.pathname);
     const path = location.pathname;
     if (path === "/prehled") return "home";
+    if (path.startsWith("/prehled/treneri")) return "home";
+    if (path.startsWith("/prehled/zpravy")) return "home";
     if (path.startsWith("/prehled/pokrok")) return "analytics";
     if (path.startsWith("/prehled/vysledky-testu")) return "analytics";
     if (path.startsWith("/prehled/analytika")) return "analytics";
