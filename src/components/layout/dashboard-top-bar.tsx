@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -54,9 +54,23 @@ export function DashboardTopBar() {
   const location = useLocation()
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const barRef = useRef<HTMLDivElement>(null)
 
   const pageTitle = getPageTitle(location.pathname)
+
+  useEffect(() => {
+    const scrollParent = barRef.current?.closest('.overflow-y-auto')
+    if (!scrollParent) return
+
+    const handleScroll = () => {
+      setScrolled(scrollParent.scrollTop > 10)
+    }
+
+    scrollParent.addEventListener('scroll', handleScroll, { passive: true })
+    return () => scrollParent.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const filteredSections = useMemo(() => {
     if (!searchQuery.trim()) return []
@@ -70,23 +84,31 @@ export function DashboardTopBar() {
 
   const showResults = searchFocused && searchQuery.trim().length > 0
 
-  const handleSelect = (path: string) => {
+  const handleSelect = useCallback((path: string) => {
     navigate(path)
     setSearchQuery('')
     setSearchFocused(false)
     inputRef.current?.blur()
-  }
+  }, [navigate])
 
   return (
     <div
+      ref={barRef}
       className={cn(
         'sticky top-0 z-30 border-b border-border/40 md:hidden',
         'bg-background'
       )}
       style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
     >
-      <div className="px-4 pt-1.5 pb-2">
-        <h1 className="text-center text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
+      <div
+        className={cn(
+          'overflow-hidden transition-all duration-200 ease-out',
+          scrolled ? 'max-h-0 opacity-0' : 'max-h-12 opacity-100'
+        )}
+      >
+        <div className="px-4 pt-1.5 pb-2">
+          <h1 className="text-center text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
+        </div>
       </div>
 
       <div className="relative px-3 pb-3">
@@ -100,7 +122,7 @@ export function DashboardTopBar() {
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
             placeholder="Hledat v aplikaci..."
-            className="w-full h-9 rounded-lg bg-muted/50 border border-border/40 pl-9 pr-8 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+            className="w-full h-9 rounded-lg bg-muted/50 border border-border/40 pl-9 pr-8 text-base placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
           />
           {searchQuery && (
             <button

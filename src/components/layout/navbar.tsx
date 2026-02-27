@@ -343,7 +343,7 @@ const Navbar10 = ({ className }: Navbar10Props) => {
     <Fragment>
       <section
         className={cn(
-          "pointer-events-auto fixed top-0 z-999 flex w-full items-center justify-center bg-background transition-all duration-500 ease-out",
+          "pointer-events-auto fixed top-0 z-999 flex w-full items-center justify-center bg-background transition-all duration-500 ease-out pt-[env(safe-area-inset-top,0px)]",
           isScrolled && "shadow-[0px_1px_0px_0px_rgba(0,0,0,0.05),0px_2px_8px_0px_rgba(16,25,36,0.08)]",
           className,
         )}
