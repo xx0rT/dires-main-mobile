@@ -142,7 +142,7 @@ export const CoursesGrid = () => {
             Prozkoumejte nasi nabidku kurzu a zacnete se ucit.
           </p>
           <Button asChild size="lg">
-            <Link to="/kurzy">Prohlizet kurzy</Link>
+            <Link to="/prehled/integrace">Prohlizet kurzy</Link>
           </Button>
         </div>
       ) : (

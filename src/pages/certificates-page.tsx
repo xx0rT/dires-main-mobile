@@ -62,6 +62,7 @@ export default function CertificatesPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="hidden md:block"
       >
         <h1 className="text-2xl sm:text-3xl font-bold">Certifikaty</h1>
         <p className="text-muted-foreground mt-1">

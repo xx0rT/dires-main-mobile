@@ -121,6 +121,7 @@ export default function ProgressPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="hidden md:block"
       >
         <h1 className="text-2xl sm:text-3xl font-bold">Pokrok ve studiu</h1>
         <p className="text-muted-foreground mt-1">
@@ -202,7 +203,7 @@ export default function ProgressPage() {
                   Zacnete studovat kurzy a sledujte svuj pokrok
                 </p>
                 <Button asChild>
-                  <Link to="/kurzy">Prohlidnout kurzy</Link>
+                  <Link to="/prehled/integrace">Prohlidnout kurzy</Link>
                 </Button>
               </div>
             )}

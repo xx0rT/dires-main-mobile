@@ -252,7 +252,7 @@ export const ContactSection = () => {
             <h3 className="mb-1.5 font-bold">Kurzy</h3>
             <p className="text-sm text-muted-foreground">
               Prozkoumejte nasi nabidku{" "}
-              <Link to="/kurzy" className="text-primary underline hover:underline">
+              <Link to="/home/kurzy" className="text-primary underline hover:underline">
                 profesionalnich kurzu
               </Link>{" "}
               pro fyzioterapeuty vsech urovni.

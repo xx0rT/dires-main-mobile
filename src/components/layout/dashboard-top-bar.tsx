@@ -101,13 +101,16 @@ export function DashboardTopBar() {
       style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
     >
       <div
-        className={cn(
-          'overflow-hidden transition-all duration-200 ease-out',
-          scrolled ? 'max-h-0 opacity-0' : 'max-h-12 opacity-100'
-        )}
+        className="grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]"
+        style={{
+          gridTemplateRows: scrolled ? '0fr' : '1fr',
+          opacity: scrolled ? 0 : 1,
+        }}
       >
-        <div className="px-4 pt-1.5 pb-2">
-          <h1 className="text-center text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
+        <div className="overflow-hidden">
+          <div className="px-4 pt-1.5 pb-2">
+            <h1 className="text-center text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
+          </div>
         </div>
       </div>
 

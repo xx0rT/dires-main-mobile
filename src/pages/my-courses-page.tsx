@@ -124,6 +124,7 @@ export default function MyCoursesPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="hidden md:block"
       >
         <h1 className="text-2xl sm:text-3xl font-bold">Moje Kurzy</h1>
         <p className="text-muted-foreground mt-1">
@@ -144,7 +145,7 @@ export default function MyCoursesPage() {
             Prozkoumejte nasi nabidku kurzu a zacnete se ucit.
           </p>
           <Button asChild size="lg">
-            <Link to="/kurzy">Prohlizet kurzy</Link>
+            <Link to="/prehled/integrace">Prohlizet kurzy</Link>
           </Button>
         </motion.div>
       ) : (

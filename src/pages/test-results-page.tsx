@@ -120,6 +120,7 @@ export default function TestResultsPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="hidden md:block"
       >
         <h1 className="text-2xl sm:text-3xl font-bold">Vysledky testu</h1>
         <p className="text-muted-foreground mt-1">
@@ -200,7 +201,7 @@ export default function TestResultsPage() {
                   Zapiste se do kurzu a zacnete studovat
                 </p>
                 <Button asChild>
-                  <Link to="/kurzy">Prohlidnout kurzy</Link>
+                  <Link to="/prehled/integrace">Prohlidnout kurzy</Link>
                 </Button>
               </div>
             )}

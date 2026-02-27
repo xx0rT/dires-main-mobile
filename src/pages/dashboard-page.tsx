@@ -1,7 +1,7 @@
 import { useAuth } from '@/lib/auth-context'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { RiBookOpenLine, RiTimeLine, RiTrophyLine, RiArrowRightLine, RiCheckLine, RiBillLine, RiUserLine } from '@remixicon/react'
+import { RiBookOpenLine, RiTimeLine, RiTrophyLine, RiArrowRightLine, RiCheckLine } from '@remixicon/react'
 import { useCallback, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
@@ -273,7 +273,7 @@ export default function DashboardPage() {
                           whileTap={{ scale: 0.98 }}
                         >
                           <Link
-                            to="/prehled/moje-kurzy"
+                            to={`/kurz/${enrollment.course_id}`}
                             className="flex items-center gap-3 p-3 rounded-2xl bg-muted/25 border border-border/25 active:bg-muted/50 transition-colors"
                           >
                             <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-primary/12 to-blue-400/12 flex items-center justify-center">
@@ -338,39 +338,6 @@ export default function DashboardPage() {
                 />
               </div>
 
-              <div>
-                <SectionLabel title="Rychle akce" delay={0.4} />
-                <motion.div
-                  className="grid grid-cols-3 gap-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.45 }}
-                >
-                  {[
-                    { to: '/prehled/moje-kurzy', icon: RiBookOpenLine, label: 'Kurzy', color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                    { to: '/prehled/fakturace', icon: RiBillLine, label: 'Platby', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-                    { to: '/prehled/nastaveni', icon: RiUserLine, label: 'Profil', color: 'text-orange-500', bg: 'bg-orange-500/10' },
-                  ].map(({ to, icon: Icon, label, color, bg }, i) => (
-                    <motion.div
-                      key={to}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 + i * 0.06, type: 'spring', stiffness: 300 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Link
-                        to={to}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-muted/25 border border-border/25 active:bg-muted/50 transition-colors"
-                      >
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${bg}`}>
-                          <Icon className={`h-5 w-5 ${color}`} />
-                        </div>
-                        <span className="text-[11px] font-semibold">{label}</span>
-                      </Link>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </div>
             </>
           )}
 

@@ -57,7 +57,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="hidden md:block">
         <h1 className="text-3xl font-bold">Nastavení</h1>
         <p className="text-muted-foreground">
           Spravujte své nastavení účtu a preference

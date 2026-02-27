@@ -81,7 +81,7 @@ export default function BillingPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <div className="hidden md:block">
         <h1 className="text-3xl font-bold">Platby a Fakturace</h1>
         <p className="text-muted-foreground mt-2">
           Spravujte své platby a prohlížejte zakoupené kurzy

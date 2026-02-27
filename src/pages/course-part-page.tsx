@@ -602,7 +602,7 @@ export default function CoursePartPage() {
             Tento kurz neexistuje nebo k nemu nemate pristup.
           </p>
           <Button asChild variant="outline" className="mt-2">
-            <Link to="/kurzy">Zpet na kurzy</Link>
+            <Link to="/prehled/moje-kurzy">Zpet na kurzy</Link>
           </Button>
         </div>
       </div>
@@ -685,7 +685,7 @@ export default function CoursePartPage() {
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to="/">
+                    <Link to="/prehled">
                       <Home className="size-4" />
                     </Link>
                   </BreadcrumbLink>
@@ -693,7 +693,7 @@ export default function CoursePartPage() {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to="/kurzy">Kurzy</Link>
+                    <Link to="/prehled/moje-kurzy">Kurzy</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
