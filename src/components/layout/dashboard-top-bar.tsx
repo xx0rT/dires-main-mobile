@@ -4,15 +4,29 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home, BookOpen, BarChart3, CreditCard, Award, Settings,
   FileText, ShoppingBag, Target, Layers, Search, X, ArrowLeft,
+  GraduationCap,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { supabase } from '@/lib/supabase'
 
 interface SectionItem {
   label: string
   path: string
   icon: LucideIcon
   keywords: string[]
+}
+
+interface CourseResult {
+  id: string
+  title: string
+}
+
+interface TrainerResult {
+  id: string
+  full_name: string | null
+  email: string
+  trainer_role: string | null
 }
 
 const sections: SectionItem[] = [
@@ -57,6 +71,8 @@ export function DashboardTopBar() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [courseResults, setCourseResults] = useState<CourseResult[]>([])
+  const [trainerResults, setTrainerResults] = useState<TrainerResult[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const barRef = useRef<HTMLDivElement>(null)
 
@@ -85,12 +101,48 @@ export function DashboardTopBar() {
     )
   }, [searchQuery])
 
+  useEffect(() => {
+    const q = searchQuery.trim()
+    if (q.length < 2) {
+      setCourseResults([])
+      setTrainerResults([])
+      return
+    }
+
+    const timer = setTimeout(async () => {
+      const escaped = q.replace(/%/g, '\\%').replace(/_/g, '\\_')
+
+      const [coursesRes, trainersRes] = await Promise.all([
+        supabase
+          .from('courses')
+          .select('id, title')
+          .eq('published', true)
+          .ilike('title', `%${escaped}%`)
+          .limit(5),
+        supabase
+          .from('profiles')
+          .select('id, full_name, email, trainer_role')
+          .eq('is_trainer', true)
+          .or(`full_name.ilike.%${escaped}%,email.ilike.%${escaped}%`)
+          .limit(5),
+      ])
+
+      setCourseResults(coursesRes.data ?? [])
+      setTrainerResults(trainersRes.data ?? [])
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  const hasAnyResults = filteredSections.length > 0 || courseResults.length > 0 || trainerResults.length > 0
   const showResults = searchFocused && searchQuery.trim().length > 0
 
   const handleSelect = useCallback((path: string) => {
     navigate(path)
     setSearchQuery('')
     setSearchFocused(false)
+    setCourseResults([])
+    setTrainerResults([])
     inputRef.current?.blur()
   }, [navigate])
 
@@ -131,30 +183,32 @@ export function DashboardTopBar() {
             </button>
           )}
           <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
-            placeholder="Hledat v aplikaci..."
-            className="w-full h-9 rounded-lg bg-muted/50 border border-border/40 pl-9 pr-8 text-base placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                setSearchQuery('')
-                inputRef.current?.focus()
-              }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+              placeholder="Hledat v aplikaci..."
+              className="w-full h-9 rounded-lg bg-muted/50 border border-border/40 pl-9 pr-8 text-base placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  setSearchQuery('')
+                  setCourseResults([])
+                  setTrainerResults([])
+                  inputRef.current?.focus()
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -165,26 +219,43 @@ export function DashboardTopBar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.15 }}
-              className="absolute left-3 right-3 top-full mt-1 rounded-lg border bg-background shadow-lg overflow-hidden z-50"
+              className="absolute left-3 right-3 top-full mt-1 rounded-lg border bg-background shadow-lg overflow-hidden z-50 max-h-[60vh] overflow-y-auto"
             >
-              {filteredSections.length > 0 ? (
-                filteredSections.map((section) => {
-                  const Icon = section.icon
-                  return (
-                    <button
-                      key={section.path}
-                      type="button"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => handleSelect(section.path)}
-                      className="flex items-center gap-3 w-full px-3 py-2.5 text-left text-sm hover:bg-muted/60 transition-colors"
-                    >
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/80">
-                        <Icon className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <span className="font-medium">{section.label}</span>
-                    </button>
-                  )
-                })
+              {hasAnyResults ? (
+                <>
+                  <SearchGroup
+                    label="Stranky"
+                    items={filteredSections.map(s => ({
+                      key: s.path,
+                      icon: s.icon,
+                      name: s.label,
+                    }))}
+                    onSelect={handleSelect}
+                  />
+
+                  <SearchGroup
+                    label="Kurzy"
+                    items={courseResults.map(c => ({
+                      key: c.id,
+                      path: `/kurz/${c.id}`,
+                      icon: BookOpen,
+                      name: c.title,
+                    }))}
+                    onSelect={handleSelect}
+                  />
+
+                  <SearchGroup
+                    label="Treneri"
+                    items={trainerResults.map(t => ({
+                      key: t.id,
+                      path: `/prehled/treneri/${t.id}`,
+                      icon: GraduationCap,
+                      name: t.full_name || t.email.split('@')[0],
+                      sublabel: t.trainer_role ?? undefined,
+                    }))}
+                    onSelect={handleSelect}
+                  />
+                </>
               ) : (
                 <div className="px-3 py-4 text-center text-sm text-muted-foreground">
                   Zadne vysledky pro "{searchQuery}"
@@ -194,6 +265,63 @@ export function DashboardTopBar() {
           )}
         </AnimatePresence>
       </div>
+    </div>
+  )
+}
+
+interface SearchGroupItem {
+  key: string
+  path?: string
+  icon: LucideIcon
+  name: string
+  sublabel?: string
+}
+
+function SearchGroup({
+  label,
+  items,
+  onSelect,
+}: {
+  label: string
+  items: SearchGroupItem[]
+  onSelect: (path: string) => void
+}) {
+  if (items.length === 0) return null
+
+  return (
+    <div>
+      <div className="px-3 pt-2 pb-1">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+          {label}
+        </span>
+      </div>
+      {items.map((item) => {
+        const Icon = item.icon
+        const path = item.path ?? item.key
+        return (
+          <button
+            key={item.key}
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => onSelect(path)}
+            className="flex items-center gap-3 w-full px-3 py-2 text-left text-sm hover:bg-muted/60 transition-colors"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/80 flex-shrink-0">
+              <Icon className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] text-muted-foreground/60">{label}</span>
+                <span className="text-[11px] text-muted-foreground/40">&rsaquo;</span>
+                <span className="font-medium truncate">{item.name}</span>
+              </div>
+              {item.sublabel && (
+                <p className="text-[11px] text-muted-foreground truncate">{item.sublabel}</p>
+              )}
+            </div>
+          </button>
+        )
+      })}
     </div>
   )
 }
