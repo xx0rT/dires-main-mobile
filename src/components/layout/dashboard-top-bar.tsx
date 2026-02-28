@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home, BookOpen, BarChart3, CreditCard, Award, Settings,
-  FileText, ShoppingBag, Target, Layers, Search, X,
+  FileText, ShoppingBag, Target, Layers, Search, X, ArrowLeft,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -61,6 +61,7 @@ export function DashboardTopBar() {
   const barRef = useRef<HTMLDivElement>(null)
 
   const pageTitle = getPageTitle(location.pathname)
+  const isMessagesPage = location.pathname.startsWith('/prehled/zpravy')
 
   useEffect(() => {
     const scrollParent = barRef.current?.closest('.overflow-y-auto')
@@ -102,22 +103,34 @@ export function DashboardTopBar() {
       )}
       style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
     >
-      <div
-        className="grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]"
-        style={{
-          gridTemplateRows: scrolled ? '0fr' : '1fr',
-          opacity: scrolled ? 0 : 1,
-        }}
-      >
-        <div className="overflow-hidden">
-          <div className="px-4 pt-1.5 pb-2">
-            <h1 className="text-center text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
+      {!isMessagesPage && (
+        <div
+          className="grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]"
+          style={{
+            gridTemplateRows: scrolled ? '0fr' : '1fr',
+            opacity: scrolled ? 0 : 1,
+          }}
+        >
+          <div className="overflow-hidden">
+            <div className="px-4 pt-1.5 pb-2">
+              <h1 className="text-center text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="relative px-3 pb-3">
-        <div className="relative">
+        <div className={cn('flex items-center', isMessagesPage && 'gap-2')}>
+          {isMessagesPage && (
+            <button
+              type="button"
+              onClick={() => navigate('/prehled')}
+              className="flex-shrink-0 p-1.5 -ml-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+            >
+              <ArrowLeft className="h-4.5 w-4.5" />
+            </button>
+          )}
+          <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             ref={inputRef}
@@ -142,6 +155,7 @@ export function DashboardTopBar() {
               <X className="h-3.5 w-3.5" />
             </button>
           )}
+          </div>
         </div>
 
         <AnimatePresence>

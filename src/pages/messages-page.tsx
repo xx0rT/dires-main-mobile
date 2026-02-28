@@ -1,26 +1,30 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Send, Users2 } from 'lucide-react'
+import { ArrowLeft, Send, Users2, GraduationCap } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
+
+interface ConversationPartner {
+  id: string
+  full_name: string | null
+  avatar_url: string | null
+  email: string
+  trainer_role: string | null
+  is_trainer: boolean | null
+  last_seen_at: string | null
+}
 
 interface Conversation {
   id: string
   user_id: string
   trainer_id: string
   last_message_at: string
-  partner: {
-    id: string
-    full_name: string | null
-    avatar_url: string | null
-    email: string
-    trainer_role: string | null
-    last_seen_at: string | null
-  }
+  partner: ConversationPartner
   lastMessage?: string
   unreadCount: number
 }
@@ -44,6 +48,12 @@ function getInitials(name: string | null, email: string): string {
   return email[0]?.toUpperCase() || 'U'
 }
 
+function showBrowserNotification(title: string, body: string) {
+  if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
+    new Notification(title, { body, icon: '/logo.png' })
+  }
+}
+
 export default function MessagesPage() {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -55,8 +65,16 @@ export default function MessagesPage() {
   const [sending, setSending] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const activeConversationRef = useRef<Conversation | null>(null)
+  activeConversationRef.current = activeConversation
 
   const trainerId = searchParams.get('trainer')
+
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+  }, [])
 
   const fetchConversations = useCallback(async () => {
     if (!user) return
@@ -73,10 +91,14 @@ export default function MessagesPage() {
       return
     }
 
-    const partnerIds = convos.map(c => c.user_id === user.id ? c.trainer_id : c.user_id)
+    const partnerIds = [...new Set(convos.map(c => {
+      if (c.user_id === c.trainer_id) return c.user_id
+      return c.user_id === user.id ? c.trainer_id : c.user_id
+    }))]
+
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, full_name, avatar_url, email, trainer_role, last_seen_at')
+      .select('id, full_name, avatar_url, email, trainer_role, is_trainer, last_seen_at')
       .in('id', partnerIds)
 
     const profileMap = new Map((profiles ?? []).map(p => [p.id, p]))
@@ -99,9 +121,12 @@ export default function MessagesPage() {
     }
 
     const mapped: Conversation[] = convos.map(c => {
-      const partnerId = c.user_id === user.id ? c.trainer_id : c.user_id
+      const partnerId = c.user_id === c.trainer_id
+        ? c.user_id
+        : (c.user_id === user.id ? c.trainer_id : c.user_id)
       const partner = profileMap.get(partnerId) || {
-        id: partnerId, full_name: null, avatar_url: null, email: '', trainer_role: null, last_seen_at: null
+        id: partnerId, full_name: null, avatar_url: null, email: '',
+        trainer_role: null, is_trainer: null, last_seen_at: null,
       }
       const msgInfo = lastMsgMap.get(c.id)
       return {
@@ -126,10 +151,47 @@ export default function MessagesPage() {
     }
   }, [trainerId, user, loading])
 
+  useEffect(() => {
+    if (!user) return
+
+    const channel = supabase
+      .channel('chat-realtime')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'chat_messages',
+      }, (payload) => {
+        const msg = payload.new as Message
+        if (msg.sender_id === user.id) return
+
+        const active = activeConversationRef.current
+        if (active && msg.conversation_id === active.id) {
+          setMessages(prev => {
+            if (prev.some(m => m.id === msg.id)) return prev
+            return [...prev, msg]
+          })
+          supabase.from('chat_messages').update({ read: true }).eq('id', msg.id)
+          setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+        }
+
+        fetchConversations()
+
+        if (document.hidden) {
+          showBrowserNotification('Nova zprava', msg.content)
+        } else if (!active || msg.conversation_id !== active.id) {
+          toast('Nova zprava', { description: msg.content })
+        }
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [user, fetchConversations])
+
   const openOrCreateConversation = async (tId: string) => {
     const existing = conversations.find(
       c => (c.user_id === user!.id && c.trainer_id === tId) ||
-           (c.trainer_id === user!.id && c.user_id === tId)
+           (c.trainer_id === user!.id && c.user_id === tId) ||
+           (c.user_id === tId && c.trainer_id === tId)
     )
 
     if (existing) {
@@ -140,7 +202,7 @@ export default function MessagesPage() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id, full_name, avatar_url, email, trainer_role, last_seen_at')
+      .select('id, full_name, avatar_url, email, trainer_role, is_trainer, last_seen_at')
       .eq('id', tId)
       .maybeSingle()
 
@@ -297,6 +359,18 @@ export default function MessagesPage() {
   )
 }
 
+function TrainerBadge({ className }: { className?: string }) {
+  return (
+    <span className={cn(
+      'inline-flex items-center gap-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-300',
+      className,
+    )}>
+      <GraduationCap className="h-2.5 w-2.5" />
+      Trener
+    </span>
+  )
+}
+
 function ConversationItem({ conversation, index, onClick }: {
   conversation: Conversation
   index: number
@@ -326,9 +400,12 @@ function ConversationItem({ conversation, index, onClick }: {
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-sm truncate">
-            {partner.full_name || partner.email.split('@')[0]}
-          </h3>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <h3 className="font-semibold text-sm truncate">
+              {partner.full_name || partner.email.split('@')[0]}
+            </h3>
+            {partner.is_trainer && <TrainerBadge />}
+          </div>
           <span className="text-[10px] text-muted-foreground flex-shrink-0 ml-2">
             {formatTime(conversation.last_message_at)}
           </span>
@@ -386,9 +463,12 @@ function ChatView({
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-sm truncate">
-            {partner.full_name || partner.email.split('@')[0]}
-          </h3>
+          <div className="flex items-center gap-1.5">
+            <h3 className="font-semibold text-sm truncate">
+              {partner.full_name || partner.email.split('@')[0]}
+            </h3>
+            {partner.is_trainer && <TrainerBadge />}
+          </div>
           <p className="text-[11px] text-muted-foreground">
             {online ? 'Online' : 'Offline'}
           </p>
