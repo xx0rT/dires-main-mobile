@@ -69,7 +69,6 @@ export function DashboardTopBar() {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchFocused, setSearchFocused] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [courseResults, setCourseResults] = useState<CourseResult[]>([])
   const [trainerResults, setTrainerResults] = useState<TrainerResult[]>([])
@@ -135,12 +134,11 @@ export function DashboardTopBar() {
   }, [searchQuery])
 
   const hasAnyResults = filteredSections.length > 0 || courseResults.length > 0 || trainerResults.length > 0
-  const showResults = searchFocused && searchQuery.trim().length > 0
+  const showResults = searchQuery.trim().length > 0
 
   const handleSelect = useCallback((path: string) => {
     navigate(path)
     setSearchQuery('')
-    setSearchFocused(false)
     setCourseResults([])
     setTrainerResults([])
     inputRef.current?.blur()
@@ -182,8 +180,6 @@ export function DashboardTopBar() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setSearchFocused(true)}
-                  onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
                   placeholder="Hledat v aplikaci..."
                   className="w-full h-9 rounded-lg bg-muted/50 border border-border/40 pl-9 pr-8 text-base placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
                 />
@@ -207,12 +203,24 @@ export function DashboardTopBar() {
 
             <AnimatePresence>
               {showResults && (
+                <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => {
+                    setSearchQuery('')
+                    setCourseResults([])
+                    setTrainerResults([])
+                    inputRef.current?.blur()
+                  }}
+                />
                 <motion.div
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.15 }}
                   className="absolute left-3 right-3 top-full mt-1 rounded-lg border bg-background shadow-lg overflow-hidden z-50 max-h-[60vh] overflow-y-auto"
+                  style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
+                  onTouchMove={(e) => e.stopPropagation()}
                 >
                   {hasAnyResults ? (
                     <>
@@ -255,6 +263,7 @@ export function DashboardTopBar() {
                     </div>
                   )}
                 </motion.div>
+                </>
               )}
             </AnimatePresence>
           </div>
