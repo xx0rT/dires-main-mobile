@@ -541,7 +541,7 @@ function ChatView({
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="border-t border-border/40 px-3 py-2 bg-background/80 backdrop-blur-sm" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 0.5rem)' }}>
+      <div className="border-t border-border/40 px-3 py-2 pb-1 bg-background">
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
