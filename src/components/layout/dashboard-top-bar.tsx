@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home, BookOpen, BarChart3, CreditCard, Award, Settings,
-  FileText, ShoppingBag, Target, Layers, Search, X, ArrowLeft,
+  FileText, ShoppingBag, Target, Layers, Search, X,
   GraduationCap,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -155,116 +155,111 @@ export function DashboardTopBar() {
       )}
       style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
     >
-      {!isMessagesPage && (
-        <div
-          className="grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]"
-          style={{
-            gridTemplateRows: scrolled ? '0fr' : '1fr',
-            opacity: scrolled ? 0 : 1,
-          }}
-        >
-          <div className="overflow-hidden">
-            <div className="px-4 pt-1.5 pb-2">
-              <h1 className="text-center text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
+      {isMessagesPage ? (
+        <div />
+      ) : (
+        <>
+          <div
+            className="grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]"
+            style={{
+              gridTemplateRows: scrolled ? '0fr' : '1fr',
+              opacity: scrolled ? 0 : 1,
+            }}
+          >
+            <div className="overflow-hidden">
+              <div className="px-4 pt-1.5 pb-2">
+                <h1 className="text-center text-lg font-semibold tracking-tight text-foreground">{pageTitle}</h1>
+              </div>
             </div>
           </div>
-        </div>
-      )}
 
-      <div className="relative px-3 pb-3">
-        <div className={cn('flex items-center', isMessagesPage && 'gap-2')}>
-          {isMessagesPage && (
-            <button
-              type="button"
-              onClick={() => navigate('/prehled')}
-              className="flex-shrink-0 p-1.5 -ml-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-            >
-              <ArrowLeft className="h-4.5 w-4.5" />
-            </button>
-          )}
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              ref={inputRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setSearchFocused(true)}
-              onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-              placeholder="Hledat v aplikaci..."
-              className="w-full h-9 rounded-lg bg-muted/50 border border-border/40 pl-9 pr-8 text-base placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  setSearchQuery('')
-                  setCourseResults([])
-                  setTrainerResults([])
-                  inputRef.current?.focus()
-                }}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
-        </div>
+          <div className="relative px-3 pb-3">
+            <div className="flex items-center">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+                  placeholder="Hledat v aplikaci..."
+                  className="w-full h-9 rounded-lg bg-muted/50 border border-border/40 pl-9 pr-8 text-base placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      setSearchQuery('')
+                      setCourseResults([])
+                      setTrainerResults([])
+                      inputRef.current?.focus()
+                    }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
 
-        <AnimatePresence>
-          {showResults && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.15 }}
-              className="absolute left-3 right-3 top-full mt-1 rounded-lg border bg-background shadow-lg overflow-hidden z-50 max-h-[60vh] overflow-y-auto"
-            >
-              {hasAnyResults ? (
-                <>
-                  <SearchGroup
-                    label="Stranky"
-                    items={filteredSections.map(s => ({
-                      key: s.path,
-                      icon: s.icon,
-                      name: s.label,
-                    }))}
-                    onSelect={handleSelect}
-                  />
+            <AnimatePresence>
+              {showResults && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-3 right-3 top-full mt-1 rounded-lg border bg-background shadow-lg overflow-hidden z-50 max-h-[60vh] overflow-y-auto"
+                >
+                  {hasAnyResults ? (
+                    <>
+                      <SearchGroup
+                        label="Stranky"
+                        items={filteredSections.map(s => ({
+                          key: s.path,
+                          icon: s.icon,
+                          name: s.label,
+                        }))}
+                        onSelect={handleSelect}
+                      />
 
-                  <SearchGroup
-                    label="Kurzy"
-                    items={courseResults.map(c => ({
-                      key: c.id,
-                      path: `/kurz/${c.id}`,
-                      icon: BookOpen,
-                      name: c.title,
-                    }))}
-                    onSelect={handleSelect}
-                  />
+                      <SearchGroup
+                        label="Kurzy"
+                        items={courseResults.map(c => ({
+                          key: c.id,
+                          path: `/kurz/${c.id}`,
+                          icon: BookOpen,
+                          name: c.title,
+                        }))}
+                        onSelect={handleSelect}
+                      />
 
-                  <SearchGroup
-                    label="Treneri"
-                    items={trainerResults.map(t => ({
-                      key: t.id,
-                      path: `/prehled/treneri/${t.id}`,
-                      icon: GraduationCap,
-                      name: t.full_name || t.email.split('@')[0],
-                      sublabel: t.trainer_role ?? undefined,
-                    }))}
-                    onSelect={handleSelect}
-                  />
-                </>
-              ) : (
-                <div className="px-3 py-4 text-center text-sm text-muted-foreground">
-                  Zadne vysledky pro "{searchQuery}"
-                </div>
+                      <SearchGroup
+                        label="Treneri"
+                        items={trainerResults.map(t => ({
+                          key: t.id,
+                          path: `/prehled/treneri/${t.id}`,
+                          icon: GraduationCap,
+                          name: t.full_name || t.email.split('@')[0],
+                          sublabel: t.trainer_role ?? undefined,
+                        }))}
+                        onSelect={handleSelect}
+                      />
+                    </>
+                  ) : (
+                    <div className="px-3 py-4 text-center text-sm text-muted-foreground">
+                      Zadne vysledky pro "{searchQuery}"
+                    </div>
+                  )}
+                </motion.div>
               )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+            </AnimatePresence>
+          </div>
+        </>
+      )}
     </div>
   )
 }
