@@ -450,8 +450,14 @@ function ChatView({
   const online = isUserOnline(partner.id)
 
   return (
-    <div className="flex flex-col -mt-4 -mx-4 -mb-24 sm:-mx-6 md:mt-0 md:mx-0 md:-mb-6 md:rounded-2xl md:border md:border-border/40 md:bg-muted/10 h-[calc(100vh-8rem)] md:h-[calc(100vh-10rem)]">
-      <div className="sticky top-0 z-20 flex items-center gap-3 px-4 py-3 border-b border-border/40 bg-background">
+    <div
+      className="fixed inset-x-0 top-0 z-30 flex flex-col bg-background md:static md:z-auto md:-mb-6 md:rounded-2xl md:border md:border-border/40 md:bg-muted/10 md:h-[calc(100vh-10rem)]"
+      style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
+    >
+      <div
+        className="z-20 flex items-center gap-3 px-4 pb-3 border-b border-border/40 bg-background"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}
+      >
         <button type="button" onClick={onBack} className="p-1 -ml-1 rounded-lg hover:bg-muted/60 transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </button>
