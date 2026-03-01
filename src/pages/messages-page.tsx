@@ -452,7 +452,7 @@ function ChatView({
   return (
     <div
       className="fixed inset-x-0 top-0 z-30 flex flex-col bg-background md:static md:z-auto md:-mb-6 md:rounded-2xl md:border md:border-border/40 md:bg-muted/10 md:h-[calc(100vh-10rem)]"
-      style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
+      style={{ bottom: 'calc(3.25rem + env(safe-area-inset-bottom, 0px))' }}
     >
       <div
         className="z-20 flex items-center gap-3 px-4 pb-3 border-b border-border/40 bg-background"
