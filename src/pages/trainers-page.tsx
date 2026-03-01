@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { MessageCircle, MapPin, Award, ChevronRight } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
+import { usePresence } from '@/lib/presence-context'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -19,12 +21,6 @@ interface Trainer {
   last_seen_at: string | null
 }
 
-function isOnline(lastSeen: string | null): boolean {
-  if (!lastSeen) return false
-  const diff = Date.now() - new Date(lastSeen).getTime()
-  return diff < 5 * 60 * 1000
-}
-
 function getInitials(name: string | null, email: string): string {
   if (name) {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -33,6 +29,8 @@ function getInitials(name: string | null, email: string): string {
 }
 
 export default function TrainersPage() {
+  const { user } = useAuth()
+  const { isUserOnline } = usePresence()
   const [trainers, setTrainers] = useState<Trainer[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -51,8 +49,8 @@ export default function TrainersPage() {
     setLoading(false)
   }
 
-  const online = trainers.filter(t => isOnline(t.last_seen_at))
-  const offline = trainers.filter(t => !isOnline(t.last_seen_at))
+  const online = trainers.filter(t => isUserOnline(t.id))
+  const offline = trainers.filter(t => !isUserOnline(t.id))
 
   if (loading) {
     return (
@@ -82,12 +80,13 @@ export default function TrainersPage() {
       ) : (
         <>
           {online.length > 0 && (
-            <TrainerSection label="Online" trainers={online} startDelay={0} />
+            <TrainerSection label="Online" trainers={online} startDelay={0} currentUserId={user?.id} />
           )}
           <TrainerSection
             label={online.length > 0 ? 'Offline' : 'Vsichni treneri'}
             trainers={offline.length > 0 ? offline : (online.length > 0 ? [] : trainers)}
             startDelay={online.length * 0.05}
+            currentUserId={user?.id}
           />
         </>
       )}
@@ -95,7 +94,7 @@ export default function TrainersPage() {
   )
 }
 
-function TrainerSection({ label, trainers, startDelay }: { label: string; trainers: Trainer[]; startDelay: number }) {
+function TrainerSection({ label, trainers, startDelay, currentUserId }: { label: string; trainers: Trainer[]; startDelay: number; currentUserId: string | undefined }) {
   if (trainers.length === 0) return null
 
   return (
@@ -106,15 +105,17 @@ function TrainerSection({ label, trainers, startDelay }: { label: string; traine
       </div>
       <div className="space-y-2">
         {trainers.map((trainer, i) => (
-          <TrainerCard key={trainer.id} trainer={trainer} index={i} delay={startDelay + i * 0.05} />
+          <TrainerCard key={trainer.id} trainer={trainer} index={i} delay={startDelay + i * 0.05} currentUserId={currentUserId} />
         ))}
       </div>
     </div>
   )
 }
 
-function TrainerCard({ trainer, delay }: { trainer: Trainer; index: number; delay: number }) {
-  const online = isOnline(trainer.last_seen_at)
+function TrainerCard({ trainer, delay, currentUserId }: { trainer: Trainer; index: number; delay: number; currentUserId: string | undefined }) {
+  const { isUserOnline } = usePresence()
+  const online = isUserOnline(trainer.id)
+  const isSelf = currentUserId === trainer.id
 
   return (
     <motion.div
@@ -168,17 +169,19 @@ function TrainerCard({ trainer, delay }: { trainer: Trainer; index: number; dela
         </div>
 
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          <Button
-            asChild
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Link to={`/prehled/zpravy?trainer=${trainer.id}`}>
-              <MessageCircle className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          </Button>
+          {!isSelf && (
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Link to={`/prehled/zpravy?trainer=${trainer.id}`}>
+                <MessageCircle className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            </Button>
+          )}
           <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
         </div>
       </Link>

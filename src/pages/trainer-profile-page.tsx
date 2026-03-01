@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, MessageCircle, MapPin, Award, Clock, Mail } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
+import { usePresence } from '@/lib/presence-context'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -21,13 +23,10 @@ interface TrainerProfile {
   created_at: string | null
 }
 
-function isOnline(lastSeen: string | null): boolean {
-  if (!lastSeen) return false
-  return Date.now() - new Date(lastSeen).getTime() < 5 * 60 * 1000
-}
-
 export default function TrainerProfilePage() {
   const { trainerId } = useParams<{ trainerId: string }>()
+  const { user } = useAuth()
+  const { isUserOnline } = usePresence()
   const [trainer, setTrainer] = useState<TrainerProfile | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -66,7 +65,8 @@ export default function TrainerProfilePage() {
     )
   }
 
-  const online = isOnline(trainer.last_seen_at)
+  const online = isUserOnline(trainer.id)
+  const isSelf = user?.id === trainer.id
   const initials = trainer.full_name
     ? trainer.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : trainer.email[0]?.toUpperCase() || 'T'
@@ -131,21 +131,23 @@ export default function TrainerProfilePage() {
           </div>
         </div>
 
-        <div className="flex gap-2 mt-5">
-          <Button asChild className="flex-1 rounded-xl">
-            <Link to={`/prehled/zpravy?trainer=${trainer.id}`}>
-              <MessageCircle className="mr-2 h-4 w-4" />
-              Napsat zpravu
-            </Link>
-          </Button>
-          {trainer.email && (
-            <Button variant="outline" className="rounded-xl" asChild>
-              <a href={`mailto:${trainer.email}`}>
-                <Mail className="h-4 w-4" />
-              </a>
+        {!isSelf && (
+          <div className="flex gap-2 mt-5">
+            <Button asChild className="flex-1 rounded-xl">
+              <Link to={`/prehled/zpravy?trainer=${trainer.id}`}>
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Napsat zpravu
+              </Link>
             </Button>
-          )}
-        </div>
+            {trainer.email && (
+              <Button variant="outline" className="rounded-xl" asChild>
+                <a href={`mailto:${trainer.email}`}>
+                  <Mail className="h-4 w-4" />
+                </a>
+              </Button>
+            )}
+          </div>
+        )}
       </motion.div>
 
       {trainer.bio && (

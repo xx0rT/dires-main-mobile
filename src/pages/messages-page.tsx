@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Send, Users2, GraduationCap } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
+import { usePresence } from '@/lib/presence-context'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -36,11 +37,6 @@ interface Message {
   content: string
   read: boolean
   created_at: string
-}
-
-function isOnline(lastSeen: string | null): boolean {
-  if (!lastSeen) return false
-  return Date.now() - new Date(lastSeen).getTime() < 5 * 60 * 1000
 }
 
 function getInitials(name: string | null, email: string): string {
@@ -188,6 +184,12 @@ export default function MessagesPage() {
   }, [user, fetchConversations])
 
   const openOrCreateConversation = async (tId: string) => {
+    if (tId === user!.id) {
+      toast.error('Nemuzete poslat zpravu sami sobe')
+      setSearchParams({})
+      return
+    }
+
     const existing = conversations.find(
       c => (c.user_id === user!.id && c.trainer_id === tId) ||
            (c.trainer_id === user!.id && c.user_id === tId) ||
@@ -376,8 +378,9 @@ function ConversationItem({ conversation, index, onClick }: {
   index: number
   onClick: () => void
 }) {
+  const { isUserOnline } = usePresence()
   const { partner } = conversation
-  const online = isOnline(partner.last_seen_at)
+  const online = isUserOnline(partner.id)
 
   return (
     <motion.button
@@ -442,8 +445,9 @@ function ChatView({
   onSend: () => void
   onKeyDown: (e: React.KeyboardEvent) => void
 }) {
+  const { isUserOnline } = usePresence()
   const { partner } = conversation
-  const online = isOnline(partner.last_seen_at)
+  const online = isUserOnline(partner.id)
 
   return (
     <div className="flex flex-col -mt-4 -mx-4 -mb-24 sm:-mx-6 md:mt-0 md:mx-0 md:-mb-6 md:rounded-2xl md:border md:border-border/40 md:bg-muted/10 h-[calc(100vh-8rem)] md:h-[calc(100vh-10rem)]">

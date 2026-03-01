@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/auth-context'
 import { ApplicationShell } from '@/components/layout/application-shell'
 import { SelectedCourseProvider } from '@/lib/selected-course-context'
 import { useNavVisibility } from '@/lib/nav-visibility-context'
+import { PresenceProvider } from '@/lib/presence-context'
 
 function NavShowOnSubPages() {
   const location = useLocation()
@@ -34,11 +35,13 @@ export default function DashboardLayout() {
   }
 
   return (
-    <SelectedCourseProvider>
-      <ApplicationShell>
-        <NavShowOnSubPages />
-        <Outlet />
-      </ApplicationShell>
-    </SelectedCourseProvider>
+    <PresenceProvider>
+      <SelectedCourseProvider>
+        <ApplicationShell>
+          <NavShowOnSubPages />
+          <Outlet />
+        </ApplicationShell>
+      </SelectedCourseProvider>
+    </PresenceProvider>
   )
 }
