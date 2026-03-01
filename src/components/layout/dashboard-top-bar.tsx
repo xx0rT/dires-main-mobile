@@ -79,6 +79,8 @@ export function DashboardTopBar() {
   const isMessagesPage = location.pathname.startsWith('/prehled/zpravy')
 
   useEffect(() => {
+    if (isMessagesPage) return
+
     const scrollParent = barRef.current?.closest('.overflow-y-auto')
     if (!scrollParent) return
 
@@ -88,7 +90,7 @@ export function DashboardTopBar() {
 
     scrollParent.addEventListener('scroll', handleScroll, { passive: true })
     return () => scrollParent.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [isMessagesPage])
 
   const filteredSections = useMemo(() => {
     if (!searchQuery.trim()) return []
