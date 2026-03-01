@@ -154,7 +154,9 @@ export function DashboardTopBar() {
       style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
     >
       {isMessagesPage ? (
-        <div />
+        <div className="px-4 pt-1.5 pb-3">
+          <h1 className="text-center text-lg font-semibold tracking-tight text-foreground">Zpravy</h1>
+        </div>
       ) : (
         <>
           <div
