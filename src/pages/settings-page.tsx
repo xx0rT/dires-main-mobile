@@ -1,21 +1,97 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
-import { RiUserLine, RiLockLine, RiLogoutBoxLine } from '@remixicon/react'
+import { RiUserLine, RiLockLine, RiLogoutBoxLine, RiSaveLine } from '@remixicon/react'
 import { SubscriptionCard } from '@/components/subscription/subscription-card'
+
+interface ProfileData {
+  full_name: string
+  phone: string
+  company: string
+  website: string
+  location: string
+  bio: string
+}
 
 export default function SettingsPage() {
   const { user, signOut } = useAuth()
   const [loading, setLoading] = useState(false)
+  const [profileLoading, setProfileLoading] = useState(true)
+  const [profileSaving, setProfileSaving] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [profile, setProfile] = useState<ProfileData>({
+    full_name: '',
+    phone: '',
+    company: '',
+    website: '',
+    location: '',
+    bio: '',
+  })
+
+  useEffect(() => {
+    if (!user) return
+
+    const fetchProfile = async () => {
+      setProfileLoading(true)
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name, phone, company, website, location, bio')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (error) {
+        toast.error('Nepodařilo se načíst profil')
+      } else if (data) {
+        setProfile({
+          full_name: data.full_name || '',
+          phone: data.phone || '',
+          company: data.company || '',
+          website: data.website || '',
+          location: data.location || '',
+          bio: data.bio || '',
+        })
+      }
+      setProfileLoading(false)
+    }
+
+    fetchProfile()
+  }, [user])
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!user) return
+
+    setProfileSaving(true)
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        full_name: profile.full_name,
+        phone: profile.phone,
+        company: profile.company,
+        website: profile.website,
+        location: profile.location,
+        bio: profile.bio,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id)
+
+    if (error) {
+      toast.error('Nepodařilo se uložit profil')
+    } else {
+      toast.success('Profil byl úspěšně uložen!')
+    }
+    setProfileSaving(false)
+  }
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,7 +109,11 @@ export default function SettingsPage() {
     setLoading(true)
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 500))
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      })
+
+      if (error) throw error
 
       toast.success('Heslo bylo úspěšně aktualizováno!')
       setCurrentPassword('')
@@ -53,6 +133,10 @@ export default function SettingsPage() {
     } catch (error: any) {
       toast.error(error.message || 'Odhlášení se nezdařilo')
     }
+  }
+
+  const updateField = (field: keyof ProfileData, value: string) => {
+    setProfile((prev) => ({ ...prev, [field]: value }))
   }
 
   return (
@@ -80,68 +164,131 @@ export default function SettingsPage() {
                 Aktualizujte informace svého účtu
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-6">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-                  <RiUserLine className="h-10 w-10 text-primary" />
+            <CardContent>
+              {profileLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                 </div>
-                <div className="space-y-2">
-                  <Button variant="outline" size="sm">
-                    Změnit avatar
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    JPG, GIF nebo PNG. Maximální velikost 800 KB
-                  </p>
-                </div>
-              </div>
+              ) : (
+                <form onSubmit={handleSaveProfile} className="space-y-6">
+                  <div className="flex items-center gap-6">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+                      <RiUserLine className="h-10 w-10 text-primary" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-medium">{profile.full_name || user?.email?.split('@')[0]}</p>
+                      <p className="text-sm text-muted-foreground">{user?.email}</p>
+                    </div>
+                  </div>
 
-              <Separator />
+                  <Separator />
 
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="email"
-                      type="email"
-                      value={user?.email || ''}
-                      disabled
-                      className="flex-1"
-                    />
-                    <Button variant="outline" disabled>
-                      Ověřeno
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-2">
+                      <Label htmlFor="full_name">Celé jméno</Label>
+                      <Input
+                        id="full_name"
+                        value={profile.full_name}
+                        onChange={(e) => updateField('full_name', e.target.value)}
+                        placeholder="Vaše celé jméno"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="phone">Telefon</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={profile.phone}
+                        onChange={(e) => updateField('phone', e.target.value)}
+                        placeholder="+420 123 456 789"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="company">Firma / Organizace</Label>
+                      <Input
+                        id="company"
+                        value={profile.company}
+                        onChange={(e) => updateField('company', e.target.value)}
+                        placeholder="Název firmy"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="website">Web</Label>
+                      <Input
+                        id="website"
+                        type="url"
+                        value={profile.website}
+                        onChange={(e) => updateField('website', e.target.value)}
+                        placeholder="https://vase-stranka.cz"
+                      />
+                    </div>
+                    <div className="grid gap-2 sm:col-span-2">
+                      <Label htmlFor="location">Lokace</Label>
+                      <Input
+                        id="location"
+                        value={profile.location}
+                        onChange={(e) => updateField('location', e.target.value)}
+                        placeholder="Praha, Česká republika"
+                      />
+                    </div>
+                    <div className="grid gap-2 sm:col-span-2">
+                      <Label htmlFor="bio">O mně</Label>
+                      <Textarea
+                        id="bio"
+                        value={profile.bio}
+                        onChange={(e) => updateField('bio', e.target.value)}
+                        placeholder="Krátce o sobě..."
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="grid gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="email">Email</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="email"
+                          type="email"
+                          value={user?.email || ''}
+                          disabled
+                          className="flex-1"
+                        />
+                        <Button variant="outline" disabled>
+                          Ověřeno
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Váš email je ověřený a nelze jej změnit
+                      </p>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor="created">Účet vytvořen</Label>
+                      <Input
+                        id="created"
+                        value={user?.created_at ? new Date(user.created_at).toLocaleDateString('cs-CZ', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        }) : ''}
+                        disabled
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button type="submit" disabled={profileSaving}>
+                      <RiSaveLine className="mr-2 h-4 w-4" />
+                      {profileSaving ? 'Ukládám...' : 'Uložit profil'}
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Váš email je ověřený a nelze jej změnit
-                  </p>
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="userId">ID uživatele</Label>
-                  <Input
-                    id="userId"
-                    value={user?.id || ''}
-                    disabled
-                    className="font-mono text-sm"
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <Label htmlFor="created">Účet vytvořen</Label>
-                  <Input
-                    id="created"
-                    value={user?.created_at ? new Date(user.created_at).toLocaleDateString('cs-CZ', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }) : ''}
-                    disabled
-                  />
-                </div>
-              </div>
+                </form>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

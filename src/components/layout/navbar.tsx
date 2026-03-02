@@ -439,11 +439,6 @@ const Navbar10 = ({ className }: Navbar10Props) => {
                           Dashboard
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50 dark:focus:bg-red-950">
-                        <LogOut className="mr-2 size-4" />
-                        Logout
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/prehled/nastaveni">
                           <Settings className="mr-2 size-4" />
@@ -455,6 +450,11 @@ const Navbar10 = ({ className }: Navbar10Props) => {
                           <CreditCard className="mr-2 size-4" />
                           Fakturace
                         </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50 dark:focus:bg-red-950">
+                        <LogOut className="mr-2 size-4" />
+                        Odhlasit se
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
