@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabase'
+import { usePushNotifications, unregisterPushToken } from './use-push-notifications'
 import type { User, Session } from '@supabase/supabase-js'
 
 interface AuthContextType {
@@ -86,12 +87,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
+    if (user) await unregisterPushToken(user.id)
     const { error } = await supabase.auth.signOut()
     if (error) throw error
     setUser(null)
     setSession(null)
     navigate('/')
   }
+
+  usePushNotifications(user)
 
   return (
     <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
