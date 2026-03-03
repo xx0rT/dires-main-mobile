@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Capacitor } from '@capacitor/core'
+import { Browser } from '@capacitor/browser'
+import { App as CapApp } from '@capacitor/app'
 import { supabase } from './supabase'
 import type { User, Session } from '@supabase/supabase-js'
 
@@ -42,6 +45,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => subscription.unsubscribe()
   }, [])
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return
+
+    const listener = CapApp.addListener('appUrlOpen', async ({ url }) => {
+      if (url.includes('auth-callback')) {
+        const hashPart = url.split('#')[1]
+        if (!hashPart) return
+
+        const params = new URLSearchParams(hashPart)
+        const accessToken = params.get('access_token')
+        const refreshToken = params.get('refresh_token')
+
+        if (accessToken && refreshToken) {
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          })
+          if (!error && data.session) {
+            setUser(data.session.user)
+            setSession(data.session)
+            navigate('/prehled')
+          }
+        }
+
+        Browser.close()
+      }
+    })
+
+    return () => {
+      listener.then(l => l.remove())
+    }
+  }, [navigate])
 
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -87,13 +123,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/prehled`,
-      },
-    })
-    if (error) throw error
+    if (Capacitor.isNativePlatform()) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: 'com.dires.app://auth-callback',
+          skipBrowserRedirect: true,
+        },
+      })
+      if (error) throw error
+      if (data.url) {
+        await Browser.open({ url: data.url, presentationStyle: 'popover' })
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/prehled`,
+        },
+      })
+      if (error) throw error
+    }
   }
 
   const signOut = async () => {
