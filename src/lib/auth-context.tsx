@@ -1,7 +1,15 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabase'
 import type { User, Session } from '@supabase/supabase-js'
+
+function isNativePlatform(): boolean {
+  try {
+    return !!(window as any).Capacitor?.isNativePlatform?.()
+  } catch {
+    return false
+  }
+}
 
 interface AuthContextType {
   user: User | null
@@ -20,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
+  const urlListenerRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -40,7 +49,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
     })
 
-    return () => subscription.unsubscribe()
+    if (isNativePlatform()) {
+      import('@capacitor/app').then(({ App }: any) => {
+        App.addListener('appUrlOpen', async ({ url }: { url: string }) => {
+          if (!url.includes('callback')) return
+
+          const hashPart = url.split('#')[1]
+          if (hashPart) {
+            const params = new URLSearchParams(hashPart)
+            const accessToken = params.get('access_token')
+            const refreshToken = params.get('refresh_token')
+            if (accessToken && refreshToken) {
+              const { error } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              })
+              if (!error) navigate('/prehled')
+            }
+          }
+
+          try {
+            const { Browser }: any = await import('@capacitor/browser')
+            await Browser.close()
+          } catch {}
+        }).then((handle: any) => {
+          urlListenerRef.current = () => handle.remove()
+        })
+      })
+    }
+
+    return () => {
+      subscription.unsubscribe()
+      urlListenerRef.current?.()
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {
@@ -87,13 +128,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/prehled`,
-      },
-    })
-    if (error) throw error
+    if (isNativePlatform()) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: 'com.dires.app://callback',
+          skipBrowserRedirect: true,
+        },
+      })
+      if (error) throw error
+      if (data.url) {
+        const { Browser }: any = await import('@capacitor/browser')
+        await Browser.open({ url: data.url })
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/prehled`,
+        },
+      })
+      if (error) throw error
+    }
   }
 
   const signOut = async () => {
