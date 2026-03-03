@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabase'
+import { isNative, getRedirectUrl, openOAuthInBrowser, setupDeepLinkListener } from './capacitor'
 import type { User, Session } from '@supabase/supabase-js'
 
 interface AuthContextType {
@@ -40,7 +41,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
     })
 
-    return () => subscription.unsubscribe()
+    const removeDeepLinkListener = setupDeepLinkListener(() => {
+      navigate('/prehled')
+    })
+
+    return () => {
+      subscription.unsubscribe()
+      removeDeepLinkListener()
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {
@@ -66,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/prehled`,
+        emailRedirectTo: isNative ? getRedirectUrl() : `${window.location.origin}/prehled`,
       }
     })
     if (error) throw error
@@ -87,13 +95,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/prehled`,
-      },
-    })
-    if (error) throw error
+    if (isNative) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: getRedirectUrl(),
+          skipBrowserRedirect: true,
+        },
+      })
+      if (error) throw error
+      if (data.url) {
+        await openOAuthInBrowser(data.url)
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      if (error) throw error
+    }
   }
 
   const signOut = async () => {
