@@ -56,7 +56,6 @@ import BlogPostPage from './pages/blog-post-page'
 import TrainersPage from './pages/trainers-page'
 import TrainerProfilePage from './pages/trainer-profile-page'
 import MessagesPage from './pages/messages-page'
-import AuthCallbackPage from './pages/auth-callback-page'
 
 function ActivityTrackerInit() {
   useActivityTracker()
@@ -74,7 +73,6 @@ export default function App() {
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<Navigate to="/prihlaseni" replace />} />
-            <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/prihlaseni" element={<PageTransition><SignInPage /></PageTransition>} />
             <Route path="/registrace" element={<PageTransition><SignUpPage /></PageTransition>} />
             <Route path="/overeni-emailu" element={<PageTransition><VerifyEmailPage /></PageTransition>} />
