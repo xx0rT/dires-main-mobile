@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (isNativePlatform()) {
       import('@capacitor/app').then(({ App }: any) => {
         App.addListener('appUrlOpen', async ({ url }: { url: string }) => {
-          if (!url.includes('callback')) return
+          if (!url.includes('auth/callback')) return
 
           const hashPart = url.split('#')[1]
           if (hashPart) {
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'com.dires.app://callback',
+          redirectTo: 'com.dires.app://auth/callback',
           skipBrowserRedirect: true,
         },
       })
