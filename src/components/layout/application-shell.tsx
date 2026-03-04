@@ -774,7 +774,7 @@ function ContentArea({ children }: ContentAreaProps) {
   const showCornerFills = isPanelOpen;
 
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-neutral-200 md:py-2 md:pr-2 dark:bg-neutral-800">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background md:bg-neutral-200 md:py-2 md:pr-2 dark:bg-background dark:md:bg-neutral-800">
       <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
         <div
           className={cn(
@@ -788,7 +788,7 @@ function ContentArea({ children }: ContentAreaProps) {
             showCornerFills ? "opacity-100" : "opacity-0"
           )}
         />
-        <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden pb-16 md:rounded-xl md:bg-white md:pb-0 dark:md:bg-neutral-900">
+        <main className="z-10 flex min-h-0 flex-1 flex-col overflow-hidden bg-neutral-50 md:rounded-xl md:bg-white dark:bg-neutral-950 dark:md:bg-neutral-900">
           <div
             className="flex-1 overflow-y-auto"
             style={{
@@ -797,7 +797,7 @@ function ContentArea({ children }: ContentAreaProps) {
             }}
           >
             <DashboardTopBar />
-            <div className="px-4 pt-4 pb-24 sm:px-6 md:pt-6 md:pb-6">
+            <div className="px-4 pt-4 pb-20 sm:px-6 md:pt-6 md:pb-6">
               {children}
             </div>
           </div>

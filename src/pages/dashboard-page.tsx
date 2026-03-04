@@ -16,6 +16,7 @@ import { BadgesCollection } from '@/components/gamification/badges-collection'
 import { XpRewardPopup } from '@/components/gamification/xp-reward-popup'
 import { WelcomeLoader } from '@/components/dashboard/welcome-loader'
 import { useNavVisibility } from '@/lib/nav-visibility-context'
+import Marquee from '@/components/ui/marquee'
 
 interface Course {
   id: string
@@ -67,7 +68,24 @@ const quickActions = [
   { label: 'Zpravy', icon: RiMessage3Line, path: '/prehled/zpravy', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
   { label: 'Pokrok', icon: RiCalendarLine, path: '/prehled/pokrok', color: 'text-amber-500', bg: 'bg-amber-500/10' },
   { label: 'Nastaveni', icon: RiSettings4Line, path: '/prehled/nastaveni', color: 'text-neutral-500', bg: 'bg-neutral-500/10' },
+  { label: 'Certifikaty', icon: RiTrophyLine, path: '/prehled/certifikaty', color: 'text-rose-500', bg: 'bg-rose-500/10' },
+  { label: 'Treneri', icon: RiBookOpenLine, path: '/prehled/treneri', color: 'text-sky-500', bg: 'bg-sky-500/10' },
 ]
+
+function QuickActionItem({ action }: { action: typeof quickActions[number] }) {
+  const Icon = action.icon
+  return (
+    <Link
+      to={action.path}
+      className="flex items-center gap-2 rounded-full border border-border/30 bg-background px-3.5 py-2 text-sm font-medium transition-colors active:bg-muted/60 hover:bg-muted/40 shrink-0 select-none"
+    >
+      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${action.bg}`}>
+        <Icon className={`h-3.5 w-3.5 ${action.color}`} />
+      </div>
+      <span className="text-xs font-semibold text-foreground/80 whitespace-nowrap">{action.label}</span>
+    </Link>
+  )
+}
 
 function QuickActions() {
   return (
@@ -75,23 +93,13 @@ function QuickActions() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.05 }}
-      className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0"
+      className="-mx-4 md:mx-0"
     >
-      {quickActions.map((action) => {
-        const Icon = action.icon
-        return (
-          <Link
-            key={action.path}
-            to={action.path}
-            className="flex items-center gap-2 rounded-full border border-border/30 bg-background px-3.5 py-2 text-sm font-medium transition-colors active:bg-muted/60 hover:bg-muted/40 shrink-0"
-          >
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${action.bg}`}>
-              <Icon className={`h-3.5 w-3.5 ${action.color}`} />
-            </div>
-            <span className="text-xs font-semibold text-foreground/80">{action.label}</span>
-          </Link>
-        )
-      })}
+      <Marquee className="py-0 [--duration:25s] [--gap:0.5rem]" pauseOnHover>
+        {quickActions.map((action) => (
+          <QuickActionItem key={action.path} action={action} />
+        ))}
+      </Marquee>
     </motion.div>
   )
 }
