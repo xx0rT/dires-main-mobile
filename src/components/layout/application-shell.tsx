@@ -979,8 +979,8 @@ function MobileBottomBar({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed inset-x-0 z-40 border-t bg-background md:hidden"
-          style={{ bottom: '-40px', paddingBottom: 'calc(40px + env(safe-area-inset-bottom, 2px))' }}
+          className="fixed inset-x-0 bottom-0 z-40 border-t bg-background md:hidden"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }}
         >
           <div
             className="grid px-[15px]"
