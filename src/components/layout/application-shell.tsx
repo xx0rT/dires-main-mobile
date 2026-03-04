@@ -979,10 +979,9 @@ function MobileBottomBar({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed inset-x-0 bottom-0 z-40 border-t bg-background md:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-border/40 bg-background/95 backdrop-blur-lg md:hidden"
           style={{
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
-            boxShadow: '0 100px 0 0 var(--background)',
+            paddingBottom: 'env(safe-area-inset-bottom, 8px)',
           }}
         >
           <div
@@ -1242,7 +1241,7 @@ export function ApplicationShell({
 
   return (
     <SidebarProvider defaultOpen={defaultSidebarOpen}>
-      <div className="flex h-screen flex-col overflow-hidden bg-neutral-200 dark:bg-neutral-800">
+      <div className="flex h-screen flex-col overflow-hidden bg-background md:bg-neutral-200 dark:bg-background dark:md:bg-neutral-800">
         <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden md:grid md:grid-cols-[min-content_minmax(0,1fr)]">
           <DubSidebar
             railIcons={navigationConfig.railIcons}
