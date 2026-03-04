@@ -16,7 +16,8 @@ import { BadgesCollection } from '@/components/gamification/badges-collection'
 import { XpRewardPopup } from '@/components/gamification/xp-reward-popup'
 import { WelcomeLoader } from '@/components/dashboard/welcome-loader'
 import { useNavVisibility } from '@/lib/nav-visibility-context'
-import Marquee from '@/components/ui/marquee'
+import useEmblaCarousel from 'embla-carousel-react'
+import AutoScroll from 'embla-carousel-auto-scroll'
 
 interface Course {
   id: string
@@ -88,18 +89,24 @@ function QuickActionItem({ action }: { action: typeof quickActions[number] }) {
 }
 
 function QuickActions() {
+  const [emblaRef] = useEmblaCarousel(
+    { loop: true, dragFree: true, containScroll: false },
+    [AutoScroll({ speed: 0.5, stopOnInteraction: false, stopOnMouseEnter: true })]
+  )
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.05 }}
-      className="-mx-4 md:mx-0"
+      className="-mx-4 md:mx-0 overflow-hidden"
+      ref={emblaRef}
     >
-      <Marquee className="py-0 [--duration:25s] [--gap:0.5rem]" pauseOnHover>
-        {quickActions.map((action) => (
-          <QuickActionItem key={action.path} action={action} />
+      <div className="flex gap-2 px-4 md:px-0">
+        {[...quickActions, ...quickActions].map((action, i) => (
+          <QuickActionItem key={`${action.path}-${i}`} action={action} />
         ))}
-      </Marquee>
+      </div>
     </motion.div>
   )
 }
