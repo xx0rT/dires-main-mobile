@@ -1,9 +1,7 @@
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Award, Download, BookOpen, Calendar } from 'lucide-react'
+import { Award, BookOpen, Calendar, Download, Shield } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -12,6 +10,62 @@ interface Certificate {
   courseId: string
   courseTitle: string
   completedAt: string
+}
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, delay: i * 0.06, ease: [0.33, 1, 0.68, 1] as const },
+  }),
+}
+
+function CertificateCard({ cert, index }: { cert: Certificate; index: number }) {
+  return (
+    <motion.div
+      custom={index + 1}
+      variants={fadeUp}
+      initial="hidden"
+      animate="visible"
+      className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-5 transition-all hover:shadow-sm"
+    >
+      <div className="flex items-start gap-4">
+        <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+          <Award className="h-6 w-6 text-amber-500" />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold mb-1">{cert.courseTitle}</h3>
+
+          {cert.completedAt && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+              <Calendar className="h-3 w-3" />
+              Dokonceno {new Date(cert.completedAt).toLocaleDateString('cs-CZ', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              <Shield className="h-3 w-3" />
+              Overeno
+            </span>
+            <button
+              type="button"
+              className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground bg-muted/50 hover:bg-muted px-2 py-0.5 rounded-full transition-colors"
+            >
+              <Download className="h-3 w-3" />
+              PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  )
 }
 
 export default function CertificatesPage() {
@@ -51,112 +105,69 @@ export default function CertificatesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-8 mx-auto max-w-4xl">
+    <div className="space-y-6 mx-auto max-w-2xl">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         className="hidden md:block"
       >
-        <h1 className="text-2xl sm:text-3xl font-bold">Certifikaty</h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="text-2xl font-bold">Certifikaty</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">
           Vase ziskane certifikaty za dokoncene kurzy
         </p>
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
+        custom={0}
+        variants={fadeUp}
+        initial="hidden"
+        animate="visible"
+        className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-5"
       >
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <div>
-              <CardTitle>Celkem certifikatu</CardTitle>
-              <CardDescription>Pocet dokoncenych kurzu</CardDescription>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
-              <Award className="h-6 w-6 text-amber-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{certificates.length}</div>
-          </CardContent>
-        </Card>
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
+            <Award className="h-7 w-7 text-amber-500" />
+          </div>
+          <div>
+            <p className="text-3xl font-bold leading-tight">{certificates.length}</p>
+            <p className="text-xs text-muted-foreground font-medium">
+              {certificates.length === 1 ? 'Ziskany certifikat' : 'Ziskanych certifikatu'}
+            </p>
+          </div>
+        </div>
       </motion.div>
 
       {certificates.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-3">
           {certificates.map((cert, i) => (
-            <motion.div
-              key={cert.courseId}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.15 + i * 0.05 }}
-            >
-              <Card className="h-full">
-                <CardContent className="p-5">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-900/20">
-                      <Award className="h-6 w-6 text-amber-600" />
-                    </div>
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <div>
-                        <h3 className="font-semibold truncate">{cert.courseTitle}</h3>
-                        {cert.completedAt && (
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                            <Calendar className="h-3 w-3" />
-                            Dokonceno: {new Date(cert.completedAt).toLocaleDateString('cs-CZ', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric',
-                            })}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="border-green-500/30 text-green-600 bg-green-500/10">
-                          Overeno
-                        </Badge>
-                        <Button variant="ghost" size="sm" className="h-7 text-xs">
-                          <Download className="h-3 w-3 mr-1" />
-                          Stahnout
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+            <CertificateCard key={cert.courseId} cert={cert} index={i} />
           ))}
         </div>
       ) : (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          custom={1}
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="text-center py-16 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40"
         >
-          <Card>
-            <CardContent className="text-center py-16">
-              <Award className="h-14 w-14 text-muted-foreground mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-semibold mb-1">Zadne certifikaty</h3>
-              <p className="text-sm text-muted-foreground mb-6">
-                Dokoncete kurz a ziskejte svuj prvni certifikat
-              </p>
-              <Button asChild>
-                <Link to="/prehled/moje-kurzy">
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Moje kurzy
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-4">
+            <BookOpen className="h-8 w-8 text-muted-foreground/50" />
+          </div>
+          <h3 className="text-base font-semibold mb-1">Zadne certifikaty</h3>
+          <p className="text-sm text-muted-foreground mb-5 max-w-xs mx-auto">
+            Dokoncete kurz a ziskejte svuj prvni certifikat
+          </p>
+          <Button asChild className="rounded-full px-6">
+            <Link to="/prehled/moje-kurzy">Moje kurzy</Link>
+          </Button>
         </motion.div>
       )}
     </div>

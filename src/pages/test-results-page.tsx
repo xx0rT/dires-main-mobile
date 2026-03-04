@@ -1,10 +1,7 @@
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { FileText, Trophy, Target, TrendingUp } from 'lucide-react'
+import { FileText, Trophy, Target, TrendingUp, ChevronRight, BookOpen } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -16,6 +13,61 @@ interface CourseResult {
   completedLessons: number
   score: number
   isCompleted: boolean
+}
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, delay: i * 0.06, ease: [0.33, 1, 0.68, 1] as const },
+  }),
+}
+
+function ScoreRing({ score, size = 52 }: { score: number; size?: number }) {
+  const strokeWidth = 5
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - (score / 100) * circumference
+
+  const color = score >= 80 ? '#22c55e' : score >= 50 ? '#f59e0b' : '#ef4444'
+
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2} cy={size / 2} r={radius}
+          fill="none" stroke="currentColor" strokeWidth={strokeWidth}
+          className="text-neutral-100 dark:text-neutral-800"
+        />
+        <motion.circle
+          cx={size / 2} cy={size / 2} r={radius}
+          fill="none" stroke={color} strokeWidth={strokeWidth}
+          strokeLinecap="round" strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1] as const, delay: 0.3 }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-bold">{score}%</span>
+      </div>
+    </div>
+  )
+}
+
+function StatPill({ icon: Icon, label, value, color }: { icon: typeof Trophy; label: string; value: string | number; color: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 px-4 py-3">
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${color}`}>
+        <Icon className="h-4.5 w-4.5 text-white" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-lg font-bold leading-tight">{value}</p>
+        <p className="text-[11px] text-muted-foreground font-medium">{label}</p>
+      </div>
+    </div>
+  )
 }
 
 export default function TestResultsPage() {
@@ -93,121 +145,117 @@ export default function TestResultsPage() {
     ? Math.max(...results.map(r => r.score))
     : 0
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600'
-    if (score >= 50) return 'text-amber-600'
-    return 'text-red-500'
-  }
-
-  const getScoreBadge = (score: number, isCompleted: boolean) => {
-    if (isCompleted) return { label: 'Splneno', variant: 'default' as const, className: 'bg-green-600' }
-    if (score >= 80) return { label: 'Vyborne', variant: 'default' as const, className: 'bg-green-600' }
-    if (score >= 50) return { label: 'Probihajici', variant: 'secondary' as const, className: '' }
-    return { label: 'Zacatek', variant: 'outline' as const, className: '' }
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-8 mx-auto max-w-5xl">
+    <div className="space-y-6 mx-auto max-w-2xl">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         className="hidden md:block"
       >
-        <h1 className="text-2xl sm:text-3xl font-bold">Vysledky testu</h1>
-        <p className="text-muted-foreground mt-1">
-          Prehled vasich vysledku a hodnoceni v kurzech
+        <h1 className="text-2xl font-bold">Vysledky testu</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">
+          Prehled vasich vysledku a hodnoceni
         </p>
       </motion.div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { label: 'Prumerne hodnoceni', value: `${avgScore}%`, icon: Target, sub: 'Ze vsech kurzu' },
-          { label: 'Nejlepsi vysledek', value: `${bestScore}%`, icon: Trophy, sub: 'Maximalni skore' },
-          { label: 'Splnene kurzy', value: passedCourses, icon: FileText, sub: `z ${results.length} celkem` },
-          { label: 'Celkovy pokrok', value: `${avgScore}%`, icon: TrendingUp, sub: 'Prumerny pokrok' },
-        ].map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: i * 0.05 }}
-          >
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{stat.label}</CardTitle>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">{stat.sub}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+      <div className="grid grid-cols-2 gap-3">
+        <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible">
+          <StatPill icon={Target} label="Prumerne skore" value={`${avgScore}%`} color="bg-blue-500" />
+        </motion.div>
+        <motion.div custom={0.5} variants={fadeUp} initial="hidden" animate="visible">
+          <StatPill icon={Trophy} label="Nejlepsi" value={`${bestScore}%`} color="bg-amber-500" />
+        </motion.div>
+        <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible">
+          <StatPill icon={FileText} label="Splneno" value={passedCourses} color="bg-emerald-500" />
+        </motion.div>
+        <motion.div custom={1.5} variants={fadeUp} initial="hidden" animate="visible">
+          <StatPill icon={TrendingUp} label="Celkem kurzu" value={results.length} color="bg-cyan-500" />
+        </motion.div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.25 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle>Vysledky podle kurzu</CardTitle>
-            <CardDescription>Podrobne vysledky a hodnoceni pro kazdy kurz</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {results.length > 0 ? (
-              <div className="space-y-4">
-                {results.map((result) => {
-                  const badge = getScoreBadge(result.score, result.isCompleted)
-                  return (
-                    <div key={result.courseId} className="p-4 rounded-lg border hover:bg-accent/30 transition-colors">
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="min-w-0">
-                          <h3 className="font-medium truncate">{result.courseTitle}</h3>
-                          <p className="text-sm text-muted-foreground mt-0.5">
-                            {result.completedLessons} / {result.totalLessons} lekci dokonceno
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className={`text-lg font-bold tabular-nums ${getScoreColor(result.score)}`}>
-                            {result.score}%
-                          </span>
-                          <Badge variant={badge.variant} className={badge.className}>
-                            {badge.label}
-                          </Badge>
-                        </div>
+      <div>
+        <motion.div
+          custom={2}
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="flex items-center justify-between mb-3"
+        >
+          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Vysledky podle kurzu</span>
+        </motion.div>
+
+        {results.length > 0 ? (
+          <div className="space-y-3">
+            {results.map((result, i) => {
+              const statusLabel = result.isCompleted ? 'Splneno' : result.score >= 50 ? 'Probihajici' : 'Zacatek'
+              const statusColor = result.isCompleted
+                ? 'text-emerald-600 bg-emerald-500/10'
+                : result.score >= 50
+                  ? 'text-amber-600 bg-amber-500/10'
+                  : 'text-neutral-500 bg-neutral-500/10'
+
+              return (
+                <motion.div
+                  key={result.courseId}
+                  custom={i + 2}
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <Link
+                    to={`/prehled/moje-kurzy/${result.courseId}`}
+                    className="flex items-center gap-4 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-4 transition-all active:scale-[0.98] hover:shadow-sm"
+                  >
+                    <ScoreRing score={result.score} />
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-sm font-semibold truncate">{result.courseTitle}</h3>
+                        <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusColor}`}>
+                          {statusLabel}
+                        </span>
                       </div>
-                      <Progress value={result.score} className="h-2" />
+                      <p className="text-xs text-muted-foreground">
+                        {result.completedLessons} / {result.totalLessons} lekci dokonceno
+                      </p>
                     </div>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
-                <h3 className="text-base font-semibold mb-1">Zadne vysledky</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Zapiste se do kurzu a zacnete studovat
-                </p>
-                <Button asChild>
-                  <Link to="/prehled/integrace">Prohlidnout kurzy</Link>
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </motion.div>
+
+                    <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+                  </Link>
+                </motion.div>
+              )
+            })}
+          </div>
+        ) : (
+          <motion.div
+            custom={2}
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            className="text-center py-16 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="h-8 w-8 text-muted-foreground/50" />
+            </div>
+            <h3 className="text-base font-semibold mb-1">Zadne vysledky</h3>
+            <p className="text-sm text-muted-foreground mb-5 max-w-xs mx-auto">
+              Zapiste se do kurzu a zacnete studovat
+            </p>
+            <Button asChild className="rounded-full px-6">
+              <Link to="/prehled/moje-kurzy">Prohlidnout kurzy</Link>
+            </Button>
+          </motion.div>
+        )}
+      </div>
     </div>
   )
 }

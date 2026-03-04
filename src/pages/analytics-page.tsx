@@ -1,299 +1,280 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAuth } from '@/lib/auth-context'
+import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { RiHeartPulseLine, RiAddLine, RiUserLine, RiTimeLine, RiCheckLine, RiArrowRightLine } from '@remixicon/react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Clock, BookOpen, Calendar, TrendingUp, Layers, ChevronRight } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useEffect, useState, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 
-const treatmentPlans = [
-  {
-    id: 1,
-    name: 'Pooperační rehabilitace kolene',
-    patient: 'Sarah Johnson',
-    type: 'Ortopedická',
-    duration: '12 týdnů',
-    progress: 75,
-    sessionsCompleted: 9,
-    totalSessions: 12,
-    status: 'active',
-    startDate: '2024-11-15',
-    exercises: [
-      { name: 'Extenze nohou', sets: 3, reps: 15, completed: true },
-      { name: 'Hamstringové rotace', sets: 3, reps: 12, completed: true },
-      { name: 'Dřepy u zdi', sets: 2, reps: 10, completed: false },
-      { name: 'Balanční cvičení', sets: 3, reps: 10, completed: false }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Léčba bolesti dolní části zad',
-    patient: 'Emma Davis',
-    type: 'Léčba bolesti',
-    duration: '8 týdnů',
-    progress: 60,
-    sessionsCompleted: 5,
-    totalSessions: 8,
-    status: 'active',
-    startDate: '2024-12-01',
-    exercises: [
-      { name: 'Pánvové náklon', sets: 3, reps: 12, completed: true },
-      { name: 'Kočka-kráva protažení', sets: 2, reps: 10, completed: true },
-      { name: 'Můstek', sets: 3, reps: 15, completed: true },
-      { name: 'Ptačí pes', sets: 3, reps: 10, completed: false }
-    ]
-  },
-  {
-    id: 3,
-    name: 'Zlepšení pohyblivosti ramen',
-    patient: 'Michael Chen',
-    type: 'Pohyblivost',
-    duration: '10 týdnů',
-    progress: 45,
-    sessionsCompleted: 4,
-    totalSessions: 10,
-    status: 'active',
-    startDate: '2024-12-10',
-    exercises: [
-      { name: 'Krouhy pažemi', sets: 2, reps: 20, completed: true },
-      { name: 'Stažení lopatek', sets: 3, reps: 12, completed: true },
-      { name: 'Chůze po zdi', sets: 2, reps: 10, completed: false },
-      { name: 'Tahání odporové gumy', sets: 3, reps: 15, completed: false }
-    ]
-  },
-  {
-    id: 4,
-    name: 'Program úlevy od bolesti krku',
-    patient: 'Lisa Anderson',
-    type: 'Léčba bolesti',
-    duration: '6 týdnů',
-    progress: 30,
-    sessionsCompleted: 2,
-    totalSessions: 6,
-    status: 'active',
-    startDate: '2024-12-20',
-    exercises: [
-      { name: 'Rotace krku', sets: 2, reps: 10, completed: true },
-      { name: 'Vtažení brady', sets: 3, reps: 15, completed: false },
-      { name: 'Pokrčení ramen', sets: 3, reps: 12, completed: false },
-      { name: 'Boční ohyby krku', sets: 2, reps: 10, completed: false }
-    ]
-  }
-]
+interface StudySession {
+  courseId: string
+  courseTitle: string
+  lessonsCompleted: number
+  totalLessons: number
+  estimatedHours: number
+  lastStudied: string | null
+}
 
-const exerciseLibrary = [
-  {
-    category: 'Síla',
-    exercises: ['Extenze nohou', 'Hamstringové rotace', 'Bicepsové zdvihy', 'Tricepsové natažení', 'Tlak na hrudník']
-  },
-  {
-    category: 'Flexibilita',
-    exercises: ['Kočka-kráva protažení', 'Hamstringové natažení', 'Protažení kyčelního flexoru', 'Protažení ramen']
-  },
-  {
-    category: 'Rovnováha',
-    exercises: ['Stoj na jedné noze', 'Chůze pata-špička', 'Balanční deska', 'Tandemový postoj']
-  },
-  {
-    category: 'Kardio',
-    exercises: ['Chůze', 'Cyklistika', 'Plavání', 'Eliptický trenažér']
-  }
-]
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, delay: i * 0.06, ease: [0.33, 1, 0.68, 1] as const },
+  }),
+}
+
+const WEEKDAYS = ['Po', 'Ut', 'St', 'Ct', 'Pa', 'So', 'Ne']
+
+function WeeklyActivityChart({ activityData }: { activityData: number[] }) {
+  const max = Math.max(...activityData, 1)
+
+  return (
+    <div className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-5">
+      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-4">Tydenni aktivita</p>
+      <div className="flex items-end gap-2 h-24">
+        {activityData.map((val, i) => {
+          const height = Math.max((val / max) * 100, 6)
+          const isToday = i === new Date().getDay() - 1 || (new Date().getDay() === 0 && i === 6)
+          return (
+            <div key={WEEKDAYS[i]} className="flex-1 flex flex-col items-center gap-1.5">
+              <motion.div
+                className={`w-full rounded-lg ${isToday ? 'bg-blue-500' : val > 0 ? 'bg-blue-200 dark:bg-blue-800' : 'bg-neutral-100 dark:bg-neutral-800'}`}
+                initial={{ height: 0 }}
+                animate={{ height: `${height}%` }}
+                transition={{ duration: 0.6, delay: 0.1 + i * 0.05, ease: [0.33, 1, 0.68, 1] as const }}
+                style={{ minHeight: 6 }}
+              />
+              <span className={`text-[10px] font-medium ${isToday ? 'text-blue-500 font-bold' : 'text-muted-foreground'}`}>
+                {WEEKDAYS[i]}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function StatPill({ icon: Icon, label, value, color }: { icon: typeof Clock; label: string; value: string | number; color: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 px-4 py-3">
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${color}`}>
+        <Icon className="h-4.5 w-4.5 text-white" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-lg font-bold leading-tight">{value}</p>
+        <p className="text-[11px] text-muted-foreground font-medium">{label}</p>
+      </div>
+    </div>
+  )
+}
 
 export default function AnalyticsPage() {
+  const { user } = useAuth()
+  const [sessions, setSessions] = useState<StudySession[]>([])
+  const [loading, setLoading] = useState(true)
+  const [weeklyData, setWeeklyData] = useState<number[]>([0, 0, 0, 0, 0, 0, 0])
+
+  useEffect(() => {
+    if (user) loadStudyData()
+  }, [user])
+
+  const loadStudyData = async () => {
+    if (!user) return
+
+    try {
+      const [
+        { data: enrollments },
+        { data: progressData },
+        { data: lessonsData },
+      ] = await Promise.all([
+        supabase
+          .from('course_enrollments')
+          .select('course_id, courses!inner(id, title)')
+          .eq('user_id', user.id),
+        supabase
+          .from('user_course_progress')
+          .select('course_id, lesson_id, completed, last_watched_at')
+          .eq('user_id', user.id),
+        supabase
+          .from('course_lessons')
+          .select('id, course_id'),
+      ])
+
+      const lessonsByCourse = new Map<string, number>()
+      for (const l of lessonsData || []) {
+        lessonsByCourse.set(l.course_id, (lessonsByCourse.get(l.course_id) || 0) + 1)
+      }
+
+      const completedByCourse = new Map<string, number>()
+      const lastActivityByCourse = new Map<string, string>()
+      for (const p of progressData || []) {
+        if (p.completed) {
+          completedByCourse.set(p.course_id, (completedByCourse.get(p.course_id) || 0) + 1)
+        }
+        const current = lastActivityByCourse.get(p.course_id)
+        if (!current || (p.last_watched_at && p.last_watched_at > current)) {
+          lastActivityByCourse.set(p.course_id, p.last_watched_at)
+        }
+      }
+
+      const mapped: StudySession[] = (enrollments || []).map((e: any) => {
+        const completed = completedByCourse.get(e.course_id) || 0
+        return {
+          courseId: e.course_id,
+          courseTitle: e.courses?.title || '',
+          lessonsCompleted: completed,
+          totalLessons: lessonsByCourse.get(e.course_id) || 0,
+          estimatedHours: Math.round(completed * 0.75 * 10) / 10,
+          lastStudied: lastActivityByCourse.get(e.course_id) || null,
+        }
+      })
+
+      mapped.sort((a, b) => {
+        if (!a.lastStudied && !b.lastStudied) return 0
+        if (!a.lastStudied) return 1
+        if (!b.lastStudied) return -1
+        return b.lastStudied.localeCompare(a.lastStudied)
+      })
+
+      setSessions(mapped)
+
+      const weekly = [0, 0, 0, 0, 0, 0, 0]
+      const now = new Date()
+      for (const p of progressData || []) {
+        if (p.completed && p.last_watched_at) {
+          const d = new Date(p.last_watched_at)
+          const diff = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24))
+          if (diff < 7) {
+            const dayIndex = d.getDay() === 0 ? 6 : d.getDay() - 1
+            weekly[dayIndex]++
+          }
+        }
+      }
+      setWeeklyData(weekly)
+    } catch (error) {
+      console.error('Error loading study data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const totalHours = useMemo(() => sessions.reduce((sum, s) => sum + s.estimatedHours, 0), [sessions])
+  const totalLessons = useMemo(() => sessions.reduce((sum, s) => sum + s.lessonsCompleted, 0), [sessions])
+  const avgPerCourse = sessions.length > 0 ? Math.round(totalHours / sessions.length * 10) / 10 : 0
+  const thisWeekLessons = useMemo(() => weeklyData.reduce((a, b) => a + b, 0), [weeklyData])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+      </div>
+    )
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between max-md:hidden">
-        <div>
-          <h1 className="text-3xl font-bold">Terapeutické plány</h1>
-          <p className="text-muted-foreground">Spravujte terapeutické plány a cvičební programy pro vaše pacienty.</p>
-        </div>
-        <Button>
-          <RiAddLine className="mr-2 h-4 w-4" />
-          Vytvořit terapeutický plán
-        </Button>
+    <div className="space-y-6 mx-auto max-w-2xl">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="hidden md:block"
+      >
+        <h1 className="text-2xl font-bold">Studijni doba</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">
+          Prehled casu straveneho studiem
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible">
+          <StatPill icon={Clock} label="Celkem hodin" value={`${totalHours}h`} color="bg-blue-500" />
+        </motion.div>
+        <motion.div custom={0.5} variants={fadeUp} initial="hidden" animate="visible">
+          <StatPill icon={Layers} label="Lekci hotovo" value={totalLessons} color="bg-emerald-500" />
+        </motion.div>
+        <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible">
+          <StatPill icon={TrendingUp} label="Prumer/kurz" value={`${avgPerCourse}h`} color="bg-amber-500" />
+        </motion.div>
+        <motion.div custom={1.5} variants={fadeUp} initial="hidden" animate="visible">
+          <StatPill icon={Calendar} label="Tento tyden" value={`${thisWeekLessons} lekci`} color="bg-cyan-500" />
+        </motion.div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aktivní plány</CardTitle>
-            <RiHeartPulseLine className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{treatmentPlans.filter(p => p.status === 'active').length}</div>
-            <p className="text-xs text-muted-foreground">U {treatmentPlans.length} pacientů</p>
-          </CardContent>
-        </Card>
+      <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible">
+        <WeeklyActivityChart activityData={weeklyData} />
+      </motion.div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Průměrný pokrok</CardTitle>
-            <RiCheckLine className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {Math.round(treatmentPlans.reduce((acc, plan) => acc + plan.progress, 0) / treatmentPlans.length)}%
-            </div>
-            <p className="text-xs text-green-600 dark:text-green-400">Dle plánu</p>
-          </CardContent>
-        </Card>
+      <div>
+        <motion.div
+          custom={3}
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="flex items-center justify-between mb-3"
+        >
+          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Cas podle kurzu</span>
+        </motion.div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Celkem sezení</CardTitle>
-            <RiTimeLine className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {treatmentPlans.reduce((acc, plan) => acc + plan.sessionsCompleted, 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">Dokončeno tento měsíc</p>
-          </CardContent>
-        </Card>
+        {sessions.length > 0 ? (
+          <div className="space-y-3">
+            {sessions.map((session, i) => (
+              <motion.div
+                key={session.courseId}
+                custom={i + 3}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+              >
+                <Link
+                  to={`/prehled/moje-kurzy/${session.courseId}`}
+                  className="flex items-center gap-4 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-4 transition-all active:scale-[0.98] hover:shadow-sm"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+                    <Clock className="h-6 w-6 text-blue-500" />
+                  </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Úspěšnost</CardTitle>
-            <RiCheckLine className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">94%</div>
-            <p className="text-xs text-green-600 dark:text-green-400">Dosažených cílů</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="active" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="active">Aktivní plány</TabsTrigger>
-          <TabsTrigger value="library">Knihovna cviků</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="active" className="space-y-4">
-          <div className="grid gap-4">
-            {treatmentPlans.map((plan) => (
-              <Card key={plan.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <CardTitle className="text-xl">{plan.name}</CardTitle>
-                        <Badge>{plan.type}</Badge>
-                        <Badge variant={plan.status === 'active' ? 'default' : 'secondary'}>
-                          {plan.status === 'active' ? 'aktivní' : plan.status}
-                        </Badge>
-                      </div>
-                      <CardDescription className="flex items-center gap-4 mt-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-semibold truncate mb-1">{session.courseTitle}</h3>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">{session.estimatedHours}h</span>
+                      <span>{session.lessonsCompleted}/{session.totalLessons} lekci</span>
+                      {session.lastStudied && (
                         <span className="flex items-center gap-1">
-                          <RiUserLine className="h-4 w-4" />
-                          {plan.patient}
+                          <Calendar className="h-3 w-3" />
+                          {new Date(session.lastStudied).toLocaleDateString('cs-CZ')}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <RiTimeLine className="h-4 w-4" />
-                          {plan.duration}
-                        </span>
-                        <span>Začátek: {new Date(plan.startDate).toLocaleDateString()}</span>
-                      </CardDescription>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Upravit plán
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Celkový pokrok</span>
-                      <span className="font-semibold">{plan.progress}%</span>
-                    </div>
-                    <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                      <div
-                        className="bg-primary h-full transition-all"
-                        style={{ width: `${plan.progress}%` }}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>Sezení: {plan.sessionsCompleted} / {plan.totalSessions}</span>
-                      <span>Zbývá {plan.totalSessions - plan.sessionsCompleted}</span>
+                      )}
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-semibold">Cvičení</h4>
-                      <Button variant="ghost" size="sm">
-                        <RiArrowRightLine className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="grid gap-2">
-                      {plan.exercises.map((exercise, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-3 rounded-lg border bg-card"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                              exercise.completed
-                                ? 'bg-green-500 border-green-500'
-                                : 'border-muted-foreground'
-                            }`}>
-                              {exercise.completed && (
-                                <RiCheckLine className="h-3 w-3 text-white" />
-                              )}
-                            </div>
-                            <span className={`text-sm font-medium ${
-                              exercise.completed ? 'line-through text-muted-foreground' : ''
-                            }`}>
-                              {exercise.name}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span>{exercise.sets} sérií</span>
-                            <span>{exercise.reps} opakování</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+                </Link>
+              </motion.div>
             ))}
           </div>
-        </TabsContent>
-
-        <TabsContent value="library" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Knihovna cviků</CardTitle>
-              <CardDescription>Procházejte a přidávejte cvičení do terapeutických plánů</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6">
-                {exerciseLibrary.map((category, index) => (
-                  <div key={index} className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">{category.category}</h3>
-                      <Badge variant="outline">{category.exercises.length} cviků</Badge>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {category.exercises.map((exercise, exIndex) => (
-                        <div
-                          key={exIndex}
-                          className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
-                        >
-                          <span className="text-sm font-medium">{exercise}</span>
-                          <Button variant="ghost" size="sm">
-                            <RiAddLine className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        ) : (
+          <motion.div
+            custom={3}
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            className="text-center py-16 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="h-8 w-8 text-muted-foreground/50" />
+            </div>
+            <h3 className="text-base font-semibold mb-1">Zadna data</h3>
+            <p className="text-sm text-muted-foreground mb-5 max-w-xs mx-auto">
+              Zacnete studovat a sledujte svou aktivitu
+            </p>
+            <Button asChild className="rounded-full px-6">
+              <Link to="/prehled/moje-kurzy">Prohlidnout kurzy</Link>
+            </Button>
+          </motion.div>
+        )}
+      </div>
     </div>
   )
 }

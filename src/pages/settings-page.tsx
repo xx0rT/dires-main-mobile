@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
-import { RiUserLine, RiLockLine, RiLogoutBoxLine, RiSaveLine } from '@remixicon/react'
+import { User, Lock, LogOut, Save, Mail, MapPin, Building2, Globe, Phone, Calendar, Shield } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { SubscriptionCard } from '@/components/subscription/subscription-card'
 
 interface ProfileData {
@@ -19,6 +19,27 @@ interface ProfileData {
   website: string
   location: string
   bio: string
+}
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, delay: i * 0.06, ease: [0.33, 1, 0.68, 1] as const },
+  }),
+}
+
+function FormField({ label, icon: Icon, children }: { label: string; icon: typeof User; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+        <Icon className="h-3.5 w-3.5" />
+        {label}
+      </Label>
+      {children}
+    </div>
+  )
 }
 
 export default function SettingsPage() {
@@ -72,22 +93,29 @@ export default function SettingsPage() {
     if (!user) return
 
     setProfileSaving(true)
+
+    const profilePayload = {
+      id: user.id,
+      email: user.email || '',
+      full_name: profile.full_name,
+      phone: profile.phone,
+      company: profile.company,
+      website: profile.website,
+      location: profile.location,
+      bio: profile.bio,
+      updated_at: new Date().toISOString(),
+    }
+
     const { error } = await supabase
       .from('profiles')
-      .update({
-        full_name: profile.full_name,
-        phone: profile.phone,
-        company: profile.company,
-        website: profile.website,
-        location: profile.location,
-        bio: profile.bio,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', user.id)
+      .upsert(profilePayload, { onConflict: 'id' })
 
     if (error) {
       toast.error('Nepodařilo se uložit profil')
     } else {
+      await supabase.auth.updateUser({
+        data: { full_name: profile.full_name },
+      })
       toast.success('Profil byl úspěšně uložen!')
     }
     setProfileSaving(false)
@@ -139,306 +167,279 @@ export default function SettingsPage() {
     setProfile((prev) => ({ ...prev, [field]: value }))
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="hidden md:block">
-        <h1 className="text-3xl font-bold">Nastavení</h1>
-        <p className="text-muted-foreground">
-          Spravujte své nastavení účtu a preference
-        </p>
-      </div>
+  const initials = (profile.full_name || user?.email?.split('@')[0] || '?')
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
 
-      <Tabs defaultValue="profile" className="space-y-6">
+  return (
+    <div className="mx-auto max-w-2xl space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="hidden md:block"
+      >
+        <h1 className="text-2xl font-bold">Nastaveni</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">
+          Spravujte sve nastaveni uctu a preference
+        </p>
+      </motion.div>
+
+      <Tabs defaultValue="profile" className="space-y-5">
         <TabsList>
           <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="subscription">Předplatné</TabsTrigger>
-          <TabsTrigger value="security">Zabezpečení</TabsTrigger>
-          <TabsTrigger value="notifications">Upozornění</TabsTrigger>
+          <TabsTrigger value="subscription">Predplatne</TabsTrigger>
+          <TabsTrigger value="security">Zabezpeceni</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Informace o profilu</CardTitle>
-              <CardDescription>
-                Aktualizujte informace svého účtu
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {profileLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                </div>
-              ) : (
-                <form onSubmit={handleSaveProfile} className="space-y-6">
-                  <div className="flex items-center gap-6">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-                      <RiUserLine className="h-10 w-10 text-primary" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-medium">{profile.full_name || user?.email?.split('@')[0]}</p>
-                      <p className="text-sm text-muted-foreground">{user?.email}</p>
-                    </div>
+        <TabsContent value="profile" className="space-y-5">
+          {profileLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+            </div>
+          ) : (
+            <form onSubmit={handleSaveProfile} className="space-y-5">
+              <motion.div
+                custom={0}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-5"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-bold">
+                    {initials}
                   </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-base truncate">
+                      {profile.full_name || user?.email?.split('@')[0]}
+                    </p>
+                    <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+                  </div>
+                </div>
+              </motion.div>
 
-                  <Separator />
+              <motion.div
+                custom={1}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-5 space-y-4"
+              >
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Osobni udaje</p>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="grid gap-2">
-                      <Label htmlFor="full_name">Celé jméno</Label>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField label="Cele jmeno" icon={User}>
+                    <Input
+                      value={profile.full_name}
+                      onChange={(e) => updateField('full_name', e.target.value)}
+                      placeholder="Vase cele jmeno"
+                      className="h-10"
+                    />
+                  </FormField>
+                  <FormField label="Telefon" icon={Phone}>
+                    <Input
+                      type="tel"
+                      value={profile.phone}
+                      onChange={(e) => updateField('phone', e.target.value)}
+                      placeholder="+420 123 456 789"
+                      className="h-10"
+                    />
+                  </FormField>
+                  <FormField label="Firma / Organizace" icon={Building2}>
+                    <Input
+                      value={profile.company}
+                      onChange={(e) => updateField('company', e.target.value)}
+                      placeholder="Nazev firmy"
+                      className="h-10"
+                    />
+                  </FormField>
+                  <FormField label="Web" icon={Globe}>
+                    <Input
+                      type="url"
+                      value={profile.website}
+                      onChange={(e) => updateField('website', e.target.value)}
+                      placeholder="https://vase-stranka.cz"
+                      className="h-10"
+                    />
+                  </FormField>
+                  <div className="sm:col-span-2">
+                    <FormField label="Lokace" icon={MapPin}>
                       <Input
-                        id="full_name"
-                        value={profile.full_name}
-                        onChange={(e) => updateField('full_name', e.target.value)}
-                        placeholder="Vaše celé jméno"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="phone">Telefon</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={profile.phone}
-                        onChange={(e) => updateField('phone', e.target.value)}
-                        placeholder="+420 123 456 789"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="company">Firma / Organizace</Label>
-                      <Input
-                        id="company"
-                        value={profile.company}
-                        onChange={(e) => updateField('company', e.target.value)}
-                        placeholder="Název firmy"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="website">Web</Label>
-                      <Input
-                        id="website"
-                        type="url"
-                        value={profile.website}
-                        onChange={(e) => updateField('website', e.target.value)}
-                        placeholder="https://vase-stranka.cz"
-                      />
-                    </div>
-                    <div className="grid gap-2 sm:col-span-2">
-                      <Label htmlFor="location">Lokace</Label>
-                      <Input
-                        id="location"
                         value={profile.location}
                         onChange={(e) => updateField('location', e.target.value)}
-                        placeholder="Praha, Česká republika"
+                        placeholder="Praha, Ceska republika"
+                        className="h-10"
                       />
-                    </div>
-                    <div className="grid gap-2 sm:col-span-2">
-                      <Label htmlFor="bio">O mně</Label>
+                    </FormField>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <FormField label="O mne" icon={User}>
                       <Textarea
-                        id="bio"
                         value={profile.bio}
                         onChange={(e) => updateField('bio', e.target.value)}
-                        placeholder="Krátce o sobě..."
+                        placeholder="Kratce o sobe..."
                         rows={3}
                       />
-                    </div>
+                    </FormField>
                   </div>
+                </div>
+              </motion.div>
 
-                  <Separator />
+              <motion.div
+                custom={2}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-5 space-y-4"
+              >
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Informace o uctu</p>
 
-                  <div className="grid gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="email">Email</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="email"
-                          type="email"
-                          value={user?.email || ''}
-                          disabled
-                          className="flex-1"
-                        />
-                        <Button variant="outline" disabled>
-                          Ověřeno
-                        </Button>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Váš email je ověřený a nelze jej změnit
-                      </p>
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor="created">Účet vytvořen</Label>
-                      <Input
-                        id="created"
-                        value={user?.created_at ? new Date(user.created_at).toLocaleDateString('cs-CZ', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        }) : ''}
-                        disabled
-                      />
-                    </div>
+                <FormField label="Email" icon={Mail}>
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      value={user?.email || ''}
+                      disabled
+                      className="h-10 flex-1"
+                    />
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-500/10 px-2.5 rounded-lg">
+                      <Shield className="h-3 w-3" />
+                      Overeno
+                    </span>
                   </div>
+                </FormField>
 
-                  <div className="flex justify-end">
-                    <Button type="submit" disabled={profileSaving}>
-                      <RiSaveLine className="mr-2 h-4 w-4" />
-                      {profileSaving ? 'Ukládám...' : 'Uložit profil'}
-                    </Button>
-                  </div>
-                </form>
-              )}
-            </CardContent>
-          </Card>
+                <FormField label="Ucet vytvoren" icon={Calendar}>
+                  <Input
+                    value={user?.created_at ? new Date(user.created_at).toLocaleDateString('cs-CZ', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    }) : ''}
+                    disabled
+                    className="h-10"
+                  />
+                </FormField>
+              </motion.div>
+
+              <motion.div
+                custom={3}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+              >
+                <Button
+                  type="submit"
+                  disabled={profileSaving}
+                  className="w-full h-11 rounded-xl font-semibold"
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  {profileSaving ? 'Ukladam...' : 'Ulozit profil'}
+                </Button>
+              </motion.div>
+            </form>
+          )}
         </TabsContent>
 
-        <TabsContent value="subscription" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Informace o předplatném</CardTitle>
-              <CardDescription>
-                Spravujte své předplatné a licenci
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {user && <SubscriptionCard userId={user.id} />}
-            </CardContent>
-          </Card>
+        <TabsContent value="subscription" className="space-y-5">
+          <motion.div
+            custom={0}
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-5"
+          >
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-4">Informace o predplatnem</p>
+            {user && <SubscriptionCard userId={user.id} />}
+          </motion.div>
         </TabsContent>
 
-        <TabsContent value="security" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Změna hesla</CardTitle>
-              <CardDescription>
-                Aktualizujte své heslo pro zabezpečení účtu
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleUpdatePassword} className="space-y-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="currentPassword">Současné heslo</Label>
-                  <Input
-                    id="currentPassword"
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Zadejte současné heslo"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="newPassword">Nové heslo</Label>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Zadejte nové heslo"
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="confirmPassword">Potvrzení nového hesla</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Potvrďte nové heslo"
-                    required
-                  />
-                </div>
-                <Button type="submit" disabled={loading}>
-                  <RiLockLine className="mr-2 h-4 w-4" />
-                  {loading ? 'Aktualizuji...' : 'Aktualizovat heslo'}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+        <TabsContent value="security" className="space-y-5">
+          <motion.div
+            custom={0}
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-5"
+          >
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-4">Zmena hesla</p>
+            <form onSubmit={handleUpdatePassword} className="space-y-4">
+              <FormField label="Soucasne heslo" icon={Lock}>
+                <Input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Zadejte soucasne heslo"
+                  className="h-10"
+                />
+              </FormField>
+              <FormField label="Nove heslo" icon={Lock}>
+                <Input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Zadejte nove heslo"
+                  required
+                  className="h-10"
+                />
+              </FormField>
+              <FormField label="Potvrzeni noveho hesla" icon={Lock}>
+                <Input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Potvrd'te nove heslo"
+                  required
+                  className="h-10"
+                />
+              </FormField>
+              <Button type="submit" disabled={loading} className="w-full h-11 rounded-xl font-semibold">
+                <Lock className="mr-2 h-4 w-4" />
+                {loading ? 'Aktualizuji...' : 'Aktualizovat heslo'}
+              </Button>
+            </form>
+          </motion.div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Aktivní relace</CardTitle>
-              <CardDescription>
-                Spravujte své aktivní relace napříč zařízeními
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-1">
-                    <p className="font-medium">Aktuální relace</p>
-                    <p className="text-sm text-muted-foreground">
-                      Toto zařízení - Aktivní nyní
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm" disabled>
-                    Aktivní
-                  </Button>
-                </div>
+          <motion.div
+            custom={1}
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-5"
+          >
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-4">Aktivni relace</p>
+            <div className="flex items-center justify-between rounded-xl border border-border/40 p-3.5">
+              <div className="space-y-0.5">
+                <p className="text-sm font-medium">Aktualni relace</p>
+                <p className="text-xs text-muted-foreground">Toto zarizeni - Aktivni nyni</p>
               </div>
-            </CardContent>
-          </Card>
+              <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+                Aktivni
+              </span>
+            </div>
+          </motion.div>
 
-          <Card className="border-destructive">
-            <CardHeader>
-              <CardTitle>Nebezpečná zóna</CardTitle>
-              <CardDescription>
-                Nevratné a destruktivní akce
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between rounded-lg border border-destructive/50 p-4">
-                <div className="space-y-1">
-                  <p className="font-medium">Odhlásit se</p>
-                  <p className="text-sm text-muted-foreground">
-                    Odhlásit se ze svého účtu na tomto zařízení
-                  </p>
-                </div>
-                <Button variant="destructive" size="sm" onClick={handleSignOut}>
-                  <RiLogoutBoxLine className="mr-2 h-4 w-4" />
-                  Odhlásit se
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <Separator />
 
-        <TabsContent value="notifications" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>E-mailová upozornění</CardTitle>
-              <CardDescription>
-                Spravujte, jak přijímáte e-mailová upozornění
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="font-medium">Marketingové e-maily</p>
-                  <p className="text-sm text-muted-foreground">
-                    Dostávejte e-maily o nových funkcích a aktualizacích
-                  </p>
-                </div>
-                <Button variant="outline" size="sm">
-                  Konfigurovat
-                </Button>
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="font-medium">Bezpečnostní upozornění</p>
-                  <p className="text-sm text-muted-foreground">
-                    Dostávejte upozornění o zabezpečení vašeho účtu
-                  </p>
-                </div>
-                <Button variant="outline" size="sm" disabled>
-                  Vždy zapnuto
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div
+            custom={2}
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+          >
+            <Button
+              variant="destructive"
+              onClick={handleSignOut}
+              className="w-full h-11 rounded-xl font-semibold"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Odhlasit se
+            </Button>
+          </motion.div>
         </TabsContent>
       </Tabs>
     </div>

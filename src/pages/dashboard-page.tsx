@@ -273,10 +273,10 @@ export default function DashboardPage() {
                   animate="visible"
                 >
                   {[
-                    { title: 'Dokoncene', value: stats.completedCourses, icon: RiTrophyLine, color: 'text-green-500', bg: 'bg-green-500/10' },
-                    { title: 'Probihajici', value: stats.inProgressCourses, icon: RiBookOpenLine, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                    { title: 'Hodin', value: stats.totalHoursSpent, icon: RiTimeLine, color: 'text-cyan-500', bg: 'bg-cyan-500/10' },
-                    { title: 'Lekci', value: stats.completedModules, icon: RiCheckLine, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+                    { title: 'Dokoncene', value: stats.completedCourses, icon: RiTrophyLine, color: 'text-emerald-500', bg: 'bg-emerald-500' },
+                    { title: 'Probihajici', value: stats.inProgressCourses, icon: RiBookOpenLine, color: 'text-blue-500', bg: 'bg-blue-500' },
+                    { title: 'Hodin', value: stats.totalHoursSpent, icon: RiTimeLine, color: 'text-cyan-500', bg: 'bg-cyan-500' },
+                    { title: 'Lekci', value: stats.completedModules, icon: RiCheckLine, color: 'text-amber-500', bg: 'bg-amber-500' },
                   ].map((stat) => {
                     const Icon = stat.icon
                     return (
@@ -284,10 +284,10 @@ export default function DashboardPage() {
                         key={stat.title}
                         variants={fadeUp}
                         whileTap={{ scale: 0.97 }}
-                        className="flex items-center gap-3 p-3.5 rounded-2xl bg-muted/30 border border-border/25"
+                        className="flex items-center gap-3 p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40"
                       >
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.bg}`}>
-                          <Icon className={`h-5 w-5 ${stat.color}`} />
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${stat.bg}`}>
+                          <Icon className="h-4.5 w-4.5 text-white" />
                         </div>
                         <div>
                           <div className="text-xl font-extrabold leading-tight">{stat.value}</div>
@@ -325,10 +325,10 @@ export default function DashboardPage() {
                         >
                           <Link
                             to={`/kurz/${enrollment.course_id}`}
-                            className="flex items-center gap-3 p-3 rounded-2xl bg-muted/25 border border-border/25 active:bg-muted/50 transition-colors"
+                            className="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 active:scale-[0.98] transition-all"
                           >
-                            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-primary/12 to-blue-400/12 flex items-center justify-center">
-                              <RiBookOpenLine className="h-5 w-5 text-primary/70" />
+                            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                              <RiBookOpenLine className="h-5 w-5 text-blue-500" />
                             </div>
                             <div className="flex-1 min-w-0 space-y-1.5">
                               <div className="flex items-center gap-2">
@@ -358,7 +358,7 @@ export default function DashboardPage() {
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.3 }}
-                    className="text-center py-10 space-y-4 rounded-2xl bg-muted/15 border border-border/20"
+                    className="text-center py-10 space-y-4 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40"
                   >
                     <motion.div
                       initial={{ scale: 0.8 }}
