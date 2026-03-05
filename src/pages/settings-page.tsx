@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
-import { User, Lock, LogOut, Save, Mail, MapPin, Building2, Globe, Phone, Calendar, Shield } from 'lucide-react'
+import { User, Lock, LogOut, Save, Mail, MapPin, Building2, Globe, Phone, Calendar, Shield, Camera } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { SubscriptionCard } from '@/components/subscription/subscription-card'
 
@@ -19,6 +19,7 @@ interface ProfileData {
   website: string
   location: string
   bio: string
+  avatar_url: string
 }
 
 const fadeUp = {
@@ -47,9 +48,11 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false)
   const [profileLoading, setProfileLoading] = useState(true)
   const [profileSaving, setProfileSaving] = useState(false)
+  const [avatarUploading, setAvatarUploading] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [profile, setProfile] = useState<ProfileData>({
     full_name: '',
     phone: '',
@@ -57,6 +60,7 @@ export default function SettingsPage() {
     website: '',
     location: '',
     bio: '',
+    avatar_url: '',
   })
 
   useEffect(() => {
@@ -66,7 +70,7 @@ export default function SettingsPage() {
       setProfileLoading(true)
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, phone, company, website, location, bio')
+        .select('full_name, phone, company, website, location, bio, avatar_url')
         .eq('id', user.id)
         .maybeSingle()
 
@@ -80,6 +84,7 @@ export default function SettingsPage() {
           website: data.website || '',
           location: data.location || '',
           bio: data.bio || '',
+          avatar_url: data.avatar_url || '',
         })
       }
       setProfileLoading(false)
@@ -87,6 +92,54 @@ export default function SettingsPage() {
 
     fetchProfile()
   }, [user])
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Vyberte prosim obrazek')
+      return
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Obrazek musi byt mensi nez 2MB')
+      return
+    }
+
+    setAvatarUploading(true)
+
+    try {
+      const ext = file.name.split('.').pop()
+      const filePath = `${user.id}/avatar.${ext}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+      const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .upsert({ id: user.id, email: user.email || '', avatar_url: avatarUrl, updated_at: new Date().toISOString() }, { onConflict: 'id' })
+
+      if (updateError) throw updateError
+
+      setProfile((prev) => ({ ...prev, avatar_url: avatarUrl }))
+      toast.success('Profilovy obrazek aktualizovan!')
+    } catch (err: any) {
+      toast.error(err.message || 'Nepodarilo se nahrat obrazek')
+    } finally {
+      setAvatarUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -103,6 +156,7 @@ export default function SettingsPage() {
       website: profile.website,
       location: profile.location,
       bio: profile.bio,
+      avatar_url: profile.avatar_url,
       updated_at: new Date().toISOString(),
     }
 
@@ -210,14 +264,50 @@ export default function SettingsPage() {
                 className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-5"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-bold">
-                    {initials}
+                  <div className="relative group">
+                    {profile.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt="Avatar"
+                        className="w-16 h-16 rounded-2xl object-cover"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-bold">
+                        {initials}
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={avatarUploading}
+                      className="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                    >
+                      {avatarUploading ? (
+                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      ) : (
+                        <Camera className="h-5 w-5 text-white" />
+                      )}
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarUpload}
+                    />
                   </div>
                   <div className="min-w-0">
                     <p className="font-semibold text-base truncate">
                       {profile.full_name || user?.email?.split('@')[0]}
                     </p>
                     <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-[11px] font-medium text-blue-500 hover:text-blue-600 mt-0.5 transition-colors"
+                    >
+                      Zmenit fotku
+                    </button>
                   </div>
                 </div>
               </motion.div>

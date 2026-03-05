@@ -88,6 +88,32 @@ function QuickActionItem({ action }: { action: typeof quickActions[number] }) {
   )
 }
 
+function StatsRing({ value }: { value: number }) {
+  const size = 52
+  const strokeWidth = 5
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - (value / 100) * circumference
+
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className="text-neutral-100 dark:text-neutral-800" />
+        <motion.circle
+          cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#2563eb" strokeWidth={strokeWidth}
+          strokeLinecap="round" strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1] as const, delay: 0.2 }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-bold">{value}%</span>
+      </div>
+    </div>
+  )
+}
+
 function QuickActions() {
   const [emblaRef] = useEmblaCarousel(
     { loop: true, dragFree: true, containScroll: false },
@@ -220,6 +246,10 @@ export default function DashboardPage() {
     showMobileNav()
   }, [showMobileNav])
 
+  const totalProgress = (stats.completedCourses + stats.inProgressCourses) > 0
+    ? Math.round((stats.completedCourses / (stats.completedCourses + stats.inProgressCourses)) * 100)
+    : 0
+
   if (selectedCourse) {
     return <CourseDashboard course={selectedCourse} />
   }
@@ -265,7 +295,34 @@ export default function DashboardPage() {
           ) : (
             <>
               <div>
-                <SectionLabel title="Statistiky" delay={0.1} />
+                <SectionLabel
+                  title="Statistiky"
+                  delay={0.1}
+                  right={
+                    <Button asChild variant="ghost" size="sm" className="text-[11px] h-6 px-2 -mr-2">
+                      <Link to="/prehled/pokrok">
+                        Podrobne
+                        <RiArrowRightLine className="ml-1 h-3 w-3" />
+                      </Link>
+                    </Button>
+                  }
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, delay: 0.12 }}
+                  className="rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 p-4 mb-3"
+                >
+                  <div className="flex items-center gap-4">
+                    <StatsRing value={totalProgress} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold">Celkovy pokrok</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {stats.completedCourses} kurzu dokonceno, {stats.completedModules} lekci
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
                 <motion.div
                   className="grid grid-cols-2 gap-3"
                   variants={stagger}
@@ -273,10 +330,10 @@ export default function DashboardPage() {
                   animate="visible"
                 >
                   {[
-                    { title: 'Dokoncene', value: stats.completedCourses, icon: RiTrophyLine, color: 'text-emerald-500', bg: 'bg-emerald-500' },
-                    { title: 'Probihajici', value: stats.inProgressCourses, icon: RiBookOpenLine, color: 'text-blue-500', bg: 'bg-blue-500' },
-                    { title: 'Hodin', value: stats.totalHoursSpent, icon: RiTimeLine, color: 'text-cyan-500', bg: 'bg-cyan-500' },
-                    { title: 'Lekci', value: stats.completedModules, icon: RiCheckLine, color: 'text-amber-500', bg: 'bg-amber-500' },
+                    { title: 'Dokoncene', value: stats.completedCourses, icon: RiTrophyLine, bg: 'bg-emerald-500' },
+                    { title: 'Probihajici', value: stats.inProgressCourses, icon: RiBookOpenLine, bg: 'bg-blue-500' },
+                    { title: 'Hodin', value: stats.totalHoursSpent, icon: RiTimeLine, bg: 'bg-cyan-500' },
+                    { title: 'Lekci', value: stats.completedModules, icon: RiCheckLine, bg: 'bg-amber-500' },
                   ].map((stat) => {
                     const Icon = stat.icon
                     return (
@@ -387,6 +444,74 @@ export default function DashboardPage() {
                   claimedRewards={claimedRewards}
                   onClaimReward={claimReward}
                 />
+              </div>
+
+              <div>
+                <SectionLabel
+                  title="Knihovna cviceni"
+                  delay={0.35}
+                  right={
+                    <Button asChild variant="ghost" size="sm" className="text-[11px] h-6 px-2 -mr-2">
+                      <Link to="/prehled/cviceni">
+                        Zobrazit vse
+                        <RiArrowRightLine className="ml-1 h-3 w-3" />
+                      </Link>
+                    </Button>
+                  }
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, delay: 0.4 }}
+                >
+                  <Link
+                    to="/prehled/cviceni"
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 active:scale-[0.98] transition-all"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+                      <RiBookOpenLine className="h-6 w-6 text-blue-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold">Prohlednete si cviceni</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">Cviky, popisy, obrazky a videa</p>
+                    </div>
+                    <RiArrowRightLine className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+                  </Link>
+                </motion.div>
+              </div>
+
+              <div>
+                <SectionLabel title="Doporuceno pro vas" delay={0.4} />
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, delay: 0.45 }}
+                  className="space-y-2.5"
+                >
+                  {[
+                    { title: 'Vysledky testu', desc: 'Zkontrolujte sve hodnoceni', path: '/prehled/vysledky-testu', icon: RiCheckLine, bg: 'bg-emerald-500' },
+                    { title: 'Studijni doba', desc: 'Sledujte cas studia', path: '/prehled/analytika', icon: RiTimeLine, bg: 'bg-cyan-500' },
+                    { title: 'Certifikaty', desc: 'Vase ziskane certifikaty', path: '/prehled/certifikaty', icon: RiTrophyLine, bg: 'bg-amber-500' },
+                  ].map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 active:scale-[0.98] transition-all"
+                      >
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${item.bg}`}>
+                          <Icon className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-semibold">{item.title}</h4>
+                          <p className="text-[11px] text-muted-foreground">{item.desc}</p>
+                        </div>
+                        <RiArrowRightLine className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+                      </Link>
+                    )
+                  })}
+                </motion.div>
               </div>
 
             </>
