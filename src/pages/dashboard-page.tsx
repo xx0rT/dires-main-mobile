@@ -446,39 +446,6 @@ export default function DashboardPage() {
                 />
               </div>
 
-              <div>
-                <SectionLabel
-                  title="Knihovna cviceni"
-                  delay={0.35}
-                  right={
-                    <Button asChild variant="ghost" size="sm" className="text-[11px] h-6 px-2 -mr-2">
-                      <Link to="/prehled/cviceni">
-                        Zobrazit vse
-                        <RiArrowRightLine className="ml-1 h-3 w-3" />
-                      </Link>
-                    </Button>
-                  }
-                />
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45, delay: 0.4 }}
-                >
-                  <Link
-                    to="/prehled/cviceni"
-                    className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 active:scale-[0.98] transition-all"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
-                      <RiBookOpenLine className="h-6 w-6 text-blue-500" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold">Prohlednete si cviceni</h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">Cviky, popisy, obrazky a videa</p>
-                    </div>
-                    <RiArrowRightLine className="h-4 w-4 text-muted-foreground/50 shrink-0" />
-                  </Link>
-                </motion.div>
-              </div>
 
               <div>
                 <SectionLabel title="Doporuceno pro vas" delay={0.4} />

@@ -56,7 +56,6 @@ import BlogPostPage from './pages/blog-post-page'
 import TrainersPage from './pages/trainers-page'
 import TrainerProfilePage from './pages/trainer-profile-page'
 import MessagesPage from './pages/messages-page'
-import ExercisesPage from './pages/exercises-page'
 
 function ActivityTrackerInit() {
   useActivityTracker()
@@ -116,7 +115,6 @@ export default function App() {
               <Route path="treneri" element={<PageTransition><TrainersPage /></PageTransition>} />
               <Route path="treneri/:trainerId" element={<PageTransition><TrainerProfilePage /></PageTransition>} />
               <Route path="zpravy" element={<PageTransition><MessagesPage /></PageTransition>} />
-              <Route path="cviceni" element={<PageTransition><ExercisesPage /></PageTransition>} />
             </Route>
 
             <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
