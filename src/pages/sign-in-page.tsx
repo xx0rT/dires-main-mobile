@@ -9,6 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import { RiArrowRightLine, RiArrowLeftLine, RiEyeLine, RiEyeOffLine } from '@remixicon/react'
 import { site } from '@/config/site'
+import { hapticNotification, hapticLight } from '@/lib/haptics'
+import { NotificationType } from '@capacitor/haptics'
 
 export default function SignInPage() {
   const { user, signIn, signInWithGoogle } = useAuth()
@@ -28,8 +30,10 @@ export default function SignInPage() {
 
     try {
       await signIn(email, password)
+      hapticNotification(NotificationType.Success)
       toast.success('Úspěšně přihlášeno!')
     } catch (error: any) {
+      hapticNotification(NotificationType.Error)
       toast.error(error.message || 'Přihlášení se nezdařilo')
     } finally {
       setLoading(false)
@@ -124,7 +128,7 @@ export default function SignInPage() {
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => { hapticLight(); setShowPassword(!showPassword) }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {showPassword ? (

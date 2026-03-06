@@ -3,6 +3,8 @@ import { Zap, Star, Trophy, ArrowUp } from 'lucide-react'
 import { useEffect } from 'react'
 import type { BadgeDefinition, Rank } from '@/lib/gamification'
 import { cn } from '@/lib/utils'
+import { hapticNotification, hapticHeavy } from '@/lib/haptics'
+import { NotificationType } from '@capacitor/haptics'
 
 interface XpRewardPopupProps {
   amount: number
@@ -23,10 +25,12 @@ export function XpRewardPopup({
 }: XpRewardPopupProps) {
   useEffect(() => {
     if (visible) {
+      hapticNotification(NotificationType.Success)
+      if (newRank) hapticHeavy()
       const timeout = setTimeout(onClose, 4000)
       return () => clearTimeout(timeout)
     }
-  }, [visible, onClose])
+  }, [visible, onClose, newRank])
 
   const sourceLabel: Record<string, string> = {
     lesson_complete: 'Lekce dokoncena',

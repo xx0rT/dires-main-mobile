@@ -11,6 +11,8 @@ import { toast } from 'sonner'
 import { User, Lock, LogOut, Save, Mail, MapPin, Building2, Globe, Phone, Calendar, Shield, Camera } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { SubscriptionCard } from '@/components/subscription/subscription-card'
+import { hapticNotification, hapticImpact } from '@/lib/haptics'
+import { NotificationType, ImpactStyle } from '@capacitor/haptics'
 
 interface ProfileData {
   full_name: string
@@ -165,11 +167,13 @@ export default function SettingsPage() {
       .upsert(profilePayload, { onConflict: 'id' })
 
     if (error) {
+      hapticNotification(NotificationType.Error)
       toast.error('Nepodařilo se uložit profil')
     } else {
       await supabase.auth.updateUser({
         data: { full_name: profile.full_name },
       })
+      hapticNotification(NotificationType.Success)
       toast.success('Profil byl úspěšně uložen!')
     }
     setProfileSaving(false)
@@ -197,11 +201,13 @@ export default function SettingsPage() {
 
       if (error) throw error
 
+      hapticNotification(NotificationType.Success)
       toast.success('Heslo bylo úspěšně aktualizováno!')
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
     } catch (error: any) {
+      hapticNotification(NotificationType.Error)
       toast.error(error.message || 'Aktualizace hesla se nezdařila')
     } finally {
       setLoading(false)
@@ -209,6 +215,7 @@ export default function SettingsPage() {
   }
 
   const handleSignOut = async () => {
+    hapticImpact(ImpactStyle.Heavy)
     try {
       await signOut()
       toast.success('Úspěšně odhlášeno')

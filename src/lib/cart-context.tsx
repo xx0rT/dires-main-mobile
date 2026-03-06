@@ -6,6 +6,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import { hapticLight, hapticNotification } from "@/lib/haptics";
+import { NotificationType } from "@capacitor/haptics";
 
 export interface CartItem {
   slug: string;
@@ -55,6 +57,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = useCallback(
     (item: Omit<CartItem, "quantity">, quantity = 1) => {
+      hapticNotification(NotificationType.Success);
       setItems((prev) => {
         const existing = prev.find((i) => i.slug === item.slug);
         if (existing) {
@@ -71,10 +74,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const removeItem = useCallback((slug: string) => {
+    hapticLight();
     setItems((prev) => prev.filter((i) => i.slug !== slug));
   }, []);
 
   const updateQuantity = useCallback((slug: string, quantity: number) => {
+    hapticLight();
     if (quantity <= 0) {
       setItems((prev) => prev.filter((i) => i.slug !== slug));
       return;
@@ -85,6 +90,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const clearCart = useCallback(() => {
+    hapticLight();
     setItems([]);
   }, []);
 

@@ -3,6 +3,8 @@ import { Clock, Lock, Play, Check, Eye, ShoppingCart, Film } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { hapticLight, hapticImpact } from '@/lib/haptics'
+import { ImpactStyle } from '@capacitor/haptics'
 
 export type CourseStatus = 'available' | 'purchased' | 'completed' | 'locked' | 'locked_daily'
 
@@ -128,7 +130,7 @@ export function CourseCard({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={(e) => { e.stopPropagation(); onPreview(id) }}
+                      onClick={(e) => { e.stopPropagation(); hapticLight(); onPreview(id) }}
                       className="h-7 rounded-lg px-2.5 text-xs gap-1"
                     >
                       <Eye className="h-3 w-3" />
@@ -137,7 +139,7 @@ export function CourseCard({
                     {isAuthenticated ? (
                       <Button
                         size="sm"
-                        onClick={(e) => { e.stopPropagation(); onBuy(id) }}
+                        onClick={(e) => { e.stopPropagation(); hapticImpact(ImpactStyle.Medium); onBuy(id) }}
                         disabled={buying}
                         className="h-7 rounded-lg px-3 text-xs gap-1"
                       >

@@ -9,6 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import { RiArrowRightLine, RiArrowLeftLine } from '@remixicon/react'
 import { site } from '@/config/site'
+import { hapticNotification } from '@/lib/haptics'
+import { NotificationType } from '@capacitor/haptics'
 
 export default function SignUpPage() {
   const { user, signInWithGoogle } = useAuth()
@@ -62,9 +64,11 @@ export default function SignUpPage() {
         return
       }
 
+      hapticNotification(NotificationType.Success)
       toast.success('Ověřovací kód byl odeslán na váš email!')
       navigate(`/overeni-emailu?email=${encodeURIComponent(email)}`)
     } catch (error: any) {
+      hapticNotification(NotificationType.Error)
       console.error('Error:', error)
       toast.error(error.message || 'Něco se pokazilo')
     } finally {

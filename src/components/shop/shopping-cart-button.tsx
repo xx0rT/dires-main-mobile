@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart-context";
 import { Button } from "@/components/ui/button";
 import { ShoppingCartSheet } from "@/components/shop/shopping-cart-sheet";
+import { hapticLight } from "@/lib/haptics";
 
 interface ShoppingCartButtonProps {
   className?: string;
@@ -20,7 +21,7 @@ const ShoppingCartButton = ({ className }: ShoppingCartButtonProps) => {
         variant="ghost"
         size="sm"
         className="relative gap-2"
-        onClick={() => setOpen(true)}
+        onClick={() => { hapticLight(); setOpen(true) }}
       >
         <ShoppingBag className="size-4" />
         <span className="hidden sm:inline">Kosik</span>

@@ -10,6 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import type { CartItem } from "@/lib/cart-context";
+import { hapticNotification } from "@/lib/haptics";
+import { NotificationType } from "@capacitor/haptics";
+import { useEffect } from "react";
 
 interface AddedToCartDialogProps {
   open: boolean;
@@ -31,6 +34,10 @@ export function AddedToCartDialog({
   onOpenChange,
   item,
 }: AddedToCartDialogProps) {
+  useEffect(() => {
+    if (open) hapticNotification(NotificationType.Success);
+  }, [open]);
+
   if (!item) return null;
 
   return (

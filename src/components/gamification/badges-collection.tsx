@@ -30,6 +30,8 @@ import { BADGES, type BadgeDefinition } from '@/lib/gamification'
 import type { ClaimedReward } from '@/lib/use-gamification'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { hapticLight, hapticNotification } from '@/lib/haptics'
+import { NotificationType } from '@capacitor/haptics'
 
 const BADGE_ICONS: Record<string, LucideIcon> = {
   'footprints': Footprints,
@@ -121,7 +123,7 @@ export function BadgesCollection({ earnedBadgeIds, claimedRewards, onClaimReward
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setSelectedCategory(null)}
+              onClick={() => { hapticLight(); setSelectedCategory(null) }}
               className={cn(
                 'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
                 !selectedCategory
@@ -139,7 +141,7 @@ export function BadgesCollection({ earnedBadgeIds, claimedRewards, onClaimReward
                   key={cat}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => { hapticLight(); setSelectedCategory(cat) }}
                   className={cn(
                     'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
                     selectedCategory === cat
@@ -201,12 +203,14 @@ function BadgeItem({
     const ok = await onClaim(badge.id)
     setClaiming(false)
     if (ok) {
+      hapticNotification(NotificationType.Success)
       toast.success('Odmena vyzvednuta!', { description: badge.reward?.label })
     }
   }
 
   const handleCopyCode = () => {
     if (rewardData?.reward_value) {
+      hapticLight()
       navigator.clipboard.writeText(rewardData.reward_value)
       setCopied(true)
       toast.success('Kod zkopirovan do schranky')

@@ -39,6 +39,8 @@ import { ModeToggle } from "@/components/layout/mode-toggle";
 import { ShoppingCartButton } from "@/components/shop/shopping-cart-button";
 import { useAuth } from "@/lib/auth-context";
 import { useSubscription } from "@/lib/use-subscription";
+import { hapticImpact } from "@/lib/haptics";
+import { ImpactStyle } from "@capacitor/haptics";
 
 import {
   Accordion,
@@ -336,6 +338,7 @@ const Navbar10 = ({ className }: Navbar10Props) => {
   }, [open]);
 
   const handleMobileMenu = () => {
+    hapticImpact(ImpactStyle.Medium);
     setOpen(!open);
   };
 
@@ -452,7 +455,7 @@ const Navbar10 = ({ className }: Navbar10Props) => {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50 dark:focus:bg-red-950">
+                      <DropdownMenuItem onClick={() => { hapticImpact(ImpactStyle.Heavy); signOut(); }} className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50 dark:focus:bg-red-950">
                         <LogOut className="mr-2 size-4" />
                         Odhlasit se
                       </DropdownMenuItem>
@@ -906,7 +909,7 @@ const MobileNavigationMenu = ({ open }: MobileNavigationMenuProps) => {
                         variant="outline"
                         size="lg"
                         className="h-12 rounded-xl border-border/50"
-                        onClick={signOut}
+                        onClick={() => { hapticImpact(ImpactStyle.Heavy); signOut(); }}
                       >
                         <LogOut className="mr-2 size-4" />
                         Odhlasit se

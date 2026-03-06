@@ -21,6 +21,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { type CartItem, useCart } from "@/lib/cart-context";
+import { hapticLight } from "@/lib/haptics";
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat("cs-CZ", {
@@ -110,7 +111,7 @@ const ShoppingCartSheet = ({ open, onOpenChange }: ShoppingCartSheetProps) => {
                   size="lg"
                   className="w-full gap-2"
                   asChild
-                  onClick={() => onOpenChange(false)}
+                  onClick={() => { hapticLight(); onOpenChange(false) }}
                 >
                   <Link to="/kosik">
                     K pokladne

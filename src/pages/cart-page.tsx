@@ -13,6 +13,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 import { useCart } from "@/lib/cart-context";
+import { hapticNotification } from "@/lib/haptics";
+import { NotificationType } from "@capacitor/haptics";
 
 import QuantityInput from "@/components/shadcnblocks/quantity-input";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -147,6 +149,7 @@ export default function CartPage() {
   });
 
   const onSubmit = (_data: CheckoutFormType) => {
+    hapticNotification(NotificationType.Success);
     navigate("/potvrzeni-objednavky");
   };
 

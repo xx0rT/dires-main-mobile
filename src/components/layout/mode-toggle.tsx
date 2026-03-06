@@ -3,11 +3,13 @@ import { MoonIcon, SunIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { Button } from "../ui/button"
+import { hapticLight } from "@/lib/haptics"
 
 export function ModeToggle() {
     const { theme, setTheme } = useTheme()
 
     const toggleTheme = () => {
+        hapticLight()
         setTheme(theme === "dark" ? "light" : "dark")
     }
 
