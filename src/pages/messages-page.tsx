@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Send, Users2, GraduationCap } from 'lucide-react'
+import { ArrowLeft, Send, Users2, GraduationCap, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
 import { usePresence } from '@/lib/presence-context'
@@ -9,6 +9,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { MessageBubble, type MessageData, type MessageReaction } from '@/components/messages/message-bubble'
+import { MessageActionMenu } from '@/components/messages/message-action-menu'
+import { hapticLight } from '@/lib/haptics'
 
 interface ConversationPartner {
   id: string
@@ -30,15 +33,6 @@ interface Conversation {
   unreadCount: number
 }
 
-interface Message {
-  id: string
-  conversation_id: string
-  sender_id: string
-  content: string
-  read: boolean
-  created_at: string
-}
-
 function getInitials(name: string | null, email: string): string {
   if (name) return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
   return email[0]?.toUpperCase() || 'U'
@@ -55,10 +49,14 @@ export default function MessagesPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<MessageData[]>([])
+  const [reactions, setReactions] = useState<MessageReaction[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [replyTo, setReplyTo] = useState<MessageData | null>(null)
+  const [actionMenuMessage, setActionMenuMessage] = useState<MessageData | null>(null)
+  const [actionMenuRect, setActionMenuRect] = useState<DOMRect | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const activeConversationRef = useRef<Conversation | null>(null)
@@ -157,7 +155,7 @@ export default function MessagesPage() {
         schema: 'public',
         table: 'chat_messages',
       }, (payload) => {
-        const msg = payload.new as Message
+        const msg = payload.new as MessageData
         if (msg.sender_id === user.id) return
 
         const active = activeConversationRef.current
@@ -176,6 +174,24 @@ export default function MessagesPage() {
           showBrowserNotification('Nova zprava', msg.content)
         } else if (!active || msg.conversation_id !== active.id) {
           toast('Nova zprava', { description: msg.content })
+        }
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'message_reactions',
+      }, (payload) => {
+        const active = activeConversationRef.current
+        if (!active) return
+        if (payload.eventType === 'INSERT') {
+          const r = payload.new as MessageReaction
+          setReactions(prev => {
+            if (prev.some(x => x.id === r.id)) return prev
+            return [...prev, r]
+          })
+        } else if (payload.eventType === 'DELETE') {
+          const r = payload.old as { id: string }
+          setReactions(prev => prev.filter(x => x.id !== r.id))
         }
       })
       .subscribe()
@@ -225,17 +241,30 @@ export default function MessagesPage() {
       setConversations(prev => [newConvo, ...prev])
       setActiveConversation(newConvo)
       setMessages([])
+      setReactions([])
     }
   }
 
   const loadMessages = async (conversationId: string) => {
-    const { data } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: true })
+    const [{ data: msgData }, { data: reactData }] = await Promise.all([
+      supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true }),
+      supabase
+        .from('message_reactions')
+        .select('*')
+        .in('message_id', (
+          await supabase
+            .from('chat_messages')
+            .select('id')
+            .eq('conversation_id', conversationId)
+        ).data?.map(m => m.id) ?? []),
+    ])
 
-    setMessages(data ?? [])
+    setMessages(msgData ?? [])
+    setReactions(reactData ?? [])
 
     if (user) {
       await supabase
@@ -253,27 +282,34 @@ export default function MessagesPage() {
     if (!newMessage.trim() || !activeConversation || !user || sending) return
 
     setSending(true)
+    hapticLight()
     const content = newMessage.trim()
+    const replyToId = replyTo?.id ?? null
     setNewMessage('')
+    setReplyTo(null)
 
-    const optimistic: Message = {
+    const optimistic: MessageData = {
       id: crypto.randomUUID(),
       conversation_id: activeConversation.id,
       sender_id: user.id,
       content,
       read: false,
       created_at: new Date().toISOString(),
+      reply_to_id: replyToId,
     }
     setMessages(prev => [...prev, optimistic])
     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
 
+    const insertPayload: Record<string, unknown> = {
+      conversation_id: activeConversation.id,
+      sender_id: user.id,
+      content,
+    }
+    if (replyToId) insertPayload.reply_to_id = replyToId
+
     const { error } = await supabase
       .from('chat_messages')
-      .insert({
-        conversation_id: activeConversation.id,
-        sender_id: user.id,
-        content,
-      })
+      .insert(insertPayload)
 
     if (!error) {
       await supabase
@@ -286,6 +322,41 @@ export default function MessagesPage() {
     inputRef.current?.focus()
   }
 
+  const handleToggleReaction = async (messageId: string, emoji: string) => {
+    if (!user) return
+    hapticLight()
+
+    const existing = reactions.find(
+      r => r.message_id === messageId && r.user_id === user.id && r.emoji === emoji
+    )
+
+    if (existing) {
+      setReactions(prev => prev.filter(r => r.id !== existing.id))
+      await supabase.from('message_reactions').delete().eq('id', existing.id)
+    } else {
+      const optimistic: MessageReaction = {
+        id: crypto.randomUUID(),
+        message_id: messageId,
+        user_id: user.id,
+        emoji,
+        created_at: new Date().toISOString(),
+      }
+      setReactions(prev => [...prev, optimistic])
+      await supabase.from('message_reactions').insert({
+        message_id: messageId,
+        user_id: user.id,
+        emoji,
+      })
+    }
+  }
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!user) return
+    setMessages(prev => prev.filter(m => m.id !== messageId))
+    setReactions(prev => prev.filter(r => r.message_id !== messageId))
+    await supabase.from('chat_messages').delete().eq('id', messageId).eq('sender_id', user.id)
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -296,25 +367,49 @@ export default function MessagesPage() {
   const goBack = () => {
     setActiveConversation(null)
     setMessages([])
+    setReactions([])
+    setReplyTo(null)
     setSearchParams({})
     fetchConversations()
   }
 
   if (activeConversation) {
     return (
-      <ChatView
-        conversation={activeConversation}
-        messages={messages}
-        newMessage={newMessage}
-        sending={sending}
-        userId={user?.id ?? ''}
-        inputRef={inputRef}
-        messagesEndRef={messagesEndRef}
-        onBack={goBack}
-        onChangeMessage={setNewMessage}
-        onSend={sendMessage}
-        onKeyDown={handleKeyDown}
-      />
+      <>
+        <ChatView
+          conversation={activeConversation}
+          messages={messages}
+          reactions={reactions}
+          newMessage={newMessage}
+          sending={sending}
+          userId={user?.id ?? ''}
+          replyTo={replyTo}
+          inputRef={inputRef}
+          messagesEndRef={messagesEndRef}
+          onBack={goBack}
+          onChangeMessage={setNewMessage}
+          onSend={sendMessage}
+          onKeyDown={handleKeyDown}
+          onLongPress={(msg, rect) => {
+            setActionMenuMessage(msg)
+            setActionMenuRect(rect)
+          }}
+          onToggleReaction={handleToggleReaction}
+          onClearReply={() => setReplyTo(null)}
+        />
+        <MessageActionMenu
+          message={actionMenuMessage}
+          bubbleRect={actionMenuRect}
+          isMe={actionMenuMessage?.sender_id === user?.id}
+          onClose={() => { setActionMenuMessage(null); setActionMenuRect(null) }}
+          onReact={handleToggleReaction}
+          onReply={(msg) => {
+            setReplyTo(msg)
+            inputRef.current?.focus()
+          }}
+          onDelete={handleDeleteMessage}
+        />
+      </>
     )
   }
 
@@ -430,24 +525,31 @@ function ConversationItem({ conversation, index, onClick }: {
 }
 
 function ChatView({
-  conversation, messages, newMessage, sending, userId, inputRef, messagesEndRef,
-  onBack, onChangeMessage, onSend, onKeyDown,
+  conversation, messages, reactions, newMessage, sending, userId, replyTo, inputRef, messagesEndRef,
+  onBack, onChangeMessage, onSend, onKeyDown, onLongPress, onToggleReaction, onClearReply,
 }: {
   conversation: Conversation
-  messages: Message[]
+  messages: MessageData[]
+  reactions: MessageReaction[]
   newMessage: string
   sending: boolean
   userId: string
+  replyTo: MessageData | null
   inputRef: React.RefObject<HTMLTextAreaElement | null>
   messagesEndRef: React.RefObject<HTMLDivElement | null>
   onBack: () => void
   onChangeMessage: (v: string) => void
   onSend: () => void
   onKeyDown: (e: React.KeyboardEvent) => void
+  onLongPress: (message: MessageData, rect: DOMRect) => void
+  onToggleReaction: (messageId: string, emoji: string) => void
+  onClearReply: () => void
 }) {
   const { isUserOnline } = usePresence()
   const { partner } = conversation
   const online = isUserOnline(partner.id)
+
+  const messagesMap = new Map(messages.map(m => [m.id, m]))
 
   return (
     <div
@@ -501,54 +603,58 @@ function ChatView({
             const isMe = msg.sender_id === userId
             const showAvatar = !isMe && (i === 0 || messages[i - 1]?.sender_id !== msg.sender_id)
             const isLast = i === messages.length - 1 || messages[i + 1]?.sender_id !== msg.sender_id
+            const msgReactions = reactions.filter(r => r.message_id === msg.id)
+            const replyMsg = msg.reply_to_id ? messagesMap.get(msg.reply_to_id) ?? null : null
 
             return (
-              <motion.div
+              <MessageBubble
                 key={msg.id}
-                initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.2 }}
-                className={cn('flex items-end gap-2', isMe ? 'justify-end' : 'justify-start')}
-              >
-                {!isMe && (
-                  <div className="w-7 flex-shrink-0">
-                    {showAvatar && (
-                      <Avatar className="h-7 w-7">
-                        <AvatarImage src={partner.avatar_url || undefined} />
-                        <AvatarFallback className="text-[10px] bg-neutral-200 dark:bg-neutral-700">
-                          {getInitials(partner.full_name, partner.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
-                  </div>
-                )}
-
-                <div
-                  className={cn(
-                    'max-w-[75%] px-3.5 py-2 text-sm leading-relaxed',
-                    isMe
-                      ? 'bg-primary text-primary-foreground rounded-2xl rounded-br-md'
-                      : 'bg-muted/60 rounded-2xl rounded-bl-md',
-                    isLast ? 'mb-1.5' : 'mb-0.5'
-                  )}
-                >
-                  {msg.content}
-                  <span className={cn(
-                    'block text-[10px] mt-0.5',
-                    isMe ? 'text-primary-foreground/60' : 'text-muted-foreground/60'
-                  )}>
-                    {new Date(msg.created_at).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-              </motion.div>
+                message={msg}
+                isMe={isMe}
+                showAvatar={showAvatar}
+                isLast={isLast}
+                partnerName={partner.full_name}
+                partnerEmail={partner.email}
+                partnerAvatar={partner.avatar_url}
+                reactions={msgReactions}
+                replyMessage={replyMsg}
+                userId={userId}
+                onLongPress={onLongPress}
+                onToggleReaction={onToggleReaction}
+              />
             )
           })}
         </AnimatePresence>
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="border-t border-border/40 px-3 py-2 pb-1 bg-background">
-        <div className="flex items-end gap-2">
+      <div className="border-t border-border/40 bg-background">
+        <AnimatePresence>
+          {replyTo && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="overflow-hidden"
+            >
+              <div className="flex items-center gap-2 px-4 py-2 border-b border-border/20 bg-muted/20">
+                <div className="w-0.5 h-8 rounded-full bg-primary flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-medium text-primary">
+                    {replyTo.sender_id === userId ? 'Vy' : (partner.full_name || partner.email.split('@')[0])}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">{replyTo.content}</p>
+                </div>
+                <button type="button" onClick={onClearReply} className="p-1 rounded-full hover:bg-muted/60 transition-colors">
+                  <X className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex items-end gap-2 px-3 py-2 pb-1">
           <textarea
             ref={inputRef}
             value={newMessage}
