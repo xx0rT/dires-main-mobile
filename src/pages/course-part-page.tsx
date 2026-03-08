@@ -92,18 +92,10 @@ export default function CoursePartPage() {
   const [actualWatchTime, setActualWatchTime] = useState(0);
   const [lastPosition, setLastPosition] = useState(0);
 
-  const [videoActivated, setVideoActivated] = useState(false);
   const [showRating, setShowRating] = useState(false);
+  const [youtubeEmbedId, setYoutubeEmbedId] = useState<string | null>(null);
 
-  const videoRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<any>(null);
-  const progressIntervalRef = useRef<any>(null);
-  const isMountedRef = useRef(true);
   const watchTimeRef = useRef(0);
-  const lastSavedTimeRef = useRef(0);
-  const saveIntervalRef = useRef<any>(null);
-  const lastUpdateTimeRef = useRef(Date.now());
-  const hasInitializedRef = useRef(false);
   const completedLessonsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -121,282 +113,67 @@ export default function CoursePartPage() {
     setVideoDuration(0);
     setActualWatchTime(0);
     setLastPosition(0);
-    setVideoActivated(false);
+    setYoutubeEmbedId(null);
   }, [courseId, partNumber]);
 
   useEffect(() => {
     if (user && courseId) loadCourseData();
   }, [user, courseId, partNumber]);
 
-  useEffect(() => {
-    if (!(window as any).YT) {
-      const tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName("script")[0];
-      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
-    }
-  }, []);
-
   const currentLesson = lessons[partIndex] || null;
 
-  const saveWatchTime = async () => {
-    if (!user || !currentLesson || !playerRef.current) return;
-    const lessonId = currentLesson.id;
-    const currentWatchTime = watchTimeRef.current;
-    if (currentWatchTime <= lastSavedTimeRef.current) return;
-
-    try {
-      const currentVideoPosition = Math.floor(
-        playerRef.current.getCurrentTime ? playerRef.current.getCurrentTime() : 0
-      );
-      const isCompleted = completedLessonsRef.current.has(lessonId);
-      const progressPct =
-        videoDuration > 0
-          ? Math.min(Math.round((currentVideoPosition / videoDuration) * 100), 100)
-          : 0;
-
-      const { data: existing } = await supabase
-        .from("user_course_progress")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("lesson_id", lessonId)
-        .maybeSingle();
-
-      if (existing) {
-        await supabase
-          .from("user_course_progress")
-          .update({
-            completed: isCompleted,
-            progress_percent: progressPct,
-            last_watched_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", existing.id);
-      } else {
-        await supabase.from("user_course_progress").insert({
-          user_id: user.id,
-          course_id: courseId,
-          lesson_id: lessonId,
-          completed: isCompleted,
-          progress_percent: progressPct,
-          last_watched_at: new Date().toISOString(),
-        });
-      }
-      lastSavedTimeRef.current = currentWatchTime;
-    } catch (error) {
-      console.error("Error saving watch time:", error);
+  const extractYouTubeId = (url: string): string | null => {
+    const patterns = [
+      /embed\/([^?/]+)/,
+      /[?&]v=([^&]+)/,
+      /youtu\.be\/([^?/]+)/,
+      /\/v\/([^?/]+)/,
+    ];
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m) return m[1];
     }
-  };
-
-  const loadModuleProgress = async () => {
-    if (!user || !currentLesson) return;
-    try {
-      const { data } = await supabase
-        .from("user_course_progress")
-        .select("progress_percent, completed")
-        .eq("user_id", user.id)
-        .eq("lesson_id", currentLesson.id)
-        .maybeSingle();
-
-      if (data) {
-        const estimatedSeconds = Math.floor(
-          (data.progress_percent / 100) * (currentLesson.duration * 60)
-        );
-        watchTimeRef.current = estimatedSeconds;
-        lastSavedTimeRef.current = estimatedSeconds;
-        setActualWatchTime(estimatedSeconds);
-        setLastPosition(estimatedSeconds);
-      } else {
-        watchTimeRef.current = 0;
-        lastSavedTimeRef.current = 0;
-        setActualWatchTime(0);
-        setLastPosition(0);
-      }
-    } catch (error) {
-      console.error("Error loading module progress:", error);
-    }
+    return null;
   };
 
   useEffect(() => {
-    if (!currentLesson) return;
-
-    isMountedRef.current = true;
-    setVideoProgress(0);
-    setWatchedTime(0);
-    setVideoDuration(0);
-    lastUpdateTimeRef.current = Date.now();
-    hasInitializedRef.current = false;
-
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-      progressIntervalRef.current = null;
+    if (!currentLesson?.video_url) {
+      setYoutubeEmbedId(null);
+      return;
     }
-    if (saveIntervalRef.current) {
-      clearInterval(saveIntervalRef.current);
-      saveIntervalRef.current = null;
-    }
+    const id = extractYouTubeId(currentLesson.video_url);
+    setYoutubeEmbedId(id);
+    setVideoDuration(currentLesson.duration * 60);
+  }, [currentLesson]);
 
-    loadModuleProgress();
+  useEffect(() => {
+    if (!user || !currentLesson) return;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("user_course_progress")
+          .select("progress_percent, completed")
+          .eq("user_id", user.id)
+          .eq("lesson_id", currentLesson.id)
+          .maybeSingle();
 
-    const cleanupPlayer = async () => {
-      if (playerRef.current) {
-        try {
-          const iframe = playerRef.current.getIframe();
-          if (iframe && iframe.parentNode) playerRef.current.destroy();
-        } catch (_e) {}
-        playerRef.current = null;
-      }
-    };
-
-    const initializePlayer = async () => {
-      if (!isMountedRef.current) return;
-      await cleanupPlayer();
-
-      const videoUrl = currentLesson?.video_url;
-      if (!videoUrl || !isMountedRef.current) return;
-
-      const extractYouTubeId = (url: string): string | null => {
-        const patterns = [
-          /embed\/([^?/]+)/,
-          /[?&]v=([^&]+)/,
-          /youtu\.be\/([^?/]+)/,
-          /\/v\/([^?/]+)/,
-        ];
-        for (const p of patterns) {
-          const m = url.match(p);
-          if (m) return m[1];
+        if (data) {
+          const estimatedSeconds = Math.floor(
+            (data.progress_percent / 100) * (currentLesson.duration * 60)
+          );
+          watchTimeRef.current = estimatedSeconds;
+          setActualWatchTime(estimatedSeconds);
+          setLastPosition(estimatedSeconds);
+        } else {
+          watchTimeRef.current = 0;
+          setActualWatchTime(0);
+          setLastPosition(0);
         }
-        return null;
-      };
-      const videoId = extractYouTubeId(videoUrl);
-
-      if (videoId && (window as any).YT?.Player && videoRef.current && isMountedRef.current) {
-        const containerElement = videoRef.current;
-        while (containerElement.firstChild) {
-          containerElement.removeChild(containerElement.firstChild);
-        }
-
-        const playerDiv = document.createElement("div");
-        containerElement.appendChild(playerDiv);
-
-        try {
-          playerRef.current = new (window as any).YT.Player(playerDiv, {
-            videoId,
-            width: "100%",
-            height: "100%",
-            playerVars: {
-              enablejsapi: 1,
-              origin: window.location.origin,
-              playsinline: 1,
-              modestbranding: 1,
-              rel: 0,
-              showinfo: 0,
-              iv_load_policy: 3,
-              disablekb: 0,
-              fs: 1,
-            },
-            events: {
-              onReady: () => {
-                if (!isMountedRef.current || !playerRef.current) return;
-                try {
-                  const duration = Math.floor(playerRef.current.getDuration());
-                  if (isMountedRef.current) setVideoDuration(duration);
-
-                  if (
-                    !hasInitializedRef.current &&
-                    lastPosition > 0 &&
-                    lastPosition < duration - 10
-                  ) {
-                    playerRef.current.seekTo(lastPosition, true);
-                    hasInitializedRef.current = true;
-                  }
-
-                  progressIntervalRef.current = setInterval(() => {
-                    if (!isMountedRef.current || !playerRef.current?.getCurrentTime) {
-                      if (progressIntervalRef.current) {
-                        clearInterval(progressIntervalRef.current);
-                        progressIntervalRef.current = null;
-                      }
-                      return;
-                    }
-                    try {
-                      const currentTime = Math.floor(playerRef.current.getCurrentTime());
-                      const dur = playerRef.current.getDuration();
-                      const playerState = playerRef.current.getPlayerState();
-
-                      if (isMountedRef.current) {
-                        setWatchedTime(currentTime);
-                        const now = Date.now();
-                        const timeDiff = (now - lastUpdateTimeRef.current) / 1000;
-                        if (playerState === 1 && timeDiff >= 0.9 && timeDiff <= 1.5) {
-                          watchTimeRef.current += 1;
-                          setActualWatchTime(watchTimeRef.current);
-                        }
-                        lastUpdateTimeRef.current = now;
-                        if (dur > 0)
-                          setVideoProgress(Math.min((currentTime / dur) * 100, 100));
-                      }
-                    } catch (_e) {}
-                  }, 1000);
-
-                  saveIntervalRef.current = setInterval(() => saveWatchTime(), 10000);
-                } catch (_e) {}
-              },
-              onStateChange: (event: any) => {
-                if (event.data === (window as any).YT.PlayerState.ENDED) {
-                  saveWatchTime();
-                  if (progressIntervalRef.current) {
-                    clearInterval(progressIntervalRef.current);
-                    progressIntervalRef.current = null;
-                  }
-                  if (saveIntervalRef.current) {
-                    clearInterval(saveIntervalRef.current);
-                    saveIntervalRef.current = null;
-                  }
-                }
-              },
-            },
-          });
-        } catch (e) {
-          console.error("Error creating player:", e);
-        }
+      } catch (error) {
+        console.error("Error loading module progress:", error);
       }
-    };
-
-    const timeoutId = setTimeout(() => {
-      if ((window as any).YT?.Player) {
-        initializePlayer();
-      } else {
-        (window as any).onYouTubeIframeAPIReady = initializePlayer;
-      }
-    }, 200);
-
-    return () => {
-      isMountedRef.current = false;
-      clearTimeout(timeoutId);
-      saveWatchTime();
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-        progressIntervalRef.current = null;
-      }
-      if (saveIntervalRef.current) {
-        clearInterval(saveIntervalRef.current);
-        saveIntervalRef.current = null;
-      }
-      if (playerRef.current) {
-        try {
-          const iframe = playerRef.current.getIframe();
-          if (iframe && iframe.parentNode) playerRef.current.destroy();
-        } catch (_e) {}
-        playerRef.current = null;
-      }
-      if (videoRef.current) {
-        while (videoRef.current.firstChild) {
-          videoRef.current.removeChild(videoRef.current.firstChild);
-        }
-      }
-    };
-  }, [currentLesson, user, courseId]);
+    })();
+  }, [currentLesson, user]);
 
   const loadCourseData = async () => {
     try {
@@ -510,7 +287,6 @@ export default function CoursePartPage() {
     if (!user || !currentLesson || completedLessons.has(currentLesson.id)) return;
 
     try {
-      await saveWatchTime();
       const now = new Date().toISOString();
 
       const { data: existing } = await supabase
@@ -795,30 +571,18 @@ export default function CoursePartPage() {
                       setVideoDuration(duration);
                     }}
                   />
+                ) : youtubeEmbedId ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${youtubeEmbedId}?playsinline=1&modestbranding=1&rel=0&iv_load_policy=3`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
+                  />
                 ) : (
-                  <>
-                    <div
-                      ref={videoRef}
-                      className="w-full h-full [&>div]:w-full [&>div]:h-full [&_iframe]:w-full [&_iframe]:h-full"
-                    />
-                    {!videoActivated && (
-                      <div
-                        className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer"
-                        onClick={() => setVideoActivated(true)}
-                        onTouchEnd={(e) => {
-                          e.preventDefault();
-                          setVideoActivated(true);
-                        }}
-                      >
-                        <div className="flex flex-col items-center gap-2 select-none">
-                          <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                            <PlayCircle className="h-9 w-9 text-white drop-shadow" />
-                          </div>
-                          <span className="text-white/80 text-xs font-medium tracking-wide drop-shadow">Klepnete pro prehrani</span>
-                        </div>
-                      </div>
-                    )}
-                  </>
+                  <div className="w-full h-full flex items-center justify-center">
+                    <p className="text-white/60 text-sm">Video neni k dispozici</p>
+                  </div>
                 )}
               </div>
               <div className="px-4 sm:px-5 py-3 bg-muted/30 border-t">
