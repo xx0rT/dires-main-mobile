@@ -573,11 +573,10 @@ export default function CoursePartPage() {
                   />
                 ) : youtubeEmbedId ? (
                   <iframe
-                    src={`https://www.youtube.com/embed/${youtubeEmbedId}?playsinline=1&modestbranding=1&rel=0&iv_load_policy=3`}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                    referrerPolicy="strict-origin-when-cross-origin"
+                    src={`https://www.youtube-nocookie.com/embed/${youtubeEmbedId}?playsinline=1&controls=0&disablekb=1&modestbranding=1&rel=0&iv_load_policy=3&fs=0&showinfo=0`}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    sandbox="allow-scripts allow-same-origin allow-presentation"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">

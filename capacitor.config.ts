@@ -6,10 +6,20 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     androidScheme: 'https',
+    allowNavigation: [
+      '*.youtube.com',
+      '*.youtube-nocookie.com',
+      '*.googlevideo.com',
+      '*.google.com',
+    ],
   },
   ios: {
     contentInset: 'never',
     backgroundColor: '#FFFFFF',
+    allowsLinkPreview: false,
+  },
+  android: {
+    allowMixedContent: true,
   },
 };
 
