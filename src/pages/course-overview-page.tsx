@@ -26,6 +26,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { CourseReviewsSection } from "@/components/courses/course-reviews-section";
 
 interface Course {
   id: string;
@@ -388,6 +389,8 @@ export default function CourseOverviewPage() {
             );
           })}
         </div>
+
+        <CourseReviewsSection courseId={courseId!} />
       </div>
     </div>
   );

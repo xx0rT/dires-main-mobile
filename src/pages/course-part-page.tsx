@@ -255,8 +255,20 @@ export default function CoursePartPage() {
       const videoUrl = currentLesson?.video_url;
       if (!videoUrl || !isMountedRef.current) return;
 
-      const videoIdMatch = videoUrl.match(/embed\/([^?]+)/);
-      const videoId = videoIdMatch ? videoIdMatch[1] : null;
+      const extractYouTubeId = (url: string): string | null => {
+        const patterns = [
+          /embed\/([^?/]+)/,
+          /[?&]v=([^&]+)/,
+          /youtu\.be\/([^?/]+)/,
+          /\/v\/([^?/]+)/,
+        ];
+        for (const p of patterns) {
+          const m = url.match(p);
+          if (m) return m[1];
+        }
+        return null;
+      };
+      const videoId = extractYouTubeId(videoUrl);
 
       if (videoId && (window as any).YT?.Player && videoRef.current && isMountedRef.current) {
         const containerElement = videoRef.current;
