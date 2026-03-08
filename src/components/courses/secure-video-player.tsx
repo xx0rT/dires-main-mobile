@@ -15,61 +15,24 @@ export function SecureVideoPlayer({
   onLoadedMetadata,
 }: SecureVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [blobSrc, setBlobSrc] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const blobUrlRef = useRef<string | null>(null);
+  const hasRestoredRef = useRef(false);
 
   useEffect(() => {
-    if (!videoUrl) return;
-
-    let cancelled = false;
+    hasRestoredRef.current = false;
     setLoading(true);
     setError(false);
 
-    const controller = new AbortController();
+    const vid = videoRef.current;
+    if (!vid || !videoUrl) return;
 
-    (async () => {
-      try {
-        const res = await fetch(videoUrl, { signal: controller.signal });
-        if (cancelled) return;
-        if (!res.ok) {
-          setError(true);
-          setLoading(false);
-          return;
-        }
-        const blob = await res.blob();
-        if (cancelled) return;
+    vid.removeAttribute("src");
+    vid.load();
 
-        if (blobUrlRef.current) {
-          URL.revokeObjectURL(blobUrlRef.current);
-        }
-
-        const url = URL.createObjectURL(blob);
-        blobUrlRef.current = url;
-        setBlobSrc(url);
-      } catch (_e) {
-        if (!cancelled) {
-          setError(true);
-          setLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
+    vid.src = videoUrl;
+    vid.load();
   }, [videoUrl]);
-
-  useEffect(() => {
-    return () => {
-      if (blobUrlRef.current) {
-        URL.revokeObjectURL(blobUrlRef.current);
-        blobUrlRef.current = null;
-      }
-    };
-  }, []);
 
   const handleLoadedMetadata = () => {
     setLoading(false);
@@ -77,8 +40,9 @@ export function SecureVideoPlayer({
     if (!vid) return;
     const dur = Math.floor(vid.duration);
     onLoadedMetadata(dur);
-    if (lastPosition > 0 && lastPosition < vid.duration - 10) {
+    if (!hasRestoredRef.current && lastPosition > 0 && lastPosition < vid.duration - 10) {
       vid.currentTime = lastPosition;
+      hasRestoredRef.current = true;
     }
   };
 
@@ -88,17 +52,14 @@ export function SecureVideoPlayer({
     onTimeUpdate(Math.floor(vid.currentTime), Math.floor(vid.duration));
   };
 
-  if (error) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-black">
-        <p className="text-white/60 text-sm">Nelze nacist video</p>
-      </div>
-    );
-  }
+  const handleError = () => {
+    setLoading(false);
+    setError(true);
+  };
 
   return (
     <>
-      {loading && (
+      {loading && !error && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black">
           <div className="flex flex-col items-center gap-2">
             <Loader2 className="h-8 w-8 animate-spin text-white/60" />
@@ -106,22 +67,26 @@ export function SecureVideoPlayer({
           </div>
         </div>
       )}
-      {blobSrc && (
-        <video
-          ref={videoRef}
-          className="w-full h-full"
-          controls
-          playsInline
-          controlsList="nodownload noremoteplayback noplaybackrate"
-          disablePictureInPicture
-          disableRemotePlayback
-          onContextMenu={(e) => e.preventDefault()}
-          onLoadedMetadata={handleLoadedMetadata}
-          onTimeUpdate={handleTimeUpdate}
-          src={blobSrc}
-          style={{ WebkitTouchCallout: "none", userSelect: "none" }}
-        />
+      {error && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black">
+          <p className="text-white/60 text-sm">Nelze nacist video</p>
+        </div>
       )}
+      <video
+        ref={videoRef}
+        className="w-full h-full"
+        controls
+        playsInline
+        controlsList="nodownload noremoteplayback noplaybackrate"
+        disablePictureInPicture
+        disableRemotePlayback
+        onContextMenu={(e) => e.preventDefault()}
+        onLoadedMetadata={handleLoadedMetadata}
+        onTimeUpdate={handleTimeUpdate}
+        onError={handleError}
+        onCanPlay={() => setLoading(false)}
+        style={{ WebkitTouchCallout: "none", userSelect: "none" }}
+      />
     </>
   );
 }

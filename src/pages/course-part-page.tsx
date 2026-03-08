@@ -37,6 +37,7 @@ import { PhysioChatbot } from "@/components/chatbot/physio-chatbot";
 import { useGamification } from "@/lib/use-gamification";
 import { XpRewardPopup } from "@/components/gamification/xp-reward-popup";
 import { SecureVideoPlayer } from "@/components/courses/secure-video-player";
+import { CourseRatingPopup } from "@/components/courses/course-rating-popup";
 
 interface Course {
   id: string;
@@ -92,6 +93,7 @@ export default function CoursePartPage() {
   const [lastPosition, setLastPosition] = useState(0);
 
   const [videoActivated, setVideoActivated] = useState(false);
+  const [showRating, setShowRating] = useState(false);
 
   const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
@@ -529,7 +531,8 @@ export default function CoursePartPage() {
         });
       }
 
-      setCompletedLessons((prev) => new Set([...prev, currentLesson.id]));
+      const newCompleted = new Set([...completedLessons, currentLesson.id]);
+      setCompletedLessons(newCompleted);
       setCompletionDates((prev) => new Map(prev).set(currentLesson.id, now));
 
       await onLessonComplete(currentLesson.id);
@@ -541,6 +544,18 @@ export default function CoursePartPage() {
           ? "Gratulujeme! Dokoncili jste cely kurz!"
           : "Dalsi lekce bude dostupna zitra.",
       });
+
+      if (newCompleted.size > 0 && newCompleted.size % 5 === 0) {
+        const { data: existingRating } = await supabase
+          .from("course_ratings")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("course_id", courseId!)
+          .maybeSingle();
+        if (!existingRating) {
+          setTimeout(() => setShowRating(true), 1500);
+        }
+      }
 
       if (isLast) {
         setTimeout(async () => {
@@ -580,6 +595,21 @@ export default function CoursePartPage() {
     } catch (error) {
       console.error("Error completing course:", error);
     }
+  };
+
+  const handleSubmitRating = async (rating: number, comment: string) => {
+    if (!user || !courseId) return;
+    await supabase.from("course_ratings").upsert(
+      {
+        user_id: user.id,
+        course_id: courseId,
+        rating,
+        comment,
+        lessons_completed: completedLessons.size,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,course_id" }
+    );
   };
 
   const formatTime = (seconds: number) => {
@@ -1019,6 +1049,14 @@ export default function CoursePartPage() {
           onClose={clearLastEvent}
         />
       )}
+
+      <CourseRatingPopup
+        visible={showRating}
+        courseTitle={course?.title ?? ""}
+        lessonsCompleted={completedLessons.size}
+        onSubmit={handleSubmitRating}
+        onClose={() => setShowRating(false)}
+      />
     </div>
   );
 }
