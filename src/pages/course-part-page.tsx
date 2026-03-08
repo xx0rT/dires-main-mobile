@@ -36,6 +36,7 @@ import {
 import { PhysioChatbot } from "@/components/chatbot/physio-chatbot";
 import { useGamification } from "@/lib/use-gamification";
 import { XpRewardPopup } from "@/components/gamification/xp-reward-popup";
+import { SecureVideoPlayer } from "@/components/courses/secure-video-player";
 
 interface Course {
   id: string;
@@ -269,7 +270,17 @@ export default function CoursePartPage() {
             videoId,
             width: "100%",
             height: "100%",
-            playerVars: { enablejsapi: 1, origin: window.location.origin },
+            playerVars: {
+              enablejsapi: 1,
+              origin: window.location.origin,
+              playsinline: 1,
+              modestbranding: 1,
+              rel: 0,
+              showinfo: 0,
+              iv_load_policy: 3,
+              disablekb: 0,
+              fs: 1,
+            },
             events: {
               onReady: () => {
                 if (!isMountedRef.current || !playerRef.current) return;
@@ -728,26 +739,18 @@ export default function CoursePartPage() {
             <div className="rounded-2xl border bg-card overflow-hidden shadow-sm">
               <div className="bg-black aspect-video relative">
                 {isStorageVideo ? (
-                  <video
-                    className="w-full h-full"
-                    controls
-                    controlsList="nodownload"
-                    onContextMenu={(e) => e.preventDefault()}
-                    src={storageVideo.video_url}
-                    onTimeUpdate={(e) => {
-                      const vid = e.currentTarget;
-                      setWatchedTime(Math.floor(vid.currentTime));
-                      if (vid.duration > 0) {
-                        setVideoProgress((vid.currentTime / vid.duration) * 100);
-                        setVideoDuration(Math.floor(vid.duration));
+                  <SecureVideoPlayer
+                    videoUrl={storageVideo.video_url}
+                    lastPosition={lastPosition}
+                    onTimeUpdate={(currentTime, duration) => {
+                      setWatchedTime(currentTime);
+                      if (duration > 0) {
+                        setVideoProgress((currentTime / duration) * 100);
+                        setVideoDuration(duration);
                       }
                     }}
-                    onLoadedMetadata={(e) => {
-                      const vid = e.currentTarget;
-                      setVideoDuration(Math.floor(vid.duration));
-                      if (lastPosition > 0 && lastPosition < vid.duration - 10) {
-                        vid.currentTime = lastPosition;
-                      }
+                    onLoadedMetadata={(duration) => {
+                      setVideoDuration(duration);
                     }}
                   />
                 ) : (
